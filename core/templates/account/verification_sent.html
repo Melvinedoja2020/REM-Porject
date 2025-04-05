@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-lg border-0" style="max-width: 600px; width: 100%; border-radius: 12px;">
+        <div class="card-header text-white text-center py-4" 
+            style="background: linear-gradient(135deg, #E8960F, #d17c0a); border-radius: 12px 12px 0 0;">
+            <h3 class="fw-bold mb-0">Verify Your Email Address</h3>
+        </div>
+        {% include 'partials/messages.html' %}
+        <div class="card-body text-center p-4">
+            <p class="lead text-dark">
+                We have sent an email to you for verification. Follow the link provided to finalize the signup process.
+            </p>
+            <p class="text-muted">
+                If you do not see the verification email in your main inbox, check your spam folder.
+            </p>
+            <p class="text-muted">
+                Please contact us if you do not receive the verification email within a few minutes.
+            </p>
+            {% comment %} <a href="{% url 'account_email' %}" class="btn btn-lg text-white shadow-sm" 
+               style="background-color: #E8960F; border-radius: 8px;">
+                Resend Verification Email
+            </a> {% endcomment %}
+        </div>
+    </div>
+</div>
+{% endblock %}

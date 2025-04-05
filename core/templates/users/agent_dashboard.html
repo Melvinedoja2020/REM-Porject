@@ -1,0 +1,340 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block content %}
+
+          <!-- main-content -->
+          <div class="main-content">
+            <!-- main-content-wrap -->
+            <div class="main-content-inner">
+              <!-- main-content-wrap -->
+              <div class="main-content-wrap">
+                <div class="tf-section-4 mb-30">
+                  <!-- chart-default -->
+                  <div class="wg-chart-default">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap14">
+                        <div class="image">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="52" viewBox="0 0 48 52"
+                            fill="none">
+                            <path opacity="0.08"
+                              d="M19.1086 2.12943C22.2027 0.343099 26.0146 0.343099 29.1086 2.12943L42.4913 9.85592C45.5853 11.6423 47.4913 14.9435 47.4913 18.5162V33.9692C47.4913 37.5418 45.5853 40.8431 42.4913 42.6294L29.1086 50.3559C26.0146 52.1423 22.2027 52.1423 19.1086 50.3559L5.72596 42.6294C2.63194 40.8431 0.725956 37.5418 0.725956 33.9692V18.5162C0.725956 14.9435 2.63195 11.6423 5.72596 9.85592L19.1086 2.12943Z"
+                              fill="url(#paint0_linear_53_110)" />
+                            <defs>
+                              <linearGradient id="paint0_linear_53_110" x1="-43.532" y1="-34.3465" x2="37.6769"
+                                y2="43.9447" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#92BCFF" />
+                                <stop offset="1" stop-color="#2377FC" />
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                          <i class="icon-shopping-bag"></i>
+                        </div>
+                        <div>
+                          <div class="body-text mb-2">Total Sales</div>
+                          <h4>34,945</h4>
+                        </div>
+                      </div>
+                      <div class="box-icon-trending up">
+                        <i class="icon-trending-up"></i>
+                        <div class="body-title number">1.56%</div>
+                      </div>
+                    </div>
+                    <div class="wrap-chart">
+                      <div id="line-chart-1"></div>
+                    </div>
+                  </div>
+                  <!-- /chart-default -->
+                  <!-- chart-default -->
+                  <div class="wg-chart-default">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap14">
+                        <div class="image">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="52" viewBox="0 0 48 52"
+                            fill="none">
+                            <path opacity="0.08"
+                              d="M19.1086 2.12943C22.2027 0.343099 26.0146 0.343099 29.1086 2.12943L42.4913 9.85592C45.5853 11.6423 47.4913 14.9435 47.4913 18.5162V33.9692C47.4913 37.5418 45.5853 40.8431 42.4913 42.6294L29.1086 50.3559C26.0146 52.1423 22.2027 52.1423 19.1086 50.3559L5.72596 42.6294C2.63194 40.8431 0.725956 37.5418 0.725956 33.9692V18.5162C0.725956 14.9435 2.63195 11.6423 5.72596 9.85592L19.1086 2.12943Z"
+                              fill="url(#paint0_linear_53_110)" />
+                            <defs>
+                              <linearGradient id="paint0_linear_53_110" x1="-43.532" y1="-34.3465" x2="37.6769"
+                                y2="43.9447" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#92BCFF" />
+                                <stop offset="1" stop-color="#2377FC" />
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                          <i class="icon-dollar-sign"></i>
+                        </div>
+                        <div>
+                          <div class="body-text mb-2">Total Income</div>
+                          <h4>$37,802</h4>
+                        </div>
+                      </div>
+                      <div class="box-icon-trending down">
+                        <i class="icon-trending-down"></i>
+                        <div class="body-title number">1.56%</div>
+                      </div>
+                    </div>
+                    <div class="wrap-chart">
+                      <div id="line-chart-2"></div>
+                    </div>
+                  </div>
+                  <!-- /chart-default -->
+                  <!-- chart-default -->
+                  <div class="wg-chart-default">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap14">
+                        <div class="image">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="52" viewBox="0 0 48 52"
+                            fill="none">
+                            <path opacity="0.08"
+                              d="M19.1086 2.12943C22.2027 0.343099 26.0146 0.343099 29.1086 2.12943L42.4913 9.85592C45.5853 11.6423 47.4913 14.9435 47.4913 18.5162V33.9692C47.4913 37.5418 45.5853 40.8431 42.4913 42.6294L29.1086 50.3559C26.0146 52.1423 22.2027 52.1423 19.1086 50.3559L5.72596 42.6294C2.63194 40.8431 0.725956 37.5418 0.725956 33.9692V18.5162C0.725956 14.9435 2.63195 11.6423 5.72596 9.85592L19.1086 2.12943Z"
+                              fill="url(#paint0_linear_53_110)" />
+                            <defs>
+                              <linearGradient id="paint0_linear_53_110" x1="-43.532" y1="-34.3465" x2="37.6769"
+                                y2="43.9447" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#92BCFF" />
+                                <stop offset="1" stop-color="#2377FC" />
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                          <i class="icon-file"></i>
+                        </div>
+                        <div>
+                          <div class="body-text mb-2">Orders Paid</div>
+                          <h4>34,945</h4>
+                        </div>
+                      </div>
+                      <div class="box-icon-trending">
+                        <i class="icon-trending-up"></i>
+                        <div class="body-title number">0.00%</div>
+                      </div>
+                    </div>
+                    <div class="wrap-chart">
+                      <div id="line-chart-3"></div>
+                    </div>
+                  </div>
+                  <!-- /chart-default -->
+                  <!-- chart-default -->
+                  <div class="wg-chart-default">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap14">
+                        <div class="image">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="52" viewBox="0 0 48 52"
+                            fill="none">
+                            <path opacity="0.08"
+                              d="M19.1086 2.12943C22.2027 0.343099 26.0146 0.343099 29.1086 2.12943L42.4913 9.85592C45.5853 11.6423 47.4913 14.9435 47.4913 18.5162V33.9692C47.4913 37.5418 45.5853 40.8431 42.4913 42.6294L29.1086 50.3559C26.0146 52.1423 22.2027 52.1423 19.1086 50.3559L5.72596 42.6294C2.63194 40.8431 0.725956 37.5418 0.725956 33.9692V18.5162C0.725956 14.9435 2.63195 11.6423 5.72596 9.85592L19.1086 2.12943Z"
+                              fill="url(#paint0_linear_53_110)" />
+                            <defs>
+                              <linearGradient id="paint0_linear_53_110" x1="-43.532" y1="-34.3465" x2="37.6769"
+                                y2="43.9447" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#92BCFF" />
+                                <stop offset="1" stop-color="#2377FC" />
+                              </linearGradient>
+                            </defs>
+                          </svg>
+                          <i class="icon-users"></i>
+                        </div>
+                        <div>
+                          <div class="body-text mb-2">Total Visitor</div>
+                          <h4>34,945</h4>
+                        </div>
+                      </div>
+                      <div class="box-icon-trending up">
+                        <i class="icon-trending-up"></i>
+                        <div class="body-title number">1.56%</div>
+                      </div>
+                    </div>
+                    <div class="wrap-chart">
+                      <div id="line-chart-4"></div>
+                    </div>
+                  </div>
+                  <!-- /chart-default -->
+                </div>
+                
+                <div class="tf-section">
+                  <!-- product-overview -->
+                  <div class="wg-box">
+                    <div class="flex items-center justify-between">
+                      <h5>Product overview</h5>
+                      <div class="dropdown default">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                          aria-haspopup="true" aria-expanded="false">
+                          <span class="view-all">View all<i class="icon-chevron-down"></i></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li>
+                            <a href="javascript:void(0);">3 days</a>
+                          </li>
+                          <li>
+                            <a href="javascript:void(0);">7 days</a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="wg-table table-product-overview t1">
+                      <ul class="table-title flex gap20 mb-14">
+                        <li>
+                          <div class="body-title">Name</div>
+                        </li>
+                        <li>
+                          <div class="body-title">Product ID</div>
+                        </li>
+                        <li>
+                          <div class="body-title">Price</div>
+                        </li>
+                        <li>
+                          <div class="body-title">Quantity</div>
+                        </li>
+                        <li>
+                          <div class="body-title">Sale</div>
+                        </li>
+                        <li>
+                          <div class="body-title">Revenue</div>
+                        </li>
+                        <li>
+                          <div class="body-title">Status</div>
+                        </li>
+                      </ul>
+                      <div class="divider mb-14"></div>
+                      <ul class="flex flex-column gap10">
+                        <li class="product-item gap14">
+                          <div class="image no-bg">
+                            <img src="{% static '/assets/images/products/26.png' %}" alt="">
+                          </div>
+                          <div class="flex items-center justify-between flex-grow gap20">
+                            <div class="name">
+                              <a href="product-list.html" class="body-text">Dog Food, Chicken & Chicken Liver
+                                Recipe...</a>
+                            </div>
+                            <div class="body-text">#70668</div>
+                            <div class="body-text">$450</div>
+                            <div class="body-text">403</div>
+                            <div class="body-text">$28,672.36</div>
+                            <div class="body-text">$928.41</div>
+                            <div>
+                              <div class="block-available">Available</div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="product-item gap14">
+                          <div class="image no-bg">
+                            <img src="{% static '/assets/images/products/27.png' %}" alt="">
+                          </div>
+                          <div class="flex items-center justify-between flex-grow gap20">
+                            <div class="name">
+                              <a href="product-list.html" class="body-text">Grain Free Dry Dog Food | Rachael Ray®
+                                Nutrish®</a>
+                            </div>
+                            <div class="body-text">#22739</div>
+                            <div class="body-text">$450</div>
+                            <div class="body-text">202</div>
+                            <div class="body-text">$28,672.36</div>
+                            <div class="body-text">$450.54</div>
+                            <div>
+                              <div class="block-not-available">Not Available</div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="product-item gap14">
+                          <div class="image no-bg">
+                            <img src="{% static '/assets/images/products/28.png' %}" alt="">
+                          </div>
+                          <div class="flex items-center justify-between flex-grow gap20">
+                            <div class="name">
+                              <a href="product-list.html" class="body-text">Weruva Pumpkin Patch Up! Pumpkin With
+                                Ginger...</a>
+                            </div>
+                            <div class="body-text">#43178</div>
+                            <div class="body-text">$420</div>
+                            <div class="body-text">5032</div>
+                            <div class="body-text">$28,672.36</div>
+                            <div class="body-text">$293.01</div>
+                            <div>
+                              <div class="block-available">Available</div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="product-item gap14">
+                          <div class="image no-bg">
+                            <img src="{% static '/assets/images/products/29.png' %}" alt="">
+                          </div>
+                          <div class="flex items-center justify-between flex-grow gap20">
+                            <div class="name">
+                              <a href="product-list.html" class="body-text">Milk-Bone Mini's Flavor Snacks Dog Treats,
+                                15 Ounce </a>
+                            </div>
+                            <div class="body-text">#43756</div>
+                            <div class="body-text">$159</div>
+                            <div class="body-text">503</div>
+                            <div class="body-text">$28,672.36</div>
+                            <div class="body-text">$475.22</div>
+                            <div>
+                              <div class="block-available">Available</div>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="divider"></li>
+                        <li class="product-item gap14">
+                          <div class="image no-bg">
+                            <img src="{% static '/assets/images/products/30.png' %}" alt="">
+                          </div>
+                          <div class="flex items-center justify-between flex-grow gap20">
+                            <div class="name">
+                              <a href="product-list.html" class="body-text">Weruva Pumpkin Patch Up! Dog & Cat
+                                Food...</a>
+                            </div>
+                            <div class="body-text">#39635</div>
+                            <div class="body-text">$408</div>
+                            <div class="body-text">203</div>
+                            <div class="body-text">$28,672.36</div>
+                            <div class="body-text">$767.50</div>
+                            <div class="block-not-available">Not Available</div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex items-center justify-between flex-wrap gap10">
+                      <div class="text-tiny">Showing 5 entries</div>
+                      <ul class="wg-pagination">
+                        <li>
+                          <a href="#"><i class="icon-chevron-left"></i></a>
+                        </li>
+                        <li>
+                          <a href="#">1</a>
+                        </li>
+                        <li class="active">
+                          <a href="#">2</a>
+                        </li>
+                        <li>
+                          <a href="#">3</a>
+                        </li>
+                        <li>
+                          <a href="#"><i class="icon-chevron-right"></i></a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <!-- /product-overview -->
+                </div>
+              </div>
+              <!-- /main-content-wrap -->
+            </div>
+            <!-- /main-content-wrap -->
+            <!-- bottom-page -->
+            <div class="bottom-page">
+              <div class="body-text">Copyright © 2024 Remos. Design with</div>
+              <i class="icon-heart"></i>
+              <div class="body-text">by <a href="https://themeforest.net/user/themesflat/portfolio">Themesflat</a> All
+                rights reserved.</div>
+            </div>
+            <!-- /bottom-page -->
+          </div>
+          <!-- /main-content -->
+        </div>
+
+{% endblock content %}
+        

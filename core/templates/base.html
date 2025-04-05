@@ -1,0 +1,1070 @@
+{% load static %}
+<!DOCTYPE html>
+<!--[if IE 8]><html class="ie" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-US" lang="en-US">
+<!--<![endif]-->
+
+<head>
+  <!-- Basic Page Needs -->
+  <meta charset="utf-8">
+  <!--[if IE ]><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/><![endif]-->
+  <title>RMP - Real Estate Market Place</title>
+
+  <meta name="description"
+    content="Propty is a website specializing in buying and renting properties, connecting buyers and tenants with trusted property owners. With an easy-to-use interface and detailed information, Propty offers a fast and convenient property search experience.">
+
+  <meta name="keywords" content=" RealEstate, RealEstate, Buy, Rent, Homes, Apartment, Listings, Sale, Rental, Housing">
+
+  <meta name="author" content="{{ request.user.name }}.com">
+
+  <!-- Mobile Specific Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Theme Style -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/animate.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/sib-styles.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/swiper-bundle.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/responsive.css' %}">
+
+  <!-- Icon -->
+  <link rel="stylesheet" type="text/css" href="{% static 'icons/icomoon/style.css' %}">
+
+  <!-- Favicon and Touch Icons  -->
+  <link rel="shortcut icon" href="{% static 'images/logo/REM.png' %}">
+  <link rel="apple-touch-icon-precomposed" href="{% static 'images/logo/REM.png' %}">
+</head>
+
+<body class="theme-color-2">
+  <!-- wrapper -->
+  <div id="wrapper">
+
+
+
+    <!-- popup-setting -->
+    <div class="popup-setting">
+      <div class="btn-setting"><a href="javascript:void(0)" class="sw-click"><i class="icon-settings"></i></a>
+      </div>
+      <div class="popup-setting-container">
+        <div class="btn-RTL mb-20">
+          <span class="title text-1 fw-5 text-color-heading mb-8">RTL: </span>
+          <a href="javascript:void(0);" id="toggle-rtl" class="btn-style-2 radius-3">rtl</a>
+        </div>
+        <div class="toggle-container">
+          <span class="title text-1 fw-5 text-color-heading mb-8">Theme Mode: </span>
+          <div class="toggle-switch">
+            <label class="switch-label">
+              <input type="checkbox" class="checkbox" id="theme-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div> <!-- popup-setting -->
+
+
+    <!-- .preload -->
+    <div id="loading">
+      <div id="loading-center">
+        <div class="loader-container">
+          <div class="wrap-loader">
+            <div class="loader">
+            </div>
+            {% comment %} <div class="icon">
+              <img src="{% static 'images/logo/REM.png' %}" alt="">
+            </div> {% endcomment %}
+          </div>
+        </div>
+      </div>
+    </div><!-- /.preload -->
+
+    <!-- .tf-top-bar -->
+    <div class="tf-top-bar">
+      <div class="tf-container xl">
+        <div class="row">
+          <div class="col-12">
+            <div class="top-bar-inner">
+              <ul class="top-bar-info">
+                <li>
+                  <i class="icon-phone-1"></i>
+                  <p>Phone: <span class="fw-7">(603) 555-0123</span></p>
+                </li>
+                <li>
+                  <i class="icon-mail"></i>
+                  <p>Email: <a href="#">{{ request.user.name }}@gmail.com</a></p>
+                </li>
+              </ul>
+              <div class="wrap-social">
+                <p>Follow us</p>
+                <ul class="tf-social  style-2">
+                  <li>
+                    <a href="#">
+                      <i class="icon-fb"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <i class="icon-X"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <i class="icon-linked"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <i class="icon-ins"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- /.tf-top-bar -->
+
+    <!-- .header -->
+    <header id="header-main" class="header style-4 header-sticky">
+      <div class="header-inner">
+        <div class="tf-container xl">
+          <div class="row">
+            <div class="col-12">
+              <div class="header-inner-wrap">
+                <div class="header-logo">
+                  <a href="{% url 'home:home' %}" class="site-logo">
+                    <img class="logo_header" alt="" src="{% static 'images/logo/logo-4%402x.png' %}"
+                      data-light="{% static 'images/logo/REM2.png' %}" data-dark="{% static 'images/logo/REM2.png' %}">
+                  </a>
+                </div>
+                <nav class="main-menu">
+                  <ul class="navigation ">
+                    <li class="has-child current-menu"><a href="#">Home</a>
+
+                    </li>
+                    {% comment %} <li class="has-child style-2"><a href="#">Listing</a>
+                      <ul class="submenu">
+                        <li>
+                          <a href="#">Layout</a>
+                          <ul class="submenu2">
+                            <li>
+                              <a href="property-grid-full-width.html">Grid Style -
+                                Full Width </a>
+                            </li>
+                            <li>
+                              <a href="property-gird-top-search.html">Grid Style - Top
+                                Search </a>
+                            </li>
+                            <li>
+                              <a href="property-gird-left-sidebar.html">Grid Style -
+                                Sidebar Left </a>
+                            </li>
+                            <li>
+                              <a href="property-gird-right-sidebar.html">Grid Style -
+                                Sidebar Right </a>
+                            </li>
+                            <li>
+                              <a href="property-list-full-width.html">List Style -
+                                Full
+                                Width </a>
+                            </li>
+                            <li>
+                              <a href="property-list-top-search.html">List Style -
+                                Top
+                                Search
+                              </a>
+                            </li>
+                            <li>
+                              <a href="property-list-left-sidebar.html">List Style -
+                                Sidebar
+                                Left </a>
+                            </li>
+                            <li>
+                              <a href="property-list-right-sidebar.html">List Style -
+                                Sidebar
+                                Right </a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="#">Feature</a>
+                          <ul class="submenu2">
+                            <li>
+                              <a href="property-half-map-grid.html">Property Half Map Grid
+                              </a>
+                            <li>
+                              <a href="property-half-map-list.html">Property Half Map List
+                              </a>
+                            </li>
+                            <li>
+                              <a href="property-half-top-map.html">Property Half Map Top
+                              </a>
+                            </li>
+                            <li>
+                              <a href="property-filter-popup.html">Property Filter Popup
+                              </a>
+                            </li>
+                            <li>
+                              <a href="property-filter-popup-left.html">Property Filter
+                                Popup Left </a>
+                            </li>
+                            <li>
+                              <a href="property-filter-popup-right.html">Property Filter
+                                Popup Right </a>
+                            </li>
+
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="#">Listing Details</a>
+                          <ul class="submenu2">
+                            <li><a href="property-detail-v1.html">Property Details 1</a>
+                            </li>
+                            <li><a href="property-detail-v2.html">Property Details 2</a>
+                            </li>
+                            <li><a href="property-detail-v3.html">Property Details 3</a>
+                            </li>
+                            <li><a href="property-detail-v4.html">Property Details 4</a>
+                            </li>
+                            <li><a href="property-detail-v5.html">Property Details 5</a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="has-child"><a href="#">Pages</a>
+                      <ul class="submenu">
+                        <li class="has-child"><a href="#">Agents</a>
+                          <ul class="submenu">
+                            <li>
+                              <a href="agents.html">Agents</a>
+                            </li>
+                            <li>
+                              <a href="agents-details.html">Agents Details</a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li class="has-child"><a href="#">Agencies</a>
+                          <ul class="submenu">
+                            <li><a href="agency-grid.html">Agencies
+                                Grid</a></li>
+                            <li><a href="agency-list.html">Agencies
+                                List</a></li>
+                            <li><a href="agency-details.html">Agencies
+                                Detail</a></li>
+                          </ul>
+                        </li>
+                        <li><a href="home-loan-process.html">Home Loan Process</a></li>
+                        <li><a href="career.html">Career</a></li>
+                        <li><a href="faq.html">Faq's</a></li>
+                        <li><a href="compare.html">Compare</a></li>
+                        <li><a href="project-list.html">Project List</a></li>
+                        <li><a href="project-details.html">Project Details</a></li>
+                        <li><a href="404.html">Page 404</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                      </ul>
+                    </li>
+                    <li class="has-child "><a href="#">Blog</a>
+                      <ul class="submenu">
+                        <li><a href="blog-list.html">Blog List</a></li>
+                        <li><a href="blog-grid.html">Blog Grid</a></li>
+                        <li><a href="blog-details.html">Blog Detail</a></li>
+                      </ul>
+                    </li> {% endcomment %}
+                    <li><a href="#">Rents</a></li>
+                    <li><a href="#">Buy</a></li>
+                    <li><a href="#">Contact</a></li>
+                  </ul>
+                </nav>
+                <div class="header-right">
+                  <div class="phone-number">
+                    <div class="icons">
+                      <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M1.875 5.625C1.875 12.5283 7.47167 18.125 14.375 18.125H16.25C16.7473 18.125 17.2242 17.9275 17.5758 17.5758C17.9275 17.2242 18.125 16.7473 18.125 16.25V15.1067C18.125 14.6767 17.8325 14.3017 17.415 14.1975L13.7292 13.2758C13.3625 13.1842 12.9775 13.3217 12.7517 13.6233L11.9433 14.7008C11.7083 15.0142 11.3025 15.1525 10.935 15.0175C9.57073 14.5159 8.33179 13.7238 7.30398 12.696C6.27618 11.6682 5.48406 10.4293 4.9825 9.065C4.8475 8.6975 4.98583 8.29167 5.29917 8.05667L6.37667 7.24833C6.67917 7.0225 6.81583 6.63667 6.72417 6.27083L5.8025 2.585C5.75178 2.38225 5.63477 2.20225 5.47004 2.07361C5.30532 1.94498 5.10234 1.87507 4.89333 1.875H3.75C3.25272 1.875 2.77581 2.07254 2.42417 2.42417C2.07254 2.77581 1.875 3.25272 1.875 3.75V5.625Z"
+                          stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+
+                    </div>
+                    <p>(603) 555-0123</p>
+                  </div>
+                  <div class="box-user tf-action-btns">
+                    <div class="user ">
+                      <svg width="24" height="24" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M15.749 6C15.749 6.99456 15.3539 7.94839 14.6507 8.65165C13.9474 9.35491 12.9936 9.75 11.999 9.75C11.0044 9.75 10.0506 9.35491 9.34735 8.65165C8.64409 7.94839 8.249 6.99456 8.249 6C8.249 5.00544 8.64409 4.05161 9.34735 3.34835C10.0506 2.64509 11.0044 2.25 11.999 2.25C12.9936 2.25 13.9474 2.64509 14.6507 3.34835C15.3539 4.05161 15.749 5.00544 15.749 6ZM4.5 20.118C4.53213 18.1504 5.33634 16.2742 6.73918 14.894C8.14202 13.5139 10.0311 12.7405 11.999 12.7405C13.9669 12.7405 15.856 13.5139 17.2588 14.894C18.6617 16.2742 19.4659 18.1504 19.498 20.118C17.1454 21.1968 14.5871 21.7535 11.999 21.75C9.323 21.75 6.783 21.166 4.5 20.118Z"
+                          stroke="#2C2E33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </div>
+                    <div class="name">
+                      {{ request.user.name }}
+                      <i class="icon-CaretDown"></i>
+                    </div>
+                    
+                    {% if request.user.role == "Agent" %}
+                    <div class=" menu-user">
+                      <a class="dropdown-item" href="{% url 'users:agent_dashboard' %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M7.5 2.5H3.33333C2.8731 2.5 2.5 2.8731 2.5 3.33333V9.16667C2.5 9.6269 2.8731 10 3.33333 10H7.5C7.96024 10 8.33333 9.6269 8.33333 9.16667V3.33333C8.33333 2.8731 7.96024 2.5 7.5 2.5Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M16.668 2.5H12.5013C12.0411 2.5 11.668 2.8731 11.668 3.33333V5.83333C11.668 6.29357 12.0411 6.66667 12.5013 6.66667H16.668C17.1282 6.66667 17.5013 6.29357 17.5013 5.83333V3.33333C17.5013 2.8731 17.1282 2.5 16.668 2.5Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M16.668 10H12.5013C12.0411 10 11.668 10.3731 11.668 10.8333V16.6667C11.668 17.1269 12.0411 17.5 12.5013 17.5H16.668C17.1282 17.5 17.5013 17.1269 17.5013 16.6667V10.8333C17.5013 10.3731 17.1282 10 16.668 10Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M7.5 13.3334H3.33333C2.8731 13.3334 2.5 13.7065 2.5 14.1667V16.6667C2.5 17.1269 2.8731 17.5 3.33333 17.5H7.5C7.96024 17.5 8.33333 17.1269 8.33333 16.6667V14.1667C8.33333 13.7065 7.96024 13.3334 7.5 13.3334Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        Dashboards
+                      </a>
+
+                      {% if user.role == "Prospective Buyer/Tenant" %}
+                      <a class="dropdown-item" href="{% url 'users:user_profile' user.pk %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M15 15C16.3807 15 17.5 13.8807 17.5 12.5C17.5 11.1193 16.3807 10 15 10C13.6193 10 12.5 11.1193 12.5 12.5C12.5 13.8807 13.6193 15 15 15Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M7.5013 9.16667C9.34225 9.16667 10.8346 7.67428 10.8346 5.83333C10.8346 3.99238 9.34225 2.5 7.5013 2.5C5.66035 2.5 4.16797 3.99238 4.16797 5.83333C4.16797 7.67428 5.66035 9.16667 7.5013 9.16667Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M8.33464 12.5H5.0013C4.11725 12.5 3.2694 12.8512 2.64428 13.4763C2.01916 14.1014 1.66797 14.9493 1.66797 15.8333V17.5"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M18.082 13.6666L17.332 13.4166" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M12.668 11.5834L11.918 11.3334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M13.832 15.5834L14.082 14.8334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M15.918 10.1666L16.168 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M16.3333 15.5833L16 14.75" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                          <path d="M14.0013 10.25L13.668 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M11.918 13.8333L12.7513 13.5" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M17.25 11.5L18.0833 11.1666" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        My profiles
+                      </a>
+                      {% endif %}
+
+                      {% if user.role == "Agent" %}
+                      <a class="dropdown-item" href="{% url 'users:agent_profile' user.pk %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M15 15C16.3807 15 17.5 13.8807 17.5 12.5C17.5 11.1193 16.3807 10 15 10C13.6193 10 12.5 11.1193 12.5 12.5C12.5 13.8807 13.6193 15 15 15Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M7.5013 9.16667C9.34225 9.16667 10.8346 7.67428 10.8346 5.83333C10.8346 3.99238 9.34225 2.5 7.5013 2.5C5.66035 2.5 4.16797 3.99238 4.16797 5.83333C4.16797 7.67428 5.66035 9.16667 7.5013 9.16667Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M8.33464 12.5H5.0013C4.11725 12.5 3.2694 12.8512 2.64428 13.4763C2.01916 14.1014 1.66797 14.9493 1.66797 15.8333V17.5"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M18.082 13.6666L17.332 13.4166" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M12.668 11.5834L11.918 11.3334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M13.832 15.5834L14.082 14.8334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M15.918 10.1666L16.168 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M16.3333 15.5833L16 14.75" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                          <path d="M14.0013 10.25L13.668 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M11.918 13.8333L12.7513 13.5" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M17.25 11.5L18.0833 11.1666" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        My profiles
+                      </a>
+                      {% endif %}
+
+                      {% if user.role == "REAL_ESTATE_OWNER" %}
+                      <a class="dropdown-item" href="{% url 'users:owner_profile' user.pk %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M15 15C16.3807 15 17.5 13.8807 17.5 12.5C17.5 11.1193 16.3807 10 15 10C13.6193 10 12.5 11.1193 12.5 12.5C12.5 13.8807 13.6193 15 15 15Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M7.5013 9.16667C9.34225 9.16667 10.8346 7.67428 10.8346 5.83333C10.8346 3.99238 9.34225 2.5 7.5013 2.5C5.66035 2.5 4.16797 3.99238 4.16797 5.83333C4.16797 7.67428 5.66035 9.16667 7.5013 9.16667Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M8.33464 12.5H5.0013C4.11725 12.5 3.2694 12.8512 2.64428 13.4763C2.01916 14.1014 1.66797 14.9493 1.66797 15.8333V17.5"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M18.082 13.6666L17.332 13.4166" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M12.668 11.5834L11.918 11.3334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M13.832 15.5834L14.082 14.8334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M15.918 10.1666L16.168 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M16.3333 15.5833L16 14.75" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                          <path d="M14.0013 10.25L13.668 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M11.918 13.8333L12.7513 13.5" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M17.25 11.5L18.0833 11.1666" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        My profiles
+                      </a>
+                      {% endif %}
+
+
+                      {% comment %} <a class="dropdown-item " href="add-property.html">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M14.9987 4.16663L12.987 2.15496C12.6745 1.84238 12.2507 1.66672 11.8087 1.66663H4.9987C4.55667 1.66663 4.13275 1.84222 3.82019 2.15478C3.50763 2.46734 3.33203 2.89127 3.33203 3.33329V16.6666C3.33203 17.1087 3.50763 17.5326 3.82019 17.8451C4.13275 18.1577 4.55667 18.3333 4.9987 18.3333H14.9987C15.4407 18.3333 15.8646 18.1577 16.1772 17.8451C16.4898 17.5326 16.6654 17.1087 16.6654 16.6666"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M17.8168 10.5217C18.1487 10.1897 18.3352 9.73947 18.3352 9.27C18.3352 8.80054 18.1487 8.3503 17.8168 8.01834C17.4848 7.68637 17.0346 7.49988 16.5651 7.49988C16.0956 7.49988 15.6454 7.68637 15.3134 8.01834L11.9718 11.3617C11.7736 11.5597 11.6286 11.8044 11.5501 12.0733L10.8526 14.465C10.8317 14.5367 10.8304 14.6127 10.849 14.6851C10.8675 14.7574 10.9052 14.8235 10.958 14.8763C11.0108 14.9291 11.0768 14.9668 11.1492 14.9853C11.2216 15.0038 11.2976 15.0026 11.3693 14.9817L13.7609 14.2842C14.0298 14.2057 14.2746 14.0606 14.4726 13.8625L17.8168 10.5217Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M6.66797 15H7.5013" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                        Add property</a> {% endcomment %}
+
+                      <a class="dropdown-item" href="{% url 'account_logout' %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M7.5 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V4.16667C2.5 3.72464 2.67559 3.30072 2.98816 2.98816C3.30072 2.67559 3.72464 2.5 4.16667 2.5H7.5"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M13.332 14.1667L17.4987 10L13.332 5.83337" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M17.5 10H7.5" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                        Logout</a>
+                    </div>
+                      
+                    {% endif %}
+                      
+                  </div>
+                  {% comment %} <div class="btn-add">
+                    <a class="tf-btn style-border pd-23" href="add-property.html">Add property</a>
+                  </div> {% endcomment %}
+                  <div class="mobile-button" data-bs-toggle="offcanvas" data-bs-target="#menu-mobile"
+                    aria-controls="menu-mobile">
+                    <i class="icon-menu"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- /header -->
+
+    <!-- .header -->
+    <header class="header style-4 ">
+      <div class="header-inner">
+        <div class="tf-container xl">
+          <div class="row">
+            <div class="col-12">
+              <div class="header-inner-wrap">
+                <div class="header-logo">
+                  <a href="{% url 'home:home' %}" class="site-logo">
+                    <img class="logo_header" alt="" src="{% static 'images/logo/REM2.png' %}"
+                      data-light="{% static 'images/logo/REM2.png' %}" data-dark="{% static 'images/logo/REM2.png' %}">
+                  </a>
+                </div>
+                <nav class="main-menu">
+                  <ul class="navigation ">
+                    <li class=" current-menu"><a href="{% url 'home:home' %}">Home</a>
+                    </li>
+                    {% comment %} <li class="has-child style-2"><a href="#">Listing</a>
+                      <ul class="submenu">
+                        <li>
+                          <a href="#">Layout</a>
+                          <ul class="submenu2">
+                            <li>
+                              <a href="property-grid-full-width.html">Grid Style -
+                                Full Width </a>
+                            </li>
+                            <li>
+                              <a href="property-gird-top-search.html">Grid Style - Top
+                                Search </a>
+                            </li>
+                            <li>
+                              <a href="property-gird-left-sidebar.html">Grid Style -
+                                Sidebar Left </a>
+                            </li>
+                            <li>
+                              <a href="property-gird-right-sidebar.html">Grid Style -
+                                Sidebar Right </a>
+                            </li>
+                            <li>
+                              <a href="property-list-full-width.html">List Style -
+                                Full
+                                Width </a>
+                            </li>
+                            <li>
+                              <a href="property-list-top-search.html">List Style -
+                                Top
+                                Search
+                              </a>
+                            </li>
+                            <li>
+                              <a href="property-list-left-sidebar.html">List Style -
+                                Sidebar
+                                Left </a>
+                            </li>
+                            <li>
+                              <a href="property-list-right-sidebar.html">List Style -
+                                Sidebar
+                                Right </a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="#">Feature</a>
+                          <ul class="submenu2">
+                            <li>
+                              <a href="property-half-map-grid.html">Property Half Map Grid
+                              </a>
+                            <li>
+                              <a href="property-half-map-list.html">Property Half Map List
+                              </a>
+                            </li>
+                            <li>
+                              <a href="property-half-top-map.html">Property Half Map Top
+                              </a>
+                            </li>
+                            <li>
+                              <a href="property-filter-popup.html">Property Filter Popup
+                              </a>
+                            </li>
+                            <li>
+                              <a href="property-filter-popup-left.html">Property Filter
+                                Popup Left </a>
+                            </li>
+                            <li>
+                              <a href="property-filter-popup-right.html">Property Filter
+                                Popup Right </a>
+                            </li>
+
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="#">Listing Details</a>
+                          <ul class="submenu2">
+                            <li><a href="property-detail-v1.html">Property Details 1</a>
+                            </li>
+                            <li><a href="property-detail-v2.html">Property Details 2</a>
+                            </li>
+                            <li><a href="property-detail-v3.html">Property Details 3</a>
+                            </li>
+                            <li><a href="property-detail-v4.html">Property Details 4</a>
+                            </li>
+                            <li><a href="property-detail-v5.html">Property Details 5</a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li> {% endcomment %}
+                    {% comment %} <li class="has-child"><a href="#">Pages</a>
+                      <ul class="submenu">
+                        <li class="has-child"><a href="#">Agents</a>
+                          <ul class="submenu">
+                            <li>
+                              <a href="agents.html">Agents</a>
+                            </li>
+                            <li>
+                              <a href="agents-details.html">Agents Details</a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li class="has-child"><a href="#">Agencies</a>
+                          <ul class="submenu">
+                            <li><a href="agency-grid.html">Agencies
+                                Grid</a></li>
+                            <li><a href="agency-list.html">Agencies
+                                List</a></li>
+                            <li><a href="agency-details.html">Agencies
+                                Detail</a></li>
+                          </ul>
+                        </li>
+                        <li><a href="home-loan-process.html">Home Loan Process</a></li>
+                        <li><a href="career.html">Career</a></li>
+                        <li><a href="faq.html">Faq's</a></li>
+                        <li><a href="compare.html">Compare</a></li>
+                        <li><a href="project-list.html">Project List</a></li>
+                        <li><a href="project-details.html">Project Details</a></li>
+                        <li><a href="404.html">Page 404</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                      </ul>
+                    </li> {% endcomment %}
+                    {% comment %} <li class="has-child "><a href="#">Blog</a>
+                      <ul class="submenu">
+                        <li><a href="blog-list.html">Blog List</a></li>
+                        <li><a href="blog-grid.html">Blog Grid</a></li>
+                        <li><a href="blog-details.html">Blog Detail</a></li>
+                      </ul>
+                    </li> {% endcomment %}
+                    <li><a href="contact.html">Contact</a></li>
+                  </ul>
+                </nav>
+                <div class="header-right">
+                  <div class="phone-number">
+                    <div class="icons">
+                      <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M1.875 5.625C1.875 12.5283 7.47167 18.125 14.375 18.125H16.25C16.7473 18.125 17.2242 17.9275 17.5758 17.5758C17.9275 17.2242 18.125 16.7473 18.125 16.25V15.1067C18.125 14.6767 17.8325 14.3017 17.415 14.1975L13.7292 13.2758C13.3625 13.1842 12.9775 13.3217 12.7517 13.6233L11.9433 14.7008C11.7083 15.0142 11.3025 15.1525 10.935 15.0175C9.57073 14.5159 8.33179 13.7238 7.30398 12.696C6.27618 11.6682 5.48406 10.4293 4.9825 9.065C4.8475 8.6975 4.98583 8.29167 5.29917 8.05667L6.37667 7.24833C6.67917 7.0225 6.81583 6.63667 6.72417 6.27083L5.8025 2.585C5.75178 2.38225 5.63477 2.20225 5.47004 2.07361C5.30532 1.94498 5.10234 1.87507 4.89333 1.875H3.75C3.25272 1.875 2.77581 2.07254 2.42417 2.42417C2.07254 2.77581 1.875 3.25272 1.875 3.75V5.625Z"
+                          stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+
+                    </div>
+                    <p>(603) 555-0123</p>
+                  </div>
+                  {% if request.user.is_authenticated %}
+                  <div class="box-user tf-action-btns">
+                    <div class="user ">
+                      <svg width="24" height="24" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M15.749 6C15.749 6.99456 15.3539 7.94839 14.6507 8.65165C13.9474 9.35491 12.9936 9.75 11.999 9.75C11.0044 9.75 10.0506 9.35491 9.34735 8.65165C8.64409 7.94839 8.249 6.99456 8.249 6C8.249 5.00544 8.64409 4.05161 9.34735 3.34835C10.0506 2.64509 11.0044 2.25 11.999 2.25C12.9936 2.25 13.9474 2.64509 14.6507 3.34835C15.3539 4.05161 15.749 5.00544 15.749 6ZM4.5 20.118C4.53213 18.1504 5.33634 16.2742 6.73918 14.894C8.14202 13.5139 10.0311 12.7405 11.999 12.7405C13.9669 12.7405 15.856 13.5139 17.2588 14.894C18.6617 16.2742 19.4659 18.1504 19.498 20.118C17.1454 21.1968 14.5871 21.7535 11.999 21.75C9.323 21.75 6.783 21.166 4.5 20.118Z"
+                          stroke="#2C2E33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </div>
+                    <div class="name">
+                      {{ request.user.email }}
+                      <i class="icon-CaretDown"></i>
+                    </div>
+                    <div class=" menu-user">
+                      <a class="dropdown-item" href="{% url 'users:agent_dashboard' %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M7.5 2.5H3.33333C2.8731 2.5 2.5 2.8731 2.5 3.33333V9.16667C2.5 9.6269 2.8731 10 3.33333 10H7.5C7.96024 10 8.33333 9.6269 8.33333 9.16667V3.33333C8.33333 2.8731 7.96024 2.5 7.5 2.5Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M16.668 2.5H12.5013C12.0411 2.5 11.668 2.8731 11.668 3.33333V5.83333C11.668 6.29357 12.0411 6.66667 12.5013 6.66667H16.668C17.1282 6.66667 17.5013 6.29357 17.5013 5.83333V3.33333C17.5013 2.8731 17.1282 2.5 16.668 2.5Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M16.668 10H12.5013C12.0411 10 11.668 10.3731 11.668 10.8333V16.6667C11.668 17.1269 12.0411 17.5 12.5013 17.5H16.668C17.1282 17.5 17.5013 17.1269 17.5013 16.6667V10.8333C17.5013 10.3731 17.1282 10 16.668 10Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M7.5 13.3334H3.33333C2.8731 13.3334 2.5 13.7065 2.5 14.1667V16.6667C2.5 17.1269 2.8731 17.5 3.33333 17.5H7.5C7.96024 17.5 8.33333 17.1269 8.33333 16.6667V14.1667C8.33333 13.7065 7.96024 13.3334 7.5 13.3334Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        Dashboards</a>
+                      {% if user.role == "CUSTOMER" %}
+                      <a class="dropdown-item" href="{% url 'users:user_profile' user.pk %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M15 15C16.3807 15 17.5 13.8807 17.5 12.5C17.5 11.1193 16.3807 10 15 10C13.6193 10 12.5 11.1193 12.5 12.5C12.5 13.8807 13.6193 15 15 15Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M7.5013 9.16667C9.34225 9.16667 10.8346 7.67428 10.8346 5.83333C10.8346 3.99238 9.34225 2.5 7.5013 2.5C5.66035 2.5 4.16797 3.99238 4.16797 5.83333C4.16797 7.67428 5.66035 9.16667 7.5013 9.16667Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M8.33464 12.5H5.0013C4.11725 12.5 3.2694 12.8512 2.64428 13.4763C2.01916 14.1014 1.66797 14.9493 1.66797 15.8333V17.5"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M18.082 13.6666L17.332 13.4166" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M12.668 11.5834L11.918 11.3334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M13.832 15.5834L14.082 14.8334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M15.918 10.1666L16.168 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M16.3333 15.5833L16 14.75" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                          <path d="M14.0013 10.25L13.668 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M11.918 13.8333L12.7513 13.5" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M17.25 11.5L18.0833 11.1666" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        My profiles
+                      </a>
+                      {% endif %}
+
+                      {% if user.role == "Agent" %}
+                      <a class="dropdown-item" href="{% url 'users:agent_profile' user.pk %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M15 15C16.3807 15 17.5 13.8807 17.5 12.5C17.5 11.1193 16.3807 10 15 10C13.6193 10 12.5 11.1193 12.5 12.5C12.5 13.8807 13.6193 15 15 15Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M7.5013 9.16667C9.34225 9.16667 10.8346 7.67428 10.8346 5.83333C10.8346 3.99238 9.34225 2.5 7.5013 2.5C5.66035 2.5 4.16797 3.99238 4.16797 5.83333C4.16797 7.67428 5.66035 9.16667 7.5013 9.16667Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M8.33464 12.5H5.0013C4.11725 12.5 3.2694 12.8512 2.64428 13.4763C2.01916 14.1014 1.66797 14.9493 1.66797 15.8333V17.5"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M18.082 13.6666L17.332 13.4166" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M12.668 11.5834L11.918 11.3334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M13.832 15.5834L14.082 14.8334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M15.918 10.1666L16.168 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M16.3333 15.5833L16 14.75" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                          <path d="M14.0013 10.25L13.668 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M11.918 13.8333L12.7513 13.5" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M17.25 11.5L18.0833 11.1666" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        My profiles
+                      </a>
+                      {% endif %}
+
+                      {% if user.role == "REAL_ESTATE_OWNER" %}
+                      <a class="dropdown-item" href="{% url 'users:owner_profile' user.pk %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M15 15C16.3807 15 17.5 13.8807 17.5 12.5C17.5 11.1193 16.3807 10 15 10C13.6193 10 12.5 11.1193 12.5 12.5C12.5 13.8807 13.6193 15 15 15Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M7.5013 9.16667C9.34225 9.16667 10.8346 7.67428 10.8346 5.83333C10.8346 3.99238 9.34225 2.5 7.5013 2.5C5.66035 2.5 4.16797 3.99238 4.16797 5.83333C4.16797 7.67428 5.66035 9.16667 7.5013 9.16667Z"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path
+                            d="M8.33464 12.5H5.0013C4.11725 12.5 3.2694 12.8512 2.64428 13.4763C2.01916 14.1014 1.66797 14.9493 1.66797 15.8333V17.5"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M18.082 13.6666L17.332 13.4166" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M12.668 11.5834L11.918 11.3334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M13.832 15.5834L14.082 14.8334" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M15.918 10.1666L16.168 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M16.3333 15.5833L16 14.75" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                          <path d="M14.0013 10.25L13.668 9.41663" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M11.918 13.8333L12.7513 13.5" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M17.25 11.5L18.0833 11.1666" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        My profiles
+                      </a>
+                      {% endif %}
+
+
+
+
+
+
+
+                      <a class="dropdown-item" href="{% url 'account_logout' %}">
+                        <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M7.5 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V4.16667C2.5 3.72464 2.67559 3.30072 2.98816 2.98816C3.30072 2.67559 3.72464 2.5 4.16667 2.5H7.5"
+                            stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M13.332 14.1667L17.4987 10L13.332 5.83337" stroke="#A8ABAE" stroke-width="1.4"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                          <path d="M17.5 10H7.5" stroke="#A8ABAE" stroke-width="1.4" stroke-linecap="round"
+                            stroke-linejoin="round"></path>
+                        </svg>
+                        Logout</a>
+                    </div>
+                  </div>
+                  <div></div>
+                  {% else %}
+                  {% if ACCOUNT_ALLOW_REGISTRATION %}
+                  <div class="btn-add">
+                    <a class="tf-btn style-border pd-23" href="{% url 'users:user_signup' %}">Register</a>
+                  </div>
+                  {% endif %}
+                  <div class="btn-add">
+                    <a class="tf-btn style-border pd-23" href="{% url 'account_login' %}">Login</a>
+                  </div>
+                  {% endif %}
+                  <div class="mobile-button" data-bs-toggle="offcanvas" data-bs-target="#menu-mobile"
+                    aria-controls="menu-mobile">
+                    <i class="icon-menu"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header><!-- /header -->
+
+
+
+    {% block content %}
+
+    {% endblock content %}
+
+
+    <!-- #Footer -->
+    <footer id="footer">
+      <div class="tf-container">
+        <div class="row">
+          <div class="col-12">
+            <div class="footer-top">
+              <div class="footer-logo">
+                <a href="index.html">
+                  <img id="logo_footer" src="{% static 'images/logo/logo-4.1%402x.png' %}" alt="logo-footer">
+                </a>
+              </div>
+              <div class="wrap-contact-item">
+                <div class="contact-item">
+                  <div class="icons">
+                    <i class="icon-phone-2"></i>
+                  </div>
+                  <div class="content">
+                    <div class="title text-1">
+                      Call us
+                    </div>
+                    <h6>
+                      <a href="#"> (603) 555-0123</a>
+                    </h6>
+                  </div>
+                </div>
+                <div class="contact-item">
+                  <div class="icons">
+                    <i class="icon-letter-2"></i>
+
+                  </div>
+                  <div class="content">
+                    <div class="title text-1">
+                      Nee live help
+                    </div>
+                    <h6 class="fw-4">
+                      <a href="#">
+                        proty-support@gmail.com
+                      </a>
+                    </h6>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="footer-main">
+            <div class="row">
+              <div class="col-lg-3 col-md-6">
+                <div class="footer-menu-list footer-col-block style-2">
+                  <h5 class="title lh-30 title-desktop">About us</h5>
+                  <h5 class="title lh-30 title-mobile">About us</h5>
+                  <ul class="tf-collapse-content">
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="service-details.html">Why choose us?</a></li>
+                    <li><a href="#">Customer reviews</a></li>
+                    <li><a href="agents.html">Our team</a></li>
+                    <li><a href="career.html">Careers with realty</a></li>
+                    <li><a href="career.html">Work with us</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="footer-menu-list footer-col-block">
+                  <h5 class="title lh-30 title-desktop">Popular house</h5>
+                  <h5 class="title lh-30 title-mobile">Popular house</h5>
+                  <ul class="tf-collapse-content">
+                    <li><a href="property-gird.html">#Penthouses</a></li>
+                    <li><a href="property-gird.html">#Villa</a></li>
+                    <li><a href="property-gird.html">#Smart home</a></li>
+                    <li><a href="property-gird.html">#Apartments</a></li>
+                    <li><a href="property-gird.html">#Office</a></li>
+                    <li><a href="property-gird.html">#Bungalow</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="footer-menu-list footer-col-block style-2">
+                  <h5 class="title lh-30 title-desktop">Quick links</h5>
+                  <h5 class="title lh-30 title-mobile">Quick links</h5>
+                  <ul class="tf-collapse-content">
+                    <li><a href="#">Terms of use</a></li>
+                    <li><a href="#">Privacy policy</a></li>
+                    <li><a href="#">Our services</a></li>
+                    <li><a href="contact.html">Contact support</a></li>
+                    <li><a href="#">Pricing plans</a></li>
+                    <li><a href="faq.html">FAQs</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="footer-menu-list newsletter ">
+                  <h5 class="title lh-30 mb-19">Newsletter</h5>
+                  <div class="sib-form">
+                    <div id="sib-form-container" class="sib-form-container">
+                      <div id="error-message" class="sib-form-message-panel">
+                        <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                          <svg viewbox="0 0 512 512" class="sib-icon sib-notification__icon">
+                            <path
+                              d="M256 40c118.621 0 216 96.075 216 216 0 119.291-96.61 216-216 216-119.244 0-216-96.562-216-216 0-119.203 96.602-216 216-216m0-32C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm-11.49 120h22.979c6.823 0 12.274 5.682 11.99 12.5l-7 168c-.268 6.428-5.556 11.5-11.99 11.5h-8.979c-6.433 0-11.722-5.073-11.99-11.5l-7-168c-.283-6.818 5.167-12.5 11.99-12.5zM256 340c-15.464 0-28 12.536-28 28s12.536 28 28 28 28-12.536 28-28-12.536-28-28-28z">
+                            </path>
+                          </svg>
+                          <span class="sib-form-message-panel__inner-text">
+                            Your subscription could not be saved. Please try again.
+                          </span>
+                        </div>
+                      </div>
+                      <div id="success-message" class="sib-form-message-panel">
+                        <div class="sib-form-message-panel__text sib-form-message-panel__text--center">
+                          <svg viewbox="0 0 512 512" class="sib-icon sib-notification__icon">
+                            <path
+                              d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 464c-118.664 0-216-96.055-216-216 0-118.663 96.055-216 216-216 118.664 0 216 96.055 216 216 0 118.663-96.055 216-216 216zm141.63-274.961L217.15 376.071c-4.705 4.667-12.303 4.637-16.97-.068l-85.878-86.572c-4.667-4.705-4.637-12.303.068-16.97l8.52-8.451c4.705-4.667 12.303-4.637 16.97.068l68.976 69.533 163.441-162.13c4.705-4.667 12.303-4.637 16.97.068l8.451 8.52c4.668 4.705 4.637 12.303-.068 16.97z">
+                            </path>
+                          </svg>
+                          <span class="sib-form-message-panel__inner-text">
+                            Your subscription has been successful.
+                          </span>
+                        </div>
+                      </div>
+                      <div id="sib-container" class="sib-container--large sib-container--vertical">
+                        <form id="sib-form" method="POST"
+                          action="https://3c02c1a1.sibforms.com/serve/MUIFABjeOIIJNMRgQ-0Mb1bjkLdsnuanXhO94qzsHBwAVG3reSaZ5DIq2ozIM0_PBl7b_lcysdmopwilW1dcjaAmtOu_es-dny_hZggPsstdEuk75SIQ1B7K-NuFEN5hBn9HqJ2SFLbleb-PnrNQY1dGLy7gXPmMlWJfT2Jfc2MeVJg4Ufeezo6UlJhAZwbC5nZ8aV9PghzVQVkE"
+                          data-type="subscription">
+                          <div class="sib-form-block ">
+                            <div class="sib-text-form-block">
+                              <p class="text-1">Sign up to receive the latest articles</p>
+                            </div>
+                          </div>
+                          <div class="sib-input sib-form-block mb-11">
+                            <div class="form__entry entry_block">
+                              <div class="form__label-row mb-10">
+                                <fieldset class="entry__field">
+                                  <input class="input input-nl" type="text" id="EMAIL" name="EMAIL" autocomplete="off"
+                                    placeholder="Your email address" data-required="true" required="">
+                                </fieldset>
+                              </div>
+                              <label class="  entry__error entry__error--primary">
+                              </label>
+                            </div>
+                          </div>
+                          <div class="sib-form-block">
+                            <button
+                              class="sib-form-block__button sib-form-block__button-with-loader tf-btn bg-color-primary w-full"
+                              form="sib-form" type="submit">
+                              <svg class="icon clickable__icon progress-indicator__icon sib-hide-loader-icon"
+                                viewbox="0 0 512 512">
+                                <path
+                                  d="M460.116 373.846l-20.823-12.022c-5.541-3.199-7.54-10.159-4.663-15.874 30.137-59.886 28.343-131.652-5.386-189.946-33.641-58.394-94.896-95.833-161.827-99.676C261.028 55.961 256 50.751 256 44.352V20.309c0-6.904 5.808-12.337 12.703-11.982 83.556 4.306 160.163 50.864 202.11 123.677 42.063 72.696 44.079 162.316 6.031 236.832-3.14 6.148-10.75 8.461-16.728 5.01z">
+                                </path>
+                              </svg>
+                              Subscribe
+                            </button>
+                          </div>
+                          <div class="sib-optin sib-form-block">
+                            <div class="form__entry entry_mcq">
+                              <div class="form__label-row ">
+                                <div class="checkbox-item ">
+                                  <label class="mb-0">
+                                    <span class="text-2 text-color-default">I have
+                                      read and agree to
+                                      the terms &
+                                      conditions</span>
+                                    <input type="checkbox" class="input_replaced" value="1" id="OPT_IN" name="OPT_IN">
+                                    <span class="btn-checkbox"></span>
+                                  </label>
+                                </div>
+                              </div>
+                              <label class="entry__error entry__error--primary">
+                              </label>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                    <form>
+                      <input type="text" name="email_address_check" value="" class="input--hidden">
+                      <input type="hidden" name="locale" value="en">
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="footer-bottom">
+              <p>Copyright © 2024 <span class="fw-7">PROTY - REAL ESTATE</span> . Designed & Developed
+                by
+                <a href="#">{{ request.user.name }}</a>
+              </p>
+              <div class="wrap-social">
+                <div class="text-3  fw-6 text_white">Follow us</div>
+                <ul class="tf-social ">
+                  <li>
+                    <a href="#">
+                      <i class="icon-fb"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <i class="icon-X"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <i class="icon-linked"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#">
+                      <i class="icon-ins"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer><!-- /#Footer -->
+
+  </div>
+  <!-- /wrapper -->
+
+
+
+  <!------------------------------------------------------------------ login modal -->
+
+
+  <!------------------------------------------------------------------ register modal -->
+
+  <!---------------------------------------------------------------- mobile nav -->
+  {% include 'partials/mobile_nav.html' %}
+  <!-- .prograss -->
+  <div class="progress-wrap">
+    <svg class="progress-circle svg-content" width="100%" height="100%" viewbox="-1 -1 102 102">
+      <path d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"
+        style="transition: stroke-dashoffset 10ms linear; stroke-dasharray: 307.919, 307.919; stroke-dashoffset: 307.919;">
+      </path>
+    </svg>
+  </div> <!-- /.prograss -->
+  <!-- Javascript -->
+  <script src="{% static 'js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/lazysize.min.js' %}"></script>
+  <script src="{% static 'js/wow.min.js' %}"></script>
+  <script src="{% static 'js/jquery.nice-select.min.js' %}"></script>
+  <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
+  <script src="{% static 'js/swiper.js' %}"></script>
+  <script src="{% static 'js/rangle-slider.js' %}"></script>
+  <script src="{% static 'js/simpleParallaxVanilla.umd.js' %}"></script>
+  <script src="{% static 'js/ScrollTrigger.min.js' %}"></script>
+  <script src="{% static 'js/Splitetext.js' %}"></script>
+  <script src="{% static 'js/gsap.min.js' %}"></script>
+  <script src="{% static 'js/infinityslide.js' %}"></script>
+  <script src="{% static 'js/SmoothScroll.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script defer="" src="{% static '../../forms/end-form/build/main.js' %}"></script>
+  <!-- /Javascript -->
+
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=real_estate_market_place
+POSTGRES_USER=TnqRmXpqYGQcBqzRvpCXgszJnCEBFBgQ
+POSTGRES_PASSWORD=AxhCJYK4qnRqjZxUYIEL40PtDfuk7d7dsllDBurMOt1NOD8nkVffDLHYQ49okoUB
