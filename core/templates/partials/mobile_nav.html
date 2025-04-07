@@ -4,7 +4,7 @@
 <div class="offcanvas offcanvas-start mobile-nav-wrap " tabindex="-1" id="menu-mobile" aria-labelledby="menu-mobile">
     <div class="offcanvas-header top-nav-mobile">
       <div class="offcanvas-title">
-        <a href="index.html"><img src="{% static 'images/logo/logo-4%402x.png' %}" alt=""></a>
+        <a href="{% url 'home:home' %}"><img src="{% static 'images/logo/REM1.png' %}" alt=""></a>
       </div>
       <div data-bs-dismiss="offcanvas" aria-label="Close">
         <i class="icon-close"></i>
@@ -185,6 +185,28 @@
           <li class="menu-item ">
             <a href="contact.html" class="tem-menu-mobile "> Contact</a>
           </li>
+          {% if request.user.is_authenticated %}
+          <li class="menu-item ">
+            <a href="{% url 'users:agent_dashboard' %}" class="tem-menu-mobile "> Dashboard</a>
+          </li>
+          {% if user.role == "CUSTOMER" %}
+          <li class="menu-item ">
+            <a href="{% url 'users:user_profile' user.pk %}" class="tem-menu-mobile "> My Profile</a>
+          </li>
+          {% endif %}
+          {% if user.role == "Agent" %}
+          <li class="menu-item ">
+            <a href="{% url 'users:agent_profile' user.pk %}" class="tem-menu-mobile "> My Profile</a>
+          </li>
+          {% endif %}
+          {% else %}
+          <li class="menu-item ">
+            <a href="contact.html" class="tem-menu-mobile "> Register</a>
+          </li>
+          <li class="menu-item ">
+            <a href="contact.html" class="tem-menu-mobile "> Login</a>
+          </li>
+          {% endif %}
         </ul>
         <div class="support">
           <a href="#" class="text-need"> Need help?</a>
