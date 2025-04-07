@@ -201,10 +201,10 @@
           {% endif %}
           {% else %}
           <li class="menu-item ">
-            <a href="contact.html" class="tem-menu-mobile "> Register</a>
+            <a href="{% url 'users:user_signup' %}" class="tem-menu-mobile "> Register</a>
           </li>
           <li class="menu-item ">
-            <a href="contact.html" class="tem-menu-mobile "> Login</a>
+            <a href="{% url 'account_login' %}" class="tem-menu-mobile "> Login</a>
           </li>
           {% endif %}
         </ul>
