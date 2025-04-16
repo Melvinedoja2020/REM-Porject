@@ -14,6 +14,8 @@ from core.applications.users.models import AgentProfile, SocialMediaLinks, User
 from core.helper.enums import UserRoleChoice
 from django.views.generic import TemplateView
 
+from core.helper.mixins import AgentApprovalRequiredMixin
+
 
 class UserDetailView(LoginRequiredMixin, DetailView):
     model = User
@@ -129,7 +131,10 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 user_redirect_view = UserRedirectView.as_view()
 
 
-class AgentDashboardView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
+class AgentDashboardView(
+    LoginRequiredMixin, UserPassesTestMixin, 
+    AgentApprovalRequiredMixin, TemplateView
+):
     template_name = "users/agent_dashboard.html"
 
     def test_func(self):

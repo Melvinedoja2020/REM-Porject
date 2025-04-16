@@ -63,7 +63,14 @@ class UserProfileAdmin(admin.ModelAdmin):
 class AgentProfileAdmin(admin.ModelAdmin):
     list_display = ["user", "office_phone_no", "office_address"]
     search_fields = ["user__name"]
+    list_filter = ["verified"]
+    actions = ["approve_agents"]
     ordering = ["id"]
+
+    def approve_agents(self, request, queryset):
+        queryset.update(verified=True)
+        self.message_user(request, "Selected agents have been approved.")
+    approve_agents.short_description = "Approve selected agents"
 
 @admin.register(RealEstateOwnerProfile)
 class RealEstateOwnerProfileAdmin(admin.ModelAdmin):

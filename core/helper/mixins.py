@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.shortcuts import redirect
+from django.contrib import messages
 
 
 class RoleRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -17,3 +18,15 @@ class RoleRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     
     def handle_no_permission(self):
         return redirect("dashboard:home")
+
+
+class AgentApprovalRequiredMixin:
+    def dispatch(self, request, *args, **kwargs):
+        print("🔥 AgentApprovalRequiredMixin dispatch called")
+        if hasattr(request.user, "agent_profile") and not request.user.agent_profile.verified:
+            messages.warning(
+                request, 
+                "Your agent profile is pending approval you will have access once approved."
+            )
+            return redirect("home:home")
+        return super().dispatch(request, *args, **kwargs)

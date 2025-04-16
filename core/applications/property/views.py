@@ -11,11 +11,15 @@ from django.contrib import messages
 from django.shortcuts import redirect
 
 from core.helper.enums import UserRoleChoice
+from core.helper.mixins import AgentApprovalRequiredMixin
 # Create your views here.
 
 
 
-class PropertyCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class PropertyCreateView(
+    LoginRequiredMixin, UserPassesTestMixin, 
+    AgentApprovalRequiredMixin, CreateView
+):
     model = Property
     form_class = PropertyForm
     template_name = "pages/dashboard/create_property.html"
@@ -52,7 +56,7 @@ class PropertyCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         return super().form_invalid(form)
 
 
-class PropertyUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class PropertyUpdateView(LoginRequiredMixin, AgentApprovalRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Property
     form_class = PropertyForm
     template_name = "pages/dashboard/create_property.html"
