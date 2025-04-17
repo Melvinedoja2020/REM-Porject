@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import (
     CreateView, UpdateView, ListView, DetailView, DeleteView
 )
@@ -10,14 +11,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 
-from core.helper.enums import UserRoleChoice
+from core.helper.enums import PropertyListingType, UserRoleChoice
 from core.helper.mixins import AgentApprovalRequiredMixin
 # Create your views here.
 
 
 
 class PropertyCreateView(
-    LoginRequiredMixin, UserPassesTestMixin, 
+    LoginRequiredMixin, UserPassesTestMixin,
     AgentApprovalRequiredMixin, CreateView
 ):
     model = Property
@@ -33,20 +34,26 @@ class PropertyCreateView(
         return redirect("home:home")
 
     def form_valid(self, form):
-        """Set the agent before saving the property."""
-        # If a new property type was created, ensure it's saved
-        new_property_type = form.cleaned_data.get('new_property_type')
+        """Set the agent and listing type before saving the property."""
+        new_property_type = form.cleaned_data.get("new_property_type")
         if new_property_type:
             property_type = PropertyType.objects.get(name__iexact=new_property_type)
             form.instance.property_type = property_type
-        form.instance.agent = self.request.user.agent_profile
+
+        agent_profile = self.request.user.agent_profile
+        form.instance.agent = agent_profile
+
+        # Set listing type to FOR_SALE if agent is a REAL_ESTATE_AGENT
+        if agent_profile.agent_type == "Real Estate Agent":
+            form.instance.property_listing = PropertyListingType.FOR_SALE
+
         response = super().form_valid(form)
-        
+
         # Handle multiple image uploads
         images = self.request.FILES.getlist("images")
         for image in images:
             PropertyImage.objects.create(property=self.object, image=image)
-        
+
         messages.success(self.request, "Property created successfully!")
         return response
 
@@ -54,7 +61,7 @@ class PropertyCreateView(
         print("❌ Form invalid. Errors:", form.errors)
         messages.error(self.request, "Error creating property. Please check the form.")
         return super().form_invalid(form)
-
+    
 
 class PropertyUpdateView(LoginRequiredMixin, AgentApprovalRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Property

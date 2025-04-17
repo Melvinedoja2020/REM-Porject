@@ -9,7 +9,7 @@ from django.db.models import ImageField, TextField, CASCADE
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from core.helper.enums import UserRoleChoice
+from core.helper.enums import AgentTypeChoices, UserRoleChoice
 from core.helper.media import MediaHelper
 from core.helper.models import UIDTimeBasedModel
 from django.conf import settings
@@ -111,6 +111,10 @@ class AgentProfile(UIDTimeBasedModel):
     user = auto_prefetch.OneToOneField(
         "users.User", on_delete=CASCADE, related_name='agent_profile'
     )
+    agent_type = CharField(
+        max_length=50, choices=AgentTypeChoices.choices,
+        default=AgentTypeChoices.PROPERTY_MANAGER
+    )
     company_name = CharField(max_length=255, blank=True, null=True)
     license_number = CharField(max_length=50, unique=True, blank=True, null=True)
     profile_picture = ImageField(
@@ -125,6 +129,23 @@ class AgentProfile(UIDTimeBasedModel):
         blank=True, null=True
     )
     verified = BooleanField(default=False)
+
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     agent_type = cleaned_data.get("agent_type")
+
+    #     if agent_type == AgentTypeChoices.REAL_ESTATE_AGENT.value:
+    #         if not cleaned_data.get("license_number"):
+    #             self.add_error(
+    #                 "license_number", 
+    #                 "License number is required for real estate agents."
+    #             )
+    #         if not cleaned_data.get("company_name"):
+    #             self.add_error(
+    #                 "company_name", 
+    #                 "Company name is required for real estate agents."
+    #             )
 
     class Meta(auto_prefetch.Model.Meta):
         verbose_name = "Agent Profile"
@@ -141,6 +162,29 @@ class AgentProfile(UIDTimeBasedModel):
             return self.profile_picture.url
         return f'{settings.STATIC_URL}images/avatar.png'
 
+    @property
+    def facebook(self):
+        return self.user.social_media_links.facebook if hasattr(
+            self.user, "social_media_links"
+        ) else None
+
+    @property
+    def twitter(self):
+        return self.user.social_media_links.twitter if hasattr(
+            self.user, "social_media_links"
+        ) else None
+
+    @property
+    def linkedin(self):
+        return self.user.social_media_links.linkedin if hasattr(
+            self.user, "social_media_links"
+        ) else None
+
+    @property
+    def instagram(self):
+        return self.user.social_media_links.instagram if hasattr(
+            self.user, "social_media_links"
+        ) else None
 class RealEstateOwnerProfile(UIDTimeBasedModel):
     user = auto_prefetch.OneToOneField(User, on_delete=CASCADE, related_name='real_estate_profile')
     company_name = CharField(max_length=255, blank=True, null=True)

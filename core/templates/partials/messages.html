@@ -1,3 +1,5 @@
+{% comment %} 🌈 Enhanced: beautiful, animated, professional message display with color & slower fade-out
+{% endcomment %}
 {% if messages %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
@@ -11,9 +13,8 @@
                      else %}bg-light text-dark{% endif %}" role="alert"
     style="font-size: 1rem; backdrop-filter: blur(3px);"
     data-delay="{% if message.tags == 'success' %}5000{% elif message.tags == 'error' %}7000{% elif message.tags == 'warning' %}6000{% else %}5500{% endif %}">
-    
-    <div class="d-flex flex-column align-items-center text-center gap-2">
-      <div class="fs-4">
+    <div class="d-flex align-items-start gap-3">
+      <div class="fs-4 pt-1">
         {% if message.tags == 'success' %}
         <i class="bi bi-check-circle-fill"></i>
         {% elif message.tags == 'error' %}
@@ -27,18 +28,18 @@
         {% endif %}
       </div>
 
-      <div>
+      <div class="flex-grow-1">
         <div class="fw-bold text-capitalize mb-1">
-          {% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Something went wrong
-          {% elif message.tags == 'warning' %}Heads up{% elif message.tags == 'info' %}Just so you know
-          {% else %}Notice{% endif %}
+          {% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Something went
+          wrong{% elif message.tags == 'warning' %}Heads up{% elif message.tags == 'info' %}Just so you
+          know{% else %}Notice{% endif %}
         </div>
-        <div class="text-center fw-semibold">
+        <div class="text-muted">
           {{ message }}
         </div>
       </div>
 
-      <button type="button" class="btn-close position-absolute top-0 end-0 mt-2 me-2" data-bs-dismiss="alert" aria-label="Close"></button>
+      <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   </div>
   {% endfor %}
@@ -51,6 +52,7 @@
     filter: blur(1px);
     transition: all 1.2s ease;
   }
+
 </style>
 
 <script>
@@ -63,5 +65,6 @@
       }, delay);
     });
   });
+
 </script>
 {% endif %}

@@ -874,126 +874,62 @@
       <!-- /section-popular-searches -->
 
       <!-- section-local-agent -->
-      {% comment %} <section class="section-local-agent ">
-        <div class="tf-container">
-          <div class="row">
-            <div class="col-12">
-              <div class="heading-section mb-46 text-center">
-                <h2 class="title split-text effect-right">Our Specialized Agents</h2>
-                <p class="text-1 split-text split-lines-transform">We connect you directly to the person
-                  that knows the
-                  most about a
-                  property for sale, the <br> listing agent.
-                </p>
-              </div>
-              <div class="swiper style-pagination tf-sw-mobile-1 " data-screen="576" data-preview="1" data-space="15">
-                <div class="swiper-wrapper tf-layout-mobile-sm sm-col-2 lg-col-4 mb-48">
-                  <div class="swiper-slide">
-                    <div class="agent-item style-3 hover-img ">
-                      <div class="image-wrap">
-                        <a href="agents-details.html">
-                          <img class="lazyload" data-src="{% static 'images/section/agent-item-1.1.jpg' %}"
-                            src="{% static 'images/section/agent-item-1.1.jpg' %}" alt="">
-                        </a>
-                        <ul class="tf-social style-3">
-                          <li><a href="#"><i class="icon-fb"></i></a></li>
-                          <li><a href="#"><i class="icon-X"></i></a></li>
-                          <li><a href="#"><i class="icon-linked"></i></a></li>
-                          <li><a href="#"><i class="icon-ins"></i></a></li>
-                        </ul>
-                      </div>
-                      <div class="content justify-center">
-                        <div class="author text-center">
-                          <h5 class="name lh-30"><a href="agents-details.html">Leslie
-                              Alexander</a></h5>
-                          <p class="text-2 lh-18">Sale agent</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <div class="agent-item style-3 hover-img ">
-                      <div class="image-wrap">
-                        <a href="agents-details.html">
-                          <img class="lazyload" data-src="images/section/agent-item-2.1.jpg"
-                            src="{% static 'images/section/agent-item-2.1.jpg' %}" alt="">
-                        </a>
-                        <ul class="tf-social style-3">
-                          <li><a href="#"><i class="icon-fb"></i></a></li>
-                          <li><a href="#"><i class="icon-X"></i></a></li>
-                          <li><a href="#"><i class="icon-linked"></i></a></li>
-                          <li><a href="#"><i class="icon-ins"></i></a></li>
-                        </ul>
-                      </div>
-                      <div class="content justify-center">
-                        <div class="author text-center">
-                          <h5 class="name lh-30"><a href="agents-details.html">Leslie
-                              Alexander</a></h5>
-                          <p class="text-2 lh-18">Sale agent</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <div class="agent-item style-3 hover-img ">
-                      <div class="image-wrap">
-                        <a href="agents-details.html">
-                          <img class="lazyload" data-src="images/section/agent-item-3.1.jpg"
-                            src="{% static 'images/section/agent-item-3.1.jpg' %}" alt="">
-                        </a>
-                        <ul class="tf-social style-3">
-                          <li><a href="#"><i class="icon-fb"></i></a></li>
-                          <li><a href="#"><i class="icon-X"></i></a></li>
-                          <li><a href="#"><i class="icon-linked"></i></a></li>
-                          <li><a href="#"><i class="icon-ins"></i></a></li>
-                        </ul>
-                      </div>
-                      <div class="content justify-center">
-                        <div class="author text-center">
-                          <h5 class="name lh-30"><a href="agents-details.html">Leslie
-                              Alexander</a></h5>
-                          <p class="text-2 lh-18">Sale agent</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <div class="agent-item style-3 hover-img ">
-                      <div class="image-wrap">
-                        <a href="agents-details.html">
-                          <img class="lazyload" data-src="images/section/agent-item-4.1.jpg"
-                            src="{% static 'images/section/agent-item-4.1.jpg' %}" alt="">
-                        </a>
-                        <ul class="tf-social style-3">
-                          <li><a href="#"><i class="icon-fb"></i></a></li>
-                          <li><a href="#"><i class="icon-X"></i></a></li>
-                          <li><a href="#"><i class="icon-linked"></i></a></li>
-                          <li><a href="#"><i class="icon-ins"></i></a></li>
-                        </ul>
-                      </div>
-                      <div class="content justify-center">
-                        <div class="author text-center">
-                          <h5 class="name lh-30"><a href="agents-details.html">Leslie
-                              Alexander</a></h5>
-                          <p class="text-2 lh-18">Sale agent</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+      
+      {% if agents_profile %}
+        <section class="section-local-agent ">
+          <div class="tf-container">
+            <div class="row">
+              <div class="col-12">
+                <div class="heading-section mb-46 text-center">
+                  <h2 class="title split-text effect-right">Our Specialized Agents</h2>
+                  <p class="text-1 split-text split-lines-transform">We connect you directly to the person
+                    that knows the
+                    most about a
+                    property for sale, the <br> listing agent.
+                  </p>
                 </div>
-                <div class="sw-pagination sw-pagination-mb-1 text-center d-md-none d-block mb-20"></div>
+                <div class="swiper style-pagination tf-sw-mobile-1 " data-screen="576" data-preview="1" data-space="15">
+                  <div class="swiper-wrapper tf-layout-mobile-sm sm-col-2 lg-col-4 mb-48">
+                    {% for agent in agents_profile %}
+                      <div class="swiper-slide">
+                        <div class="agent-item style-3 hover-img ">
+                          <div class="image-wrap">
+                            <a href="agents-details.html">
+                              <img class="lazyload" data-src="{{ agent.get_profile_picture }}"
+                                src="{{ agent.get_profile_picture }}" alt="">
+                            </a>
+                            <ul class="tf-social style-3">
+                              <li><a href="{{agent.facebook }}"><i class="icon-fb"></i></a></li>
+                              <li><a href="{{ agent.twitter }}"><i class="icon-X"></i></a></li>
+                              <li><a href="{{ agent.linkedin }}"><i class="icon-linked"></i></a></li>
+                              <li><a href="{{ agent.instagram }}"><i class="icon-ins"></i></a></li>
+                            </ul>
+                          </div>
+                          <div class="content justify-center">
+                            <div class="author text-center">
+                              <h5 class="name lh-30"><a href="agents-details.html">{{ agent.user.name}}
+                                  </a></h5>
+                              <p class="text-2 lh-18">Sale agent</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                    
+                  </div>
+                  <div class="sw-pagination sw-pagination-mb-1 text-center d-md-none d-block mb-20"></div>
+                </div>
+                <p class="text-center text-1 mb-46">Explore Property agents are here to help with all your
+                  buying, renting and selling goals. <br>
+                  Find the home of your dreams with an expert you can trust. <a href="#">Let’s chat</a>
+                </p>
+                <a href="#" class="tf-btn bg-color-primary pd-3 fw-6 mx-auto">Find your location agent <i
+                    class="icon-MagnifyingGlass"></i></a>
               </div>
-              <p class="text-center text-1 mb-46">Explore Property agents are here to help with all your
-                buying, renting and selling goals. <br>
-                Find the home of your dreams with an expert you can trust. <a href="#">Let’s chat</a>
-              </p>
-              <a href="#" class="tf-btn bg-color-primary pd-3 fw-6 mx-auto">Find your location agent <i
-                  class="icon-MagnifyingGlass"></i></a>
             </div>
           </div>
-        </div>
-      </section> <!-- /.section-local-agent --> {% endcomment %}
-
+        </section> <!-- /.section-local-agent -->
+      {% endif %}
       <!-- .section-featured -->
       {% comment %} <section class="section-featured tf-spacing-1">
         <div class="box-house style-list style-3">

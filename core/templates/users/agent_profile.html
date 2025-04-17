@@ -186,15 +186,19 @@
       </div> {% endcomment %}
       {% include 'partials/messages.html' %}
       <div class="widget-box-2">
-        {% comment %} <div class="box">
+        {% if request.user.agent_profile and not request.user.agent_profile.verified %}
+        <div class="box">
           <div class="box-agent-account">
             <h6>Agent Profile</h6>
             <p class="note">Dear {{ request.user.name }}, <br>
-                please fill in the following information to complete your profile.
+              To complete your registration as an agent, please fill in your profile information below.
+              Your profile will be reviewed, and once approved, you'll be granted full access as a verified agent.
+
             </p>
-                         
+
           </div>
-        </div> {% endcomment %}
+        </div>
+        {% endif %}
         <form method=post enctype="multipart/form-data">
           {% csrf_token %}
           <div class="box">
@@ -203,73 +207,127 @@
               <div class="img-poster">
                 <img src="{{ profile_picture }}" alt="avatar" loading="lazy">
               </div>
-              
-                  <div class="content uploadfile">
-                      <p>Upload a new poster</p>
-                      <div class="box-ip">
-                        {{ form.profile_picture}}
-                      </div>
-                      <span>JPEG 100x100</span>
-                    </div>
-              
+
+              <div class="content uploadfile">
+                <p>Upload a new poster</p>
+                <div class="box-ip">
+                  {{ form.profile_picture}}
+                </div>
+                <span>JPEG 100x100</span>
+              </div>
+
             </div>
           </div>
           <h5 class="title">Information</h5>
-          
-            <fieldset class="box box-fieldset">
-              <label for="name">Full name:<span>*</span></label>
-              <input type="text" id="name" value="{{ request.user.name }}" class="form-control " readonly>
-            </fieldset>
-            <fieldset class="box box-fieldset">
-              <label>{{ form.description.label}}:<span>*</span></label>
-              {{ form.description }}
-            </fieldset>
-            <fieldset class="box grid-layout-4 gap-30">
-              <div class="box-fieldset">
-                <label for="company">{{form.company_name.label}}:<span>*</span></label>
-                {{ form.company_name }}
-              </div>
-              <div class="box-fieldset">
-                <label for="office_adress">{{ form.office_address.label}}:<span>*</span></label>
-                {{ form.office_address }}
-              </div>
-              <div class="box-fieldset">
-                <label for="num">{{ form.office_phone_no.label}}:<span>*</span></label>
-                {{ form.office_phone_no }}
-              </div>
-              <div class="box-fieldset">
-                <label for="office_location">{{ form.office_location.label}}:<span>*</span></label>
-                {{ form.office_location}}
-              </div>
-              
-            </fieldset>
-            <div class="box grid-layout-4 gap-30 box-info-2">
-              
-              <div class="box-fieldset">
-                <label for="email">Email address:<span>*</span></label>
-                <input type="text" id="email" value="themeflat@gmail.com" class="form-control" readonly>
-              </div>
-              
+
+          <fieldset class="box box-fieldset">
+            <label for="name">Full name:<span>*</span></label>
+            <input type="text" id="name" value="{{ request.user.name }}" class="form-control " readonly>
+          </fieldset>
+          <fieldset class="box box-fieldset">
+            <label>{{ form.description.label}}:<span>*</span></label>
+            {{ form.description }}
+          </fieldset>
+          <fieldset class="box grid-layout-4 gap-30">
+            <div class="box-fieldset">
+              <label for="company">{{form.company_name.label}}:<span>*</span></label>
+              {{ form.company_name }}
             </div>
-            
-            <div class="box box-fieldset">
-              <label for="fb">{{social_media_form.facebook.label}}:<span>*</span></label>
-              {{ social_media_form.facebook }}
+            <div class="box-fieldset">
+              <label for="office_adress">{{ form.office_address.label}}:<span>*</span></label>
+              {{ form.office_address }}
             </div>
-            <div class="box box-fieldset">
-              <label for="tw">{{ social_media_form.twitter.label }}:<span>*</span></label>
-              {{ social_media_form.twitter }}
+            <div class="box-fieldset">
+              <label for="num">{{ form.office_phone_no.label}}:<span>*</span></label>
+              {{ form.office_phone_no }}
             </div>
-            <div class="box box-fieldset">
-              <label for="linkedin">{{ social_media_form.linkedin.label}}:<span>*</span></label>
-              {{ social_media_form.linkedin }}
+            <div class="box-fieldset">
+              <label for="office_location">{{ form.office_location.label}}:<span>*</span></label>
+              {{ form.office_location}}
             </div>
-            <div class="box">
-              <button type="submit" class="tf-btn bg-color-primary pd-10">Save & Update</button>
+
+          </fieldset>
+          <div class="box grid-layout-4 gap-30 box-info-2">
+
+            <div class="box-fieldset">
+              <label for="email">Email address:<span>*</span></label>
+              <input type="text" id="email" value="themeflat@gmail.com" class="form-control" readonly>
             </div>
-            
+            <div class="box-fieldset">
+              <label for="email">{{ form.license_number.label}}:<span>*</span></label>
+              {{ form.license_number }}
+            </div>
+            <div class="box-fieldset">
+              <label for="{{ form.agent_type.label}}">{{ form.agent_type.label}}:<span>*</span></label>
+              {{ form.agent_type}}
+            </div>
+
+          </div>
+
+          <div class="box box-fieldset">
+            <label for="fb">{{social_media_form.facebook.label}}:<span>*</span></label>
+            {{ social_media_form.facebook }}
+          </div>
+          <div class="box box-fieldset">
+            <label for="tw">{{ social_media_form.twitter.label }}:<span>*</span></label>
+            {{ social_media_form.twitter }}
+          </div>
+          <div class="box box-fieldset">
+            <label for="linkedin">{{ social_media_form.linkedin.label}}:<span>*</span></label>
+            {{ social_media_form.linkedin }}
+          </div>
+          <div class="box">
+            <button type="submit" class="tf-btn bg-color-primary pd-10">Save & Update</button>
+          </div>
+
 
         </form>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            const agentTypeField = document.getElementById("id_agent_type");
         
+            const fieldIdsMap = {
+              "Real Estate Agent": ["id_license_number", "id_company_name", "id_office_location"],
+              "Property Manager": ["id_company_name", "id_office_address", "id_office_phone_no"]
+            };
+        
+            function toggleFields(selectedType) {
+              const allFieldIds = [
+                "id_license_number",
+                "id_company_name",
+                "id_office_location",
+                "id_office_address",
+                "id_office_phone_no"
+              ];
+        
+              allFieldIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                  const wrapper = el.closest(".box-fieldset");
+                  if (wrapper) wrapper.style.display = "none";
+                }
+              });
+        
+              const toShow = fieldIdsMap[selectedType] || [];
+              toShow.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                  const wrapper = el.closest(".box-fieldset");
+                  if (wrapper) wrapper.style.display = "block";
+                }
+              });
+            }
+        
+            if (agentTypeField) {
+              toggleFields(agentTypeField.value);
+              agentTypeField.addEventListener("change", function () {
+                toggleFields(this.value);
+              });
+            }
+          });
+        </script>
+        
+
       </div>
       {% endblock content %}

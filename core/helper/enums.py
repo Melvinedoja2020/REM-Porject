@@ -4,7 +4,7 @@ from django.db.models import TextChoices
 class UserRoleChoice(TextChoices):
     CUSTOMER = ("Prospective Buyer/Tenant", "Prospective Buyer/Tenant")
     AGENT = ("Agent", "Agent")
-    REAL_ESTATE_OWNER = ("Real Estate Owner", "Real Estate Owner")
+    # REAL_ESTATE_OWNER = ("Real Estate Owner", "Real Estate Owner")
 
 
 class PROPERTY_TYPES_CHOICES(TextChoices):
@@ -37,5 +37,11 @@ class PaymentStatus(TextChoices):
 class PropertyListingType(TextChoices):
     RENT = ("Rent", "Rent")
     FOR_SALE = ("For Sale", "For Sale")
+
+
+class AgentTypeChoices(TextChoices):
+    REAL_ESTATE_AGENT = ("Real Estate Agent", "Real Estate Agent")
+    PROPERTY_MANAGER = ("Property Manager", "Property Manager")
+    
 
 

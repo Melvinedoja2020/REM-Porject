@@ -3,11 +3,12 @@
 {% load static %}
 
 <style>
-  .user-choices{
+  .user-choices {
     height: 50px;
     font-size: 10px;
-    
+
   }
+
 </style>
 
 <div class="flat-account">
@@ -19,17 +20,33 @@
     <div class="title-box">
       <h4 style=text-align:center>Register</h4>
     </div>
+    {% if form.errors %}
+    <div class="alert alert-danger" role="alert">
+      <ul class="mb-0">
+        {% for field in form %}
+        {% for error in field.errors %}
+        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+        {% endfor %}
+        {% endfor %}
+
+        {% for error in form.non_field_errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
     {% include 'partials/messages.html' %}
     <div class="box">
       <fieldset class="box-fieldset">
-        
+
         <div class="ip-field">
           {{ form.name }}
         </div>
       </fieldset>
-      
+
       <fieldset class="box-fieldset">
-        
+
         <div class="ip-field">
           {{ form.email }}
         </div>
@@ -57,10 +74,11 @@
       <button type="submit" class="btn w-100" style=background:#E8960F>Sign Up</button>
     </div>
     <div class="footer-account">
-        <p>Already have an account? <a href="{% url 'account_login' %}">Login</a></p>
-        {% comment %} <p>Forgot your password? <a href="{% url 'account_reset_password' %}">Reset Password</a></p> {% endcomment %}
+      <p>Already have an account? <a href="{% url 'account_login' %}">Login</a></p>
+      {% comment %} <p>Forgot your password? <a href="{% url 'account_reset_password' %}">Reset Password</a></p>
+      {% endcomment %}
     </div>
   </form>
-    
+
 </div>
 {% endblock content %}

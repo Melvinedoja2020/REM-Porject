@@ -106,7 +106,7 @@ class UserSignupForm(SignupForm):
             profile_classes = {
                 UserRoleChoice.CUSTOMER: UserProfile,
                 UserRoleChoice.AGENT: AgentProfile,
-                UserRoleChoice.REAL_ESTATE_OWNER: RealEstateOwnerProfile,
+                # UserRoleChoice.REAL_ESTATE_OWNER: RealEstateOwnerProfile,
             }
 
             profile_class = profile_classes.get(user.role)
@@ -160,7 +160,8 @@ class AgentProfileForm(ModelForm):
         model = AgentProfile
         fields = [
             "office_phone_no", "office_location", "description",
-            "office_address", "profile_picture", "company_name"
+            "office_address", "profile_picture", "company_name",
+            "license_number", "agent_type", 
         ]
         widgets = {
             "company_name": TextInput(attrs={
@@ -187,7 +188,14 @@ class AgentProfileForm(ModelForm):
                 "class": "form-control"
             }),
             "description": TextInput(attrs={
-                "placeholder": "Description",
+                "placeholder": "Describe yourself",
+                "class": "form-control"
+            }),
+            "license_number": TextInput(attrs={
+                "placeholder": "License Number",
+                "class": "form-control"
+            }),
+            "agent_type": Select(attrs={
                 "class": "form-control"
             }),
         }
