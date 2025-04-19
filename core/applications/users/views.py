@@ -3,13 +3,13 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import QuerySet
 from django.contrib import messages
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView
 from django.views.generic import RedirectView
-from django.views.generic import UpdateView
+from django.views.generic import UpdateView, CreateView
 
-from core.applications.users.forms import AgentProfileForm, SocialMediaLinksForm
+from core.applications.users.forms import AgentProfileForm, SocialMediaLinksForm, SuperCustomUserCreationForm
 from core.applications.users.models import AgentProfile, SocialMediaLinks, User
 from core.helper.enums import UserRoleChoice
 from django.views.generic import TemplateView
@@ -148,3 +148,14 @@ class AgentDashboardView(
     def get_context_data(self, **kwargs):
         """Pass dashboard data to the template"""
         context = super().get_context_data(**kwargs)
+
+
+
+class SuperUserSignupView(CreateView):
+    model = User
+    form_class = SuperCustomUserCreationForm
+    template_name = "users/superuser_signup.html"
+    success_url = reverse_lazy('admin:login')
+
+
+# superuser_signup = SuperUserSignupView.as_view()

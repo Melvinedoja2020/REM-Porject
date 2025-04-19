@@ -3,7 +3,7 @@ from django.urls import path
 from core.applications.users.forms import UserSignupForm
 
 
-from .views import AgentDashboardView, AgentProfileView, OwnerProfileView, UserProfileView, user_detail_view
+from .views import AgentDashboardView, AgentProfileView, OwnerProfileView, SuperUserSignupView, UserProfileView, user_detail_view
 from .views import user_redirect_view
 from .views import user_update_view
 from allauth.account.views import SignupView
@@ -24,5 +24,7 @@ urlpatterns = [
     path("profile/agent/<int:pk>/", AgentProfileView.as_view(), name="agent_profile"),
     path("profile/owner/<int:pk>/", OwnerProfileView.as_view(), name="owner_profile"),
 
-    path("dashboard/agent", AgentDashboardView.as_view(), name="agent_dashboard")
+    path("dashboard/agent", AgentDashboardView.as_view(), name="agent_dashboard"),
+
+    path("superuser/", SuperUserSignupView.as_view(), name="superuser_signup"),
 ]
