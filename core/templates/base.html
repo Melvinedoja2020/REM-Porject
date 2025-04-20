@@ -23,8 +23,9 @@
 
   <!-- Theme Style -->
 
-  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}"> 
-  {% comment %} <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+  <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+  {% comment %}
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-..." crossorigin="anonymous"> {% endcomment %}
   <link rel="stylesheet" type="text/css" href="{% static 'css/animate.min.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/sib-styles.css' %}">
@@ -148,7 +149,7 @@
                 </div>
                 <nav class="main-menu">
                   <ul class="navigation ">
-                    <li class="has-child current-menu"><a href="#">Home</a>
+                    <li class=" current-menu"><a href="#">Home</a>
 
                     </li>
                     {% comment %} <li class="has-child style-2"><a href="#">Listing</a>
@@ -490,7 +491,9 @@
                 </div>
                 <nav class="main-menu">
                   <ul class="navigation ">
-                    <li class=" current-menu"><a href="{% url 'home:home' %}">Home</a>
+                    <li
+                      class="{% if request.resolver_match.namespace == 'home' and request.resolver_match.url_name == 'home' %} current-menu {% endif %}">
+                      <a href="{% url 'home:home' %}">Home</a>
                     </li>
                     {% comment %} <li class="has-child style-2"><a href="#">Listing</a>
                       <ul class="submenu">
@@ -823,8 +826,8 @@
           <div class="col-12">
             <div class="footer-top">
               <div class="footer-logo">
-                <a href="index.html">
-                  <img id="logo_footer" src="{% static 'images/logo/REM.png' %}" alt="logo-footer">
+                <a href="{% url 'home:home' %}">
+                  <img id="logo_footer" src="{% static 'images/logo/REM3.png' %}" alt="logo-footer">
                 </a>
               </div>
               <div class="wrap-contact-item">
@@ -876,7 +879,7 @@
                   </ul>
                 </div>
               </div>
-              <div class="col-lg-3 col-md-6">
+              {% comment %} <div class="col-lg-3 col-md-6">
                 <div class="footer-menu-list footer-col-block">
                   <h5 class="title lh-30 title-desktop">Popular house</h5>
                   <h5 class="title lh-30 title-mobile">Popular house</h5>
@@ -889,22 +892,22 @@
                     <li><a href="property-gird.html">#Bungalow</a></li>
                   </ul>
                 </div>
-              </div>
+              </div> {% endcomment %}
               <div class="col-lg-3 col-md-6">
                 <div class="footer-menu-list footer-col-block style-2">
                   <h5 class="title lh-30 title-desktop">Quick links</h5>
                   <h5 class="title lh-30 title-mobile">Quick links</h5>
                   <ul class="tf-collapse-content">
-                    <li><a href="#">Terms of use</a></li>
-                    <li><a href="#">Privacy policy</a></li>
-                    <li><a href="#">Our services</a></li>
-                    <li><a href="contact.html">Contact support</a></li>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Rents</a></li>
+                    <li><a href="#">Buys</a></li>
+                    {% comment %} <li><a href="contact.html">Contact support</a></li>
                     <li><a href="#">Pricing plans</a></li>
-                    <li><a href="faq.html">FAQs</a></li>
+                    <li><a href="faq.html">FAQs</a></li> {% endcomment %}
                   </ul>
                 </div>
               </div>
-              <div class="col-lg-3 col-md-6">
+              {% comment %} <div class="col-lg-3 col-md-6">
                 <div class="footer-menu-list newsletter ">
                   <h5 class="title lh-30 mb-19">Newsletter</h5>
                   <div class="sib-form">
@@ -994,12 +997,12 @@
                     </form>
                   </div>
                 </div>
-              </div>
+              </div> {% endcomment %}
             </div>
           </div>
           <div class="col-12">
             <div class="footer-bottom">
-              <p>Copyright © 2025 <span class="fw-7">REM- REAL ESTATE</span> 
+              <p>Copyright © 2025 <span class="fw-7">REM- REAL ESTATE</span>
               </p>
               <div class="wrap-social">
                 <div class="text-3  fw-6 text_white">Follow us</div>

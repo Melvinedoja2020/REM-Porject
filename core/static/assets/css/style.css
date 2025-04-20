@@ -29,8 +29,8 @@
 /**
   * Name: Remos eCommerce Admin Dashboard HTML Template
   * Version: 1.0.1
-  * Author: Themesflat
-  * Author URI: http://www.themesflat.com
+  * Author: REM
+  * Author URI: http://www.REM.com
 */
 /**
 
@@ -41,7 +41,7 @@
 	* Typography
 	* Extra classes
     * link style
-    * themesflat-container
+    * REM-container
 
 */
 /* Reset Browsers
@@ -934,9 +934,9 @@ a:hover, a:focus {
   transition: all 0.3s ease;
 }
 
-/* themesflat-container
+/* REM-container
 -------------------------------------------------------------- */
-.themesflat-container {
+.REM-container {
   position: relative;
   margin-left: auto;
   margin-right: auto;
@@ -945,16 +945,16 @@ a:hover, a:focus {
   width: 1200px;
   max-width: 100%;
 }
-.themesflat-container .row {
+.REM-container .row {
   margin-left: -15px !important;
   margin-right: -15px !important;
 }
-.themesflat-container .row > * {
+.REM-container .row > * {
   padding-left: 15px !important;
   padding-right: 15px !important;
 }
 
-.themesflat-container.full {
+.REM-container.full {
   width: 100%;
 }
 
