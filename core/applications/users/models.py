@@ -4,15 +4,16 @@ from typing import ClassVar
 from django.contrib.auth.models import AbstractUser
 from django.db.models import CharField
 from django.db.models import EmailField
-from django.db.models import BooleanField, DecimalField,  IntegerField, URLField
+from django.db.models import BooleanField, DecimalField,  IntegerField, URLField, FileField
 from django.db.models import ImageField, TextField, CASCADE
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from core.helper.enums import AgentTypeChoices, UserRoleChoice
+from core.helper.enums import AgentTypeChoices, UserRoleChoice, VerificationStatusChoices
 from core.helper.media import MediaHelper
 from core.helper.models import UIDTimeBasedModel
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from .managers import UserManager
 import auto_prefetch
@@ -54,8 +55,8 @@ class User(AbstractUser):
         """Returns the profile URL based on user type"""
         if self.role == UserRoleChoice.AGENT.value:
             return reverse("users:agent_profile", kwargs={"pk": self.id})
-        elif self.role == UserRoleChoice.REAL_ESTATE_OWNER.value:
-            return reverse("users:real_estate_owner_profile", kwargs={"pk": self.id})
+        # elif self.role == UserRoleChoice.REAL_ESTATE_OWNER.value:
+        #     return reverse("users:real_estate_owner_profile", kwargs={"pk": self.id})
         return reverse("users:user_profile", kwargs={"pk": self.id})
     
     @property
@@ -113,7 +114,7 @@ class AgentProfile(UIDTimeBasedModel):
     )
     agent_type = CharField(
         max_length=50, choices=AgentTypeChoices.choices,
-        default=AgentTypeChoices.PROPERTY_MANAGER
+        
     )
     company_name = CharField(max_length=255, blank=True, null=True)
     license_number = CharField(max_length=50, unique=True, blank=True, null=True)
@@ -128,24 +129,34 @@ class AgentProfile(UIDTimeBasedModel):
         max_digits=3, decimal_places=2, default=0.0,
         blank=True, null=True
     )
+    license_document = FileField(
+        upload_to=MediaHelper.get_image_upload_path, 
+        null=True, blank=True
+    )
+    company_registration_document = FileField(
+        upload_to=MediaHelper.get_image_upload_path, 
+        null=True, blank=True
+    )
+    company_registration_number = CharField(
+        max_length=50, unique=True, blank=True, null=True
+    )
+    verification_status = CharField(
+    max_length=20,
+    choices=VerificationStatusChoices.choices,
+    default=VerificationStatusChoices.PENDING
+    )
     verified = BooleanField(default=False)
 
-
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     agent_type = cleaned_data.get("agent_type")
-
-    #     if agent_type == AgentTypeChoices.REAL_ESTATE_AGENT.value:
-    #         if not cleaned_data.get("license_number"):
-    #             self.add_error(
-    #                 "license_number", 
-    #                 "License number is required for real estate agents."
-    #             )
-    #         if not cleaned_data.get("company_name"):
-    #             self.add_error(
-    #                 "company_name", 
-    #                 "Company name is required for real estate agents."
-    #             )
+    def clean(self):
+        if self.agent_type == AgentTypeChoices.REAL_ESTATE_AGENT:
+            if not self.company_name:
+                raise ValidationError({
+                    "company_name": "Company name is required for real estate agents."
+                })
+            if not self.license_number:
+                raise ValidationError({
+                    "license_number": "License number is required for real estate agents."
+                })
 
     class Meta(auto_prefetch.Model.Meta):
         verbose_name = "Agent Profile"

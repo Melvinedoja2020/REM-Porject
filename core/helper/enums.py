@@ -42,6 +42,12 @@ class PropertyListingType(TextChoices):
 class AgentTypeChoices(TextChoices):
     REAL_ESTATE_AGENT = ("Real Estate Agent", "Real Estate Agent")
     PROPERTY_MANAGER = ("Property Manager", "Property Manager")
+
+
+class VerificationStatusChoices(TextChoices):
+    PENDING = "pending", "Pending"
+    VERIFIED = "verified", "Verified"
+    REJECTED = "rejected", "Rejected"
     
 
 

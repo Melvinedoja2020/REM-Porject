@@ -253,17 +253,32 @@
               <label for="email">Email address:<span>*</span></label>
               <input type="text" id="email" value="themeflat@gmail.com" class="form-control" readonly>
             </div>
+
+            
             <div class="box-fieldset">
-              <label for="email">{{ form.license_number.label}}:<span>*</span></label>
-              {{ form.license_number }}
-            </div>
-            <div class="box-fieldset">
+              
               <label for="{{ form.agent_type.label}}">{{ form.agent_type.label}}:<span>*</span></label>
+              {% if form.fields.agent_type.disabled %}
+              <input type="text" class="form-control" value="{{ form.instance.get_agent_type_display }}" disabled>
+              {% else %}
               {{ form.agent_type}}
+              {% endif %}
             </div>
+
 
           </div>
-
+          <div class="box-fieldset">
+            <label for="email">{{ form.license_number.label}}:<span>*</span></label>
+            {{ form.license_number }}
+          </div>
+          <div class="box-fieldset">
+            <label for="email">{{ form.company_registration_document.label}}:<span>*</span></label>
+            {{ form.company_registration_document }}
+          </div>
+          <div class="box-fieldset">
+            <label for="email">{{ form.license_document.label}}:<span>*</span></label>
+            {{ form.license_document }}
+          </div>
           <div class="box box-fieldset">
             <label for="fb">{{social_media_form.facebook.label}}:<span>*</span></label>
             {{ social_media_form.facebook }}
@@ -287,42 +302,71 @@
           document.addEventListener("DOMContentLoaded", function () {
             const agentTypeField = document.getElementById("id_agent_type");
         
-            const fieldIdsMap = {
-              "Real Estate Agent": ["id_license_number", "id_company_name", "id_office_location"],
-              "Property Manager": ["id_company_name", "id_office_address", "id_office_phone_no"]
-            };
-        
-            function toggleFields(selectedType) {
-              const allFieldIds = [
+            // Mapping agent types to the field IDs they require
+            const agentFieldMap = {
+              "Real Estate Agent": [
                 "id_license_number",
                 "id_company_name",
+                "id_office_phone_no",
                 "id_office_location",
+                "id_company_registration_number",
+                "id_company_registration_document",
+                "id_license_document"
+              ],
+              "Property Manager": [
+                "id_company_name",
                 "id_office_address",
                 "id_office_phone_no"
-              ];
+              ]
+            };
         
-              allFieldIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                  const wrapper = el.closest(".box-fieldset");
+            // All potential field IDs that might need toggling
+            const allFieldIds = [
+              "id_license_number",
+              "id_company_name",
+              "id_office_location",
+              "id_office_address",
+              "id_office_phone_no",
+              "id_company_registration_number",
+              "id_company_registration_document",
+              "id_license_document"
+            ];
+        
+            // Utility to hide all optional fields
+            function hideAllFields() {
+              allFieldIds.forEach(fieldId => {
+                const fieldElement = document.getElementById(fieldId);
+                if (fieldElement) {
+                  const wrapper = fieldElement.closest(".box-fieldset") || fieldElement.closest(".box");
                   if (wrapper) wrapper.style.display = "none";
                 }
               });
+            }
         
-              const toShow = fieldIdsMap[selectedType] || [];
-              toShow.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                  const wrapper = el.closest(".box-fieldset");
+            // Show only fields relevant to the selected agent type
+            function showFieldsForAgentType(agentType) {
+              const requiredFields = agentFieldMap[agentType] || [];
+              requiredFields.forEach(fieldId => {
+                const fieldElement = document.getElementById(fieldId);
+                if (fieldElement) {
+                  const wrapper = fieldElement.closest(".box-fieldset") || fieldElement.closest(".box");
                   if (wrapper) wrapper.style.display = "block";
                 }
               });
             }
         
+            // Main function to update fields based on selection
+            function handleAgentTypeChange(selectedType) {
+              hideAllFields();
+              showFieldsForAgentType(selectedType);
+            }
+        
+            // Initial state and listener
             if (agentTypeField) {
-              toggleFields(agentTypeField.value);
+              handleAgentTypeChange(agentTypeField.value);
+        
               agentTypeField.addEventListener("change", function () {
-                toggleFields(this.value);
+                handleAgentTypeChange(this.value);
               });
             }
           });

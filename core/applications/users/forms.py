@@ -161,7 +161,8 @@ class AgentProfileForm(ModelForm):
         fields = [
             "office_phone_no", "office_location", "description",
             "office_address", "profile_picture", "company_name",
-            "license_number", "agent_type", 
+            "license_number", "agent_type", "company_registration_number",
+            "company_registration_document", "license_document" 
         ]
         widgets = {
             "company_name": TextInput(attrs={
@@ -187,6 +188,16 @@ class AgentProfileForm(ModelForm):
             "profile_picture": FileInput(attrs={
                 "class": "form-control"
             }),
+            "company_registration_document": FileInput(attrs={
+                "class": "form-control"
+            }),
+            "license_document": FileInput(attrs={
+                "class": "form-control"
+            }),
+            "company_registration_number": TextInput(attrs={
+                "placeholder": "Company Registration Number",
+                "class": "form-control"
+            }),
             "description": TextInput(attrs={
                 "placeholder": "Describe yourself",
                 "class": "form-control"
@@ -196,9 +207,22 @@ class AgentProfileForm(ModelForm):
                 "class": "form-control"
             }),
             "agent_type": Select(attrs={
-                "class": "form-control"
+                "class": "dropdown-item"
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+        if user:
+            try:
+                agent_profile = user.agent_profile
+                if agent_profile.agent_type:
+                    self.fields["agent_type"].disabled = True
+                    self.fields["agent_type"].required = False  # ensure no validation error
+            except AgentProfile.DoesNotExist:
+                pass
 
 
 

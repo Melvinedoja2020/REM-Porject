@@ -4,6 +4,7 @@ from django.dispatch import receiver
 
 from core.applications.users.models import AgentProfile
 from django.core.mail import send_mail
+from django.conf import settings
 
 
 @receiver(post_migrate)
@@ -22,11 +23,11 @@ def create_default_groups(sender, **kwargs):
 
 
 @receiver(post_save, sender=AgentProfile)
-def notify_agent_approval(sender, instance, **kwargs):
-    if instance.verified:
+def notify_agent_approval(sender, instance, created, **kwargs):
+    if not created and instance.verified:
         send_mail(
-            subject="Your Agent Profile Has Been Approved!",
-            message="You're now verified and can start listing properties.",
+            subject="Agent Profile Approved",
+            message="Congratulations! Your agent profile has been verified. You can now list properties.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[instance.user.email],
-            from_email="real estate market place <noreply@example.com>"
         )

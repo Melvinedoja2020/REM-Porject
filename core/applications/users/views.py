@@ -35,8 +35,8 @@ class BaseProfileView(LoginRequiredMixin, DetailView):
 
         if user.role == UserRoleChoice.AGENT.value:
             context["profile"] = user.agent_profile
-        elif user.role == UserRoleChoice.REAL_ESTATE_OWNER.value:
-            context["profile"] = user.real_estate_owner_profile
+        # elif user.role == UserRoleChoice.REAL_ESTATE_OWNER.value:
+        #     context["profile"] = user.real_estate_owner_profile
         else:
             context["profile"] = user.profile
         
@@ -96,6 +96,14 @@ class AgentProfileView(LoginRequiredMixin, UpdateView):
             return redirect("users:agent_profile", pk=request.user.pk)
 
         return self.form_invalid(profile_form)
+    
+    def get_form_kwargs(self):
+        """
+        Pass the logged-in user to the form.
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
 
 
 class OwnerProfileView(BaseProfileView):
