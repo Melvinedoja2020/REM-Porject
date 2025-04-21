@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.helper.enums import UserRoleChoice
 
-from .models import AgentProfile, RealEstateOwnerProfile, SocialMediaLinks, User, UserProfile
+from .models import AgentProfile, SocialMediaLinks, User, UserProfile
 
 from django.forms import ModelForm
 from django.db import transaction
@@ -246,25 +246,25 @@ class UsersProfile(ModelForm):
         }
 
 
-class RealEstateOwnerProfileForm(ModelForm):
-    """
-    Form to handle real estate owner profile
-    """
-    model = RealEstateOwnerProfile
-    fields = ["phone_number", "address", "profile_picture"]
-    widgets = {
-        "phone_number": TextInput(attrs={
-            "placeholder": "Phone Number",
-            "class": "form-control"
-        }),
-        "address": TextInput(attrs={
-            "placeholder": "Address",
-            "class": "form-control"
-        }),
-        "profile_picture": FileInput(attrs={
-            "class": "form-control"
-        }),
-    }
+# class RealEstateOwnerProfileForm(ModelForm):
+#     """
+#     Form to handle real estate owner profile
+#     """
+#     model = RealEstateOwnerProfile
+#     fields = ["phone_number", "address", "profile_picture"]
+#     widgets = {
+#         "phone_number": TextInput(attrs={
+#             "placeholder": "Phone Number",
+#             "class": "form-control"
+#         }),
+#         "address": TextInput(attrs={
+#             "placeholder": "Address",
+#             "class": "form-control"
+#         }),
+#         "profile_picture": FileInput(attrs={
+#             "class": "form-control"
+#         }),
+#     }
 
 
 

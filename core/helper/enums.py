@@ -7,12 +7,23 @@ class UserRoleChoice(TextChoices):
     # REAL_ESTATE_OWNER = ("Real Estate Owner", "Real Estate Owner")
 
 
-class PROPERTY_TYPES_CHOICES(TextChoices):
-    APARTMENT = ("Apartment",    "Apartment")
-    HOUSE = ("House", "House")
-    STUDIO = ("Studio", "Studio")
-    OFFICE = ("Office", "Office")
-    EVENT_HALL = ("Event Hall", "Event Hall")
+class PropertyTypeChoices(TextChoices):
+    APARTMENT = ("apartment", "Apartment")
+    HOUSE = ("house", "House")
+    STUDIO = ("studio", "Studio")
+    VILLA = ("villa", "Villa")
+    DUPLEX = ("duplex", "Duplex")
+    BUNGALOW = ("bungalow", "Bungalow")
+    PENTHOUSE = ("penthouse", "Penthouse")
+    TOWNHOUSE = ("townhouse", "Townhouse")
+    CONDO = ("condo", "Condominium")
+    LAND = ("land", "Land")
+    OFFICE = ("office", "Office Space")
+    SHOP = ("shop", "Shop")
+    WAREHOUSE = ("warehouse", "Warehouse")
+    FARM = ("farm", "Farm / Agricultural")
+    OTHER = ("other", "Other")
+
 
 
 class Lead_Status_Choices(TextChoices):

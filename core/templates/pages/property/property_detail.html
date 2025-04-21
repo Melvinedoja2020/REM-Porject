@@ -2,1146 +2,924 @@
 {% load static %}
 {% block content %}
 
-    <!-- flat-title -->
-    <section class="flat-title ">
-      <div class="tf-container">
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="title-inner ">
-              <ul class="breadcrumb">
-                <li><a class="home fw-6 text-color-3" href="index.html">Home</a></li>
-                <li>Property Listing</li>
+
+<!-- .main-content -->
+<div class="main-content">
+
+
+  <div class="single-property-gallery">
+    <div class="tf-container">
+      <div class="row">
+        <div class="position-relative">
+          <!-- Main Swiper Gallery -->
+          <div class="swiper sw-single">
+            <div class="swiper-wrapper">
+              {% for image in property.images.all %}
+              <div class="swiper-slide">
+                <a href="{{ image.image.url }}" data-fancybox="gallery" class="image-wrap d-block">
+                  <img class="lazyload img-fluid rounded" data-src="{{ image.image.url }}" src="{{ image.image.url }}"
+                    alt="Property Image" style="max-height: 400px; object-fit: cover; width: 100%;">
+                </a>
+              </div>
+              {% endfor %}
+            </div>
+            <div class="swiper-button-prev sw-button style-2 sw-thumbs-prev">
+              <i class="icon-arrow-left-1"></i>
+            </div>
+            <div class="swiper-button-next sw-button style-2 sw-thumbs-next">
+              <i class="icon-arrow-right-1"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thumbnails Swiper Pagination -->
+        <div class="swiper thumbs-sw-pagi style-2 mt-3" data-preview="6" data-space="15" data-moblie="3"
+          data-mobile-sm="6">
+          <div class="swiper-wrapper">
+            {% for image in property.images.all %}
+            <div class="swiper-slide">
+              <div class="img-thumb-pagi">
+                <img src="{{ image.image.url }}" alt="Property Thumbnail" class="img-fluid rounded"
+                  style="max-height: 90px; object-fit: cover; width: 100%;">
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- section-property-detail -->
+  <section class="section-property-detail style-2 ">
+    <div class="tf-container">
+      <div class="row">
+        <div class="col-xl-8 col-lg-7">
+          <div class="wg-property box-overview ">
+            <div class="heading flex justify-between">
+              <div class="title text-5 fw-6 text-color-heading">
+                {{ property.title }}
+              </div>
+              <div class="price text-5 fw-6 text-color-heading">
+                ${{ property.price}}
+                <span class="h5 lh-30 fw-4 text-color-default">/month</span>
+              </div>
+            </div>
+            <div class="info flex justify-between">
+              <div class="feature">
+                <p class="location text-1 flex items-center gap-10">
+                  <i class="icon-location"></i>{{ property.location }}
+                </p>
+                <ul class="meta-list flex">
+                  <li class="text-1 flex"><span>{{property.bedrooms}}</span>Bed</li>
+                  <li class="text-1 flex"><span>{{property.bathrooms}}</span>Bath</li>
+                  <li class="text-1 flex"><span>{{ property.sqty}}</span>Sqft</li>
+                </ul>
+              </div>
+              <div class="action">
+                <ul class="list-action">
+                  <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M15.75 6.1875C15.75 4.32375 14.1758 2.8125 12.234 2.8125C10.7828 2.8125 9.53625 3.657 9 4.86225C8.46375 3.657 7.21725 2.8125 5.76525 2.8125C3.825 2.8125 2.25 4.32375 2.25 6.1875C2.25 11.6025 9 15.1875 9 15.1875C9 15.1875 15.75 11.6025 15.75 6.1875Z"
+                          stroke="#5C5E61" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </a></li>
+                  <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M5.625 15.75L2.25 12.375M2.25 12.375L5.625 9M2.25 12.375H12.375M12.375 2.25L15.75 5.625M15.75 5.625L12.375 9M15.75 5.625H5.625"
+                          stroke="#5C5E61" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </a></li>
+                  <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M5.04 10.3718C4.86 10.3943 4.68 10.4183 4.5 10.4438M5.04 10.3718C7.66969 10.0418 10.3303 10.0418 12.96 10.3718M5.04 10.3718L4.755 13.5M12.96 10.3718C13.14 10.3943 13.32 10.4183 13.5 10.4438M12.96 10.3718L13.245 13.5L13.4167 15.3923C13.4274 15.509 13.4136 15.6267 13.3762 15.7378C13.3388 15.8489 13.2787 15.951 13.1996 16.0376C13.1206 16.1242 13.0244 16.1933 12.9172 16.2407C12.8099 16.288 12.694 16.3125 12.5767 16.3125H5.42325C4.92675 16.3125 4.53825 15.8865 4.58325 15.3923L4.755 13.5M4.755 13.5H3.9375C3.48995 13.5 3.06072 13.3222 2.74426 13.0057C2.42779 12.6893 2.25 12.2601 2.25 11.8125V7.092C2.25 6.28125 2.826 5.58075 3.62775 5.46075C4.10471 5.3894 4.58306 5.32764 5.0625 5.2755M13.2435 13.5H14.0618C14.2834 13.5001 14.5029 13.4565 14.7078 13.3718C14.9126 13.287 15.0987 13.1627 15.2555 13.006C15.4123 12.8493 15.5366 12.6632 15.6215 12.4585C15.7063 12.2537 15.75 12.0342 15.75 11.8125V7.092C15.75 6.28125 15.174 5.58075 14.3723 5.46075C13.8953 5.38941 13.4169 5.32764 12.9375 5.2755M12.9375 5.2755C10.3202 4.99073 7.67978 4.99073 5.0625 5.2755M12.9375 5.2755V2.53125C12.9375 2.0655 12.5595 1.6875 12.0938 1.6875H5.90625C5.4405 1.6875 5.0625 2.0655 5.0625 2.53125V5.2755M13.5 7.875H13.506V7.881H13.5V7.875ZM11.25 7.875H11.256V7.881H11.25V7.875Z"
+                          stroke="#5C5E61" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </a></li>
+                  <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M5.41251 8.18028C5.23091 7.85351 4.94594 7.5963 4.60234 7.44902C4.25874 7.30173 3.87596 7.27271 3.51408 7.36651C3.1522 7.46032 2.83171 7.67163 2.60293 7.96728C2.37414 8.26293 2.25 8.62619 2.25 9.00003C2.25 9.37387 2.37414 9.73712 2.60293 10.0328C2.83171 10.3284 3.1522 10.5397 3.51408 10.6335C3.87596 10.7273 4.25874 10.6983 4.60234 10.551C4.94594 10.4038 5.23091 10.1465 5.41251 9.81978M5.41251 8.18028C5.54751 8.42328 5.62476 8.70228 5.62476 9.00003C5.62476 9.29778 5.54751 9.57753 5.41251 9.81978M5.41251 8.18028L12.587 4.19478M5.41251 9.81978L12.587 13.8053M12.587 4.19478C12.6922 4.39288 12.8358 4.56803 13.0095 4.70998C13.1832 4.85192 13.3834 4.95782 13.5985 5.02149C13.8135 5.08515 14.0392 5.1053 14.2621 5.08075C14.4851 5.0562 14.7009 4.98745 14.897 4.87853C15.093 4.7696 15.2654 4.62267 15.404 4.44634C15.5427 4.27001 15.6448 4.06781 15.7043 3.85157C15.7639 3.63532 15.7798 3.40937 15.751 3.18693C15.7222 2.96448 15.6494 2.75 15.5368 2.55603C15.3148 2.17378 14.9518 1.89388 14.5256 1.77649C14.0995 1.6591 13.6443 1.71359 13.2579 1.92824C12.8715 2.1429 12.5848 2.50059 12.4593 2.92442C12.3339 3.34826 12.3797 3.80439 12.587 4.19478ZM12.587 13.8053C12.4794 13.9991 12.4109 14.2121 12.3856 14.4324C12.3603 14.6526 12.3787 14.8757 12.4396 15.0888C12.5005 15.3019 12.6028 15.501 12.7406 15.6746C12.8784 15.8482 13.0491 15.993 13.2429 16.1007C13.4367 16.2083 13.6498 16.2767 13.87 16.302C14.0902 16.3273 14.3133 16.309 14.5264 16.2481C14.7396 16.1872 14.9386 16.0849 15.1122 15.9471C15.2858 15.8092 15.4306 15.6386 15.5383 15.4448C15.7557 15.0534 15.8087 14.5917 15.6857 14.1613C15.5627 13.7308 15.2737 13.3668 14.8824 13.1494C14.491 12.932 14.0293 12.879 13.5989 13.002C13.1684 13.125 12.8044 13.4139 12.587 13.8053Z"
+                          stroke="#5C5E61" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      </svg>
+                    </a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="info-detail ">
+              {% comment %} <div class="wrap-box">
+                <div class="box-icon">
+                  <div class="icons">
+                    <i class="icon-HouseLine"></i>
+                  </div>
+                  <div class="content">
+                    <div class="text-4 text-color-default">ID:</div>
+                    <div class="text-1 text-color-heading">{{ property.id}}</div>
+                  </div>
+                </div>
+                <div class="box-icon">
+                  <div class="icons">
+                    <i class="icon-Bathtub"></i>
+                  </div>
+                  <div class="content">
+                    <div class="text-4 text-color-default">Bathrooms:</div>
+                    <div class="text-1 text-color-heading">{{ property.bathrooms }} Rooms</div>
+                  </div>
+                </div>
+              </div> {% endcomment %}
+              <div class="wrap-box">
+                <div class="box-icon">
+                  <div class="icons">
+                    <i class="icon-SlidersHorizontal"></i>
+                  </div>
+                  <div class="content">
+                    <div class="text-4 text-color-default">Type:</div>
+                    <div class="text-1 text-color-heading">{{ property.property_type}}</div>
+                  </div>
+                </div>
+                <div class="box-icon">
+                  <div class="icons">
+                    <i class="icon-Crop"></i>
+                  </div>
+                  <div class="content">
+                    <div class="text-4 text-color-default">Land Size:</div>
+                    <div class="text-1 text-color-heading">{{ property.sqft}} SqFt</div>
+                  </div>
+                </div>
+              </div>
+              {% comment %} <div class="wrap-box">
+                <div class="box-icon">
+                  <div class="icons">
+                    <i class="icon-Garage-1"></i>
+                  </div>
+                  <div class="content">
+                    <div class="text-4 text-color-default">Garages</div>
+                    <div class="text-1 text-color-heading">1</div>
+                  </div>
+                </div> {% endcomment %}
+                {% comment %} <div class="box-icon">
+                  <div class="icons">
+                    <i class="icon-Hammer"></i>
+                  </div>
+                  <div class="content">
+                    <div class="text-4 text-color-default">Year Built:</div>
+                    <div class="text-1 text-color-heading">2023</div>
+                  </div>
+                </div> {% endcomment %}
+              </div>
+              <div class="wrap-box">
+                <div class="box-icon">
+                  <div class="icons">
+                    <i class="icon-Bed-2"></i>
+                  </div>
+                  <div class="content">
+                    <div class="text-4 text-color-default">Bedrooms:</div>
+                    <div class="text-1 text-color-heading">{{ property.bedrooms}} Rooms</div>
+                  </div>
+                </div>
+                <div class="box-icon">
+                  <div class="icons">
+                    <i class="icon-Ruler"></i>
+                  </div>
+                  <div class="content">
+                    <div class="text-4 text-color-default">Size:</div>
+                    <div class="text-1 text-color-heading">{{ property.sqft}} SqFt</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% comment %} <a href="#" class="tf-btn bg-color-primary pd-21 fw-6">Ask a question</a> {% endcomment %}
+          </div>
+
+          <div class="wg-property box-property-detail  spacing-1">
+            <div class="wg-title text-11 fw-6 text-color-heading">
+              Property Details
+            </div>
+            <div class="content">
+              <p class="description text-1 mb-10">{{ property.description}}.</p>
+              <a href="#" class="tf-btn-link style-hover-rotate">
+                {% comment %} <span>Read More
+                </span> {% endcomment %}
+                <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clip-path="url(#clip0_2348_5612)">
+                    <path
+                      d="M1.66732 9.99999C1.66732 14.6024 5.39828 18.3333 10.0007 18.3333C14.603 18.3333 18.334 14.6024 18.334 9.99999C18.334 5.39762 14.603 1.66666 10.0007 1.66666C5.39828 1.66666 1.66732 5.39762 1.66732 9.99999Z"
+                      stroke="#F1913D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M10 6.66666L10 13.3333" stroke="#F1913D" stroke-width="1.5" stroke-linecap="round"
+                      stroke-linejoin="round"></path>
+                    <path d="M6.66732 10L10.0007 13.3333L13.334 10" stroke="#F1913D" stroke-width="1.5"
+                      stroke-linecap="round" stroke-linejoin="round"></path>
+                  </g>
+                  <defs>
+                    <clippath id="clip0_2348_5612">
+                      <rect width="20" height="20" fill="white" transform="translate(20) rotate(90)"></rect>
+                    </clippath>
+                  </defs>
+                </svg>
+              </a>
+            </div>
+            <div class="box">
+              <ul>
+                <li class="flex">
+                  <p class="fw-6">ID</p>
+                  <p>#{{property.id}}</p>
+                </li>
+                <li class="flex">
+                  <p class="fw-6">Price</p>
+                  <p>${{ property.price}}</p>
+                </li>
+                <li class="flex">
+                  <p class="fw-6">Size</p>
+                  <p>{{ property.sqft}} sqft</p>
+                </li>
+                <li class="flex">
+                  <p class="fw-6">Rooms</p>
+                  <p>{{ property.bedrooms}}</p>
+                </li>
+                <li class="flex">
+                  <p class="fw-6">Baths</p>
+                  <p>{{ property.bathrooms }}</p>
+                </li>
+              </ul>
+              <ul>
+                {% comment %} <li class="flex">
+                  <p class="fw-6">Beds</p>
+                  <p>7.328</p>
+                </li>
+                <li class="flex">
+                  <p class="fw-6">Year buit</p>
+                  <p>2022</p>
+                </li> {% endcomment %}
+                <li class="flex">
+                  <p class="fw-6">Type</p>
+                  <p>{{ property.property_type}}</p>
+                </li>
+                <li class="flex">
+                  <p class="fw-6">Status</p>
+                  <p>{{ proerty.property_listing}}</p>
+                </li>
+                {% comment %} <li class="flex">
+                  <p class="fw-6">Garage</p>
+                  <p>1</p>
+                </li> {% endcomment %}
               </ul>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-    <!-- /flat-title -->
-
-    <!-- .main-content -->
-    <div class="main-content">
-
-
-      <div class=" single-property-gallery ">
-        <div class="tf-container">
-          <div class="row">
-            <div class="position-relative">
-              <div class="swiper sw-single">
-                <div class="swiper-wrapper">
-                  <div class="swiper-slide">
-                    <a href="images/section/property-details-thumbs-2.jpg" data-fancybox="gallery"
-                      class="image-wrap d-block">
-                      <img class="lazyload" data-src="images/section/property-details-thumbs-2.jpg"
-                        src="images/section/property-details-thumbs-2.jpg" alt="">
-                    </a>
-                  </div>
-                  <div class="swiper-slide">
-                    <a href="images/section/property-details-thumbs-3.jpg" data-fancybox="gallery"
-                      class="image-wrap d-block">
-                      <img class="lazyload" data-src="images/section/property-details-thumbs-3.jpg"
-                        src="images/section/property-details-thumbs-3.jpg" alt="">
-                    </a>
-                  </div>
-                  <div class="swiper-slide">
-                    <a href="images/section/property-details-thumbs-4.jpg" data-fancybox="gallery"
-                      class="image-wrap d-block">
-                      <img class="lazyload" data-src="images/section/property-details-thumbs-4.jpg"
-                        src="images/section/property-details-thumbs-4.jpg" alt="">
-                    </a>
-                  </div>
-                  <div class="swiper-slide">
-                    <a href="images/section/property-details-thumbs-5.jpg" data-fancybox="gallery"
-                      class="image-wrap d-block">
-                      <img class="lazyload" data-src="images/section/property-details-thumbs-5.jpg"
-                        src="images/section/property-details-thumbs-5.jpg" alt="">
-                    </a>
-                  </div>
-                  <div class="swiper-slide">
-                    <a href="images/section/property-details-thumbs-6.jpg" data-fancybox="gallery"
-                      class="image-wrap d-block">
-                      <img class="lazyload" data-src="images/section/property-details-thumbs-6.jpg"
-                        src="images/section/property-details-thumbs-6.jpg" alt="">
-                    </a>
-                  </div>
-                  <div class="swiper-slide">
-                    <a href="images/section/property-details-thumbs-7.jpg" data-fancybox="gallery"
-                      class="image-wrap d-block">
-                      <img class="lazyload" data-src="images/section/property-details-thumbs-7.jpg"
-                        src="images/section/property-details-thumbs-7.jpg" alt="">
-                    </a>
-                  </div>
-                </div>
-                <div class="swiper-button-prev sw-button style-2 sw-thumbs-prev">
-                  <i class="icon-arrow-left-1"></i>
-                </div>
-                <div class="swiper-button-next sw-button style-2 sw-thumbs-next">
-                  <i class="icon-arrow-right-1"></i>
-                </div>
-              </div>
+          <div class="wg-property box-amenities spacing-3">
+            <div class="wg-title text-11 fw-6 text-color-heading">
+              Amenities And Features
             </div>
-            <div class="swiper thumbs-sw-pagi style-2" data-preview="6" data-space="15" data-moblie="3"
-              data-mobile-sm="6">
-              <div class="swiper-wrapper">
-                <div class="swiper-slide">
-                  <div class="img-thumb-pagi">
-                    <img src="images/section/sw-thumbs-6.jpg" alt="images">
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="img-thumb-pagi">
-                    <img src="images/section/sw-thumbs-7.jpg" alt="images">
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="img-thumb-pagi">
-                    <img src="images/section/sw-thumbs-8.jpg" alt="images">
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="img-thumb-pagi">
-                    <img src="images/section/sw-thumbs-9.jpg" alt="images">
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="img-thumb-pagi">
-                    <img src="images/section/sw-thumbs-10.jpg" alt="images">
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div class="img-thumb-pagi">
-                    <img src="images/section/sw-thumbs-11.jpg" alt="images">
-                  </div>
-                </div>
+            <div class="wrap-feature">
+              <div class="box-feature">
+                <ul>
+                  {% for amenity in property.amenities.all %}
+                  <li class="feature-item">
+                    {{ amenity.name }}
+                  </li>
+                  {% endfor %}
+
+                </ul>
               </div>
+
             </div>
           </div>
-        </div>
+          {% comment %} <div class="wg-property single-property-map spacing-11">
+            <div class="wg-title text-11 fw-6 text-color-heading">Get Direction</div>
+            <iframe class="map"
+              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d135905.11693909427!2d-73.95165795400088!3d41.17584829642291!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1727094281524!5m2!1sen!2s"
+              style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div class="info-map">
+              <ul class="box-left">
+                <li>
+                  <span class="label fw-6">Address</span>
+                  <div class="text text-variant-1">150 sqft</div>
+                </li>
+                <li>
+                  <span class="label fw-6">City</span>
+                  <div class="text text-variant-1">#1234</div>
+                </li>
+                <li>
+                  <span class="label fw-6">State/county</span>
+                  <div class="text text-variant-1">$7,500</div>
+                </li>
+              </ul>
+              <ul class="box-right">
+                <li>
+                  <span class="label fw-6">Postal code</span>
+                  <div class="text text-variant-1">7.328</div>
+                </li>
+                <li>
+                  <span class="label fw-6">Area</span>
+                  <div class="text text-variant-1">7.328</div>
+                </li>
+                <li>
+                  <span class="label fw-6">Country</span>
+                  <div class="text text-variant-1">2024</div>
+                </li>
+              </ul>
+            </div>
+          </div> {% endcomment %}
+          {% comment %} <div class="wg-property single-property-floor spacing-4">
+            <div class="wg-title text-11 fw-6 text-color-heading">Floor Plans</div>
+            <ul class="box-floor" id="parent-floor">
+              <li class="floor-item">
+                <div class="floor-header" role="button" data-bs-target="#floor-one" data-bs-toggle="collapse"
+                  aria-expanded="false" aria-controls="floor-one">
+                  <div class="inner-left">
+                    <i class="icon icon-CaretDown"></i>
+                    <span class="text-btn">First Floor</span>
+                  </div>
+                  <ul class="inner-right">
+                    <li class="flex items-center gap-8">
+                      <i class="icon icon-beds-3"></i>
+                      2 Bedroom
+                    </li>
+                    <li class="flex items-center gap-8">
+                      <i class="icon icon-baths"></i>
+                      2 Bathroom
+                    </li>
+                  </ul>
+                </div>
+                <div id="floor-one" class="collapse show" data-bs-parent="#parent-floor">
+                  <div class="faq-body">
+                    <div class="box-img">
+                      <img src="{% static 'images/section/floor.jpg' %}" alt="img-floor">
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="floor-item">
+                <div class="floor-header collapsed" role="button" data-bs-target="#floor-two" data-bs-toggle="collapse"
+                  aria-expanded="false" aria-controls="floor-two">
+                  <div class="inner-left">
+                    <i class="icon icon-CaretDown"></i>
+                    <span class="text-btn">Second Floor</span>
+                  </div>
+                  <ul class="inner-right">
+                    <li class="flex items-center gap-8">
+                      <i class="icon icon-beds-3"></i>
+                      2 Bedroom
+                    </li>
+                    <li class="flex items-center gap-8">
+                      <i class="icon icon-baths"></i>
+                      2 Bathroom
+                    </li>
+                  </ul>
+                </div>
+                <div id="floor-two" class="collapse" data-bs-parent="#parent-floor">
+                  <div class="faq-body">
+                    <div class="box-img">
+                      <img src="{% static 'images/section/floor.jpg' %}" alt="img-floor">
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div> {% endcomment %}
+          {% comment %} <div class="wg-property box-attachments spacing-5">
+            <div class="wg-title text-11 fw-6 text-color-heading">File Attachments</div>
+            <div class="row">
+              <div class="col-sm-6">
+                <a href="#" target="_blank" class="attachments-item">
+                  <div class="box-icon w-60">
+                    <img src="{% static 'images/items/download-1.png' %}" alt="file">
+                  </div>
+                  <span>Villa-Document.pdf</span>
+                  <i class="icon icon-DownloadSimple"></i>
+                </a>
+              </div>
+              <div class="col-sm-6">
+                <a href="#" target="_blank" class="attachments-item">
+                  <div class="box-icon w-60">
+                    <img src="{% static 'images/items/download-2.png' %}" alt="file">
+                  </div>
+                  <span>Villa-Document.pdf</span>
+                  <i class="icon icon-DownloadSimple"></i>
+                </a>
+              </div>
+            </div>
+          </div> {% endcomment %}
+          {% comment %} <div class="wg-property box-virtual-tour spacing-6">
+            <div class="wg-title text-11 fw-6 text-color-heading">360 Virtual Tour</div>
+            <div class="image-wrap">
+              <img src="{% static 'images/section/property-detail-2.jpg' %}" alt="">
+              <div class="box-icon">
+                <div class="icons">
+                  <i class="icon-360"></i>
+                </div>
+              </div>
+            </div>
+          </div> {% endcomment %}
+          {% comment %} <div class="wg-property box-loan spacing-4">
+            <div class="wg-title text-11 fw-6 text-color-heading">Loan Calculator</div>
+            <form class="form-pre-approved">
+              <div class="cols ">
+                <fieldset>
+                  <label class=" text-1 fw-6 mb-12" for="amount">Total Amount</label>
+                  <input type="number" id="amount" placeholder="1000">
+                </fieldset>
+                <div class="wrap-input">
+                  <fieldset class="payment">
+                    <label class="text-1 fw-6 mb-12" for="payment">Down Payment</label>
+                    <input type="number" id="payment" placeholder="2000">
+                  </fieldset>
+                  <fieldset class="percent">
+                    <input class="input-percent" type="text" value="20%">
+                  </fieldset>
+                </div>
+              </div>
+              <div class="cols">
+                <fieldset class="interest-rate">
+                  <label class="text-1 fw-6 mb-12" for="interest-rate">Interest Rate</label>
+                  <input type="number" id="interest-rate" placeholder="0">
+                </fieldset>
+                <div class="select">
+                  <label class="text-1 fw-6 mb-12">Amortization Period (months)</label>
+                  <div class="nice-select" tabindex="0">
+                    <span class="current">Select amortization period</span>
+                    <ul class="list">
+                      <li data-value="" class="option selected">Select amortization period
+                      </li>
+                      <li data-value="1 month" class="option">1 month</li>
+                      <li data-value="2 months" class="option">2 months</li>
+                      <li data-value="3 months" class="option">3 months</li>
+                      <li data-value="4 months" class="option">4 months</li>
+                      <li data-value="5 months" class="option">5 months</li>
+                      <li data-value="6 months" class="option">6 months</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="cols">
+                <fieldset>
+                  <label class=" text-1 fw-6 mb-12" for="tax">Property Tax</label>
+                  <input type="number" id="tax" placeholder="$3000">
+                </fieldset>
+                <fieldset>
+                  <label class=" text-1 fw-6 mb-12" for="insurance">Home Insurance</label>
+                  <input type="number" id="insurance" placeholder="$3000">
+                </fieldset>
+              </div>
 
-      </div>
-
-      <!-- section-property-detail -->
-      <section class="section-property-detail style-2 ">
-        <div class="tf-container">
-          <div class="row">
-            <div class="col-xl-8 col-lg-7">
-              <div class="wg-property box-overview ">
-                <div class="heading flex justify-between">
-                  <div class="title text-5 fw-6 text-color-heading">
-                    Elegant studio flat
-                  </div>
-                  <div class="price text-5 fw-6 text-color-heading">
-                    $250,00
-                    <span class="h5 lh-30 fw-4 text-color-default">/month</span>
-                  </div>
-                </div>
-                <div class="info flex justify-between">
-                  <div class="feature">
-                    <p class="location text-1 flex items-center gap-10">
-                      <i class="icon-location"></i>102 Ingraham St, Brooklyn, NY 11237
-                    </p>
-                    <ul class="meta-list flex">
-                      <li class="text-1 flex"><span>3</span>Bed</li>
-                      <li class="text-1 flex"><span>3</span>Bath</li>
-                      <li class="text-1 flex"><span>4,043</span>Sqft</li>
-                    </ul>
-                  </div>
-                  <div class="action">
-                    <ul class="list-action">
-                      <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                              d="M15.75 6.1875C15.75 4.32375 14.1758 2.8125 12.234 2.8125C10.7828 2.8125 9.53625 3.657 9 4.86225C8.46375 3.657 7.21725 2.8125 5.76525 2.8125C3.825 2.8125 2.25 4.32375 2.25 6.1875C2.25 11.6025 9 15.1875 9 15.1875C9 15.1875 15.75 11.6025 15.75 6.1875Z"
-                              stroke="#5C5E61" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                          </svg>
-                        </a></li>
-                      <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                              d="M5.625 15.75L2.25 12.375M2.25 12.375L5.625 9M2.25 12.375H12.375M12.375 2.25L15.75 5.625M15.75 5.625L12.375 9M15.75 5.625H5.625"
-                              stroke="#5C5E61" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                          </svg>
-                        </a></li>
-                      <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                              d="M5.04 10.3718C4.86 10.3943 4.68 10.4183 4.5 10.4438M5.04 10.3718C7.66969 10.0418 10.3303 10.0418 12.96 10.3718M5.04 10.3718L4.755 13.5M12.96 10.3718C13.14 10.3943 13.32 10.4183 13.5 10.4438M12.96 10.3718L13.245 13.5L13.4167 15.3923C13.4274 15.509 13.4136 15.6267 13.3762 15.7378C13.3388 15.8489 13.2787 15.951 13.1996 16.0376C13.1206 16.1242 13.0244 16.1933 12.9172 16.2407C12.8099 16.288 12.694 16.3125 12.5767 16.3125H5.42325C4.92675 16.3125 4.53825 15.8865 4.58325 15.3923L4.755 13.5M4.755 13.5H3.9375C3.48995 13.5 3.06072 13.3222 2.74426 13.0057C2.42779 12.6893 2.25 12.2601 2.25 11.8125V7.092C2.25 6.28125 2.826 5.58075 3.62775 5.46075C4.10471 5.3894 4.58306 5.32764 5.0625 5.2755M13.2435 13.5H14.0618C14.2834 13.5001 14.5029 13.4565 14.7078 13.3718C14.9126 13.287 15.0987 13.1627 15.2555 13.006C15.4123 12.8493 15.5366 12.6632 15.6215 12.4585C15.7063 12.2537 15.75 12.0342 15.75 11.8125V7.092C15.75 6.28125 15.174 5.58075 14.3723 5.46075C13.8953 5.38941 13.4169 5.32764 12.9375 5.2755M12.9375 5.2755C10.3202 4.99073 7.67978 4.99073 5.0625 5.2755M12.9375 5.2755V2.53125C12.9375 2.0655 12.5595 1.6875 12.0938 1.6875H5.90625C5.4405 1.6875 5.0625 2.0655 5.0625 2.53125V5.2755M13.5 7.875H13.506V7.881H13.5V7.875ZM11.25 7.875H11.256V7.881H11.25V7.875Z"
-                              stroke="#5C5E61" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                          </svg>
-                        </a></li>
-                      <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                              d="M5.41251 8.18028C5.23091 7.85351 4.94594 7.5963 4.60234 7.44902C4.25874 7.30173 3.87596 7.27271 3.51408 7.36651C3.1522 7.46032 2.83171 7.67163 2.60293 7.96728C2.37414 8.26293 2.25 8.62619 2.25 9.00003C2.25 9.37387 2.37414 9.73712 2.60293 10.0328C2.83171 10.3284 3.1522 10.5397 3.51408 10.6335C3.87596 10.7273 4.25874 10.6983 4.60234 10.551C4.94594 10.4038 5.23091 10.1465 5.41251 9.81978M5.41251 8.18028C5.54751 8.42328 5.62476 8.70228 5.62476 9.00003C5.62476 9.29778 5.54751 9.57753 5.41251 9.81978M5.41251 8.18028L12.587 4.19478M5.41251 9.81978L12.587 13.8053M12.587 4.19478C12.6922 4.39288 12.8358 4.56803 13.0095 4.70998C13.1832 4.85192 13.3834 4.95782 13.5985 5.02149C13.8135 5.08515 14.0392 5.1053 14.2621 5.08075C14.4851 5.0562 14.7009 4.98745 14.897 4.87853C15.093 4.7696 15.2654 4.62267 15.404 4.44634C15.5427 4.27001 15.6448 4.06781 15.7043 3.85157C15.7639 3.63532 15.7798 3.40937 15.751 3.18693C15.7222 2.96448 15.6494 2.75 15.5368 2.55603C15.3148 2.17378 14.9518 1.89388 14.5256 1.77649C14.0995 1.6591 13.6443 1.71359 13.2579 1.92824C12.8715 2.1429 12.5848 2.50059 12.4593 2.92442C12.3339 3.34826 12.3797 3.80439 12.587 4.19478ZM12.587 13.8053C12.4794 13.9991 12.4109 14.2121 12.3856 14.4324C12.3603 14.6526 12.3787 14.8757 12.4396 15.0888C12.5005 15.3019 12.6028 15.501 12.7406 15.6746C12.8784 15.8482 13.0491 15.993 13.2429 16.1007C13.4367 16.2083 13.6498 16.2767 13.87 16.302C14.0902 16.3273 14.3133 16.309 14.5264 16.2481C14.7396 16.1872 14.9386 16.0849 15.1122 15.9471C15.2858 15.8092 15.4306 15.6386 15.5383 15.4448C15.7557 15.0534 15.8087 14.5917 15.6857 14.1613C15.5627 13.7308 15.2737 13.3668 14.8824 13.1494C14.491 12.932 14.0293 12.879 13.5989 13.002C13.1684 13.125 12.8044 13.4139 12.587 13.8053Z"
-                              stroke="#5C5E61" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                          </svg>
-                        </a></li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="info-detail ">
-                  <div class="wrap-box">
-                    <div class="box-icon">
-                      <div class="icons">
-                        <i class="icon-HouseLine"></i>
-                      </div>
-                      <div class="content">
-                        <div class="text-4 text-color-default">ID:</div>
-                        <div class="text-1 text-color-heading">2297</div>
-                      </div>
-                    </div>
-                    <div class="box-icon">
-                      <div class="icons">
-                        <i class="icon-Bathtub"></i>
-                      </div>
-                      <div class="content">
-                        <div class="text-4 text-color-default">Bathrooms:</div>
-                        <div class="text-1 text-color-heading">2 Rooms</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="wrap-box">
-                    <div class="box-icon">
-                      <div class="icons">
-                        <i class="icon-SlidersHorizontal"></i>
-                      </div>
-                      <div class="content">
-                        <div class="text-4 text-color-default">Type:</div>
-                        <div class="text-1 text-color-heading">Hourse</div>
-                      </div>
-                    </div>
-                    <div class="box-icon">
-                      <div class="icons">
-                        <i class="icon-Crop"></i>
-                      </div>
-                      <div class="content">
-                        <div class="text-4 text-color-default">Land Size:</div>
-                        <div class="text-1 text-color-heading">2,000 SqFt</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="wrap-box">
-                    <div class="box-icon">
-                      <div class="icons">
-                        <i class="icon-Garage-1"></i>
-                      </div>
-                      <div class="content">
-                        <div class="text-4 text-color-default">Garages</div>
-                        <div class="text-1 text-color-heading">1</div>
-                      </div>
-                    </div>
-                    <div class="box-icon">
-                      <div class="icons">
-                        <i class="icon-Hammer"></i>
-                      </div>
-                      <div class="content">
-                        <div class="text-4 text-color-default">Year Built:</div>
-                        <div class="text-1 text-color-heading">2023</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="wrap-box">
-                    <div class="box-icon">
-                      <div class="icons">
-                        <i class="icon-Bed-2"></i>
-                      </div>
-                      <div class="content">
-                        <div class="text-4 text-color-default">Bedrooms:</div>
-                        <div class="text-1 text-color-heading">2 Rooms</div>
-                      </div>
-                    </div>
-                    <div class="box-icon">
-                      <div class="icons">
-                        <i class="icon-Ruler"></i>
-                      </div>
-                      <div class="content">
-                        <div class="text-4 text-color-default">Size:</div>
-                        <div class="text-1 text-color-heading">900 SqFt</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <a href="#" class="tf-btn bg-color-primary pd-21 fw-6">Ask a question</a>
+              <div class="wrap-btn flex items-center justify-between ">
+                <a href="#" class="tf-btn bg-color-primary  pd-22 fw-7">
+                  Calculate now <i class="icon-arrow-right-2 fw-4
+                                            "></i>
+                </a>
+                <p class="text-1 mb-0 fw-5 text-color-heading">Your estimated monthly payment:
+                  <span>$599.25</span>
+                </p>
               </div>
-              <div class=" wg-property video spacing-2">
-                <div class="wg-title text-11 fw-6 text-color-heading">
-                  Video
-                </div>
-                <div class="widget-video style-1">
-                  <img class="lazyload" data-src="images/section/property-detail.jpg"
-                    src="images/section/property-detail.jpg" alt="">
-                  <a href="https://www.youtube.com/watch?v=MLpWrANjFbI" class="popup-youtube">
-                    <i class="icon-play"></i></a>
-                </div>
-              </div>
-              <div class="wg-property box-property-detail  spacing-1">
-                <div class="wg-title text-11 fw-6 text-color-heading">
-                  Property Details
-                </div>
-                <div class="content">
-                  <p class="description text-1 mb-10">3 Units in North Hollywood with upside potential
-                    through
-                    construction of an ADU (buyer to verify). Unit mix consists of (3) 3+1 bath
-                    units.
-                    The building is a total of 2, 660 square feet and situated on a 6, 001 square
-                    foot
-                    lot. Easy access to the 101, 170, and 134 freeways. The building is separately
-                    metered for gas and electricity.</p>
-                  <a href="#" class="tf-btn-link style-hover-rotate">
-                    <span>Read More
-                    </span>
-                    <svg width="20" height="20" viewbox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g clip-path="url(#clip0_2348_5612)">
-                        <path
-                          d="M1.66732 9.99999C1.66732 14.6024 5.39828 18.3333 10.0007 18.3333C14.603 18.3333 18.334 14.6024 18.334 9.99999C18.334 5.39762 14.603 1.66666 10.0007 1.66666C5.39828 1.66666 1.66732 5.39762 1.66732 9.99999Z"
-                          stroke="#F1913D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                        <path d="M10 6.66666L10 13.3333" stroke="#F1913D" stroke-width="1.5" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M6.66732 10L10.0007 13.3333L13.334 10" stroke="#F1913D" stroke-width="1.5"
-                          stroke-linecap="round" stroke-linejoin="round"></path>
-                      </g>
-                      <defs>
-                        <clippath id="clip0_2348_5612">
-                          <rect width="20" height="20" fill="white" transform="translate(20) rotate(90)"></rect>
-                        </clippath>
-                      </defs>
-                    </svg>
-                  </a>
-                </div>
-                <div class="box">
-                  <ul>
-                    <li class="flex">
-                      <p class="fw-6">ID</p>
-                      <p>#1234</p>
-                    </li>
-                    <li class="flex">
-                      <p class="fw-6">Price</p>
-                      <p>$7,500</p>
-                    </li>
-                    <li class="flex">
-                      <p class="fw-6">Size</p>
-                      <p>150 sqft</p>
-                    </li>
-                    <li class="flex">
-                      <p class="fw-6">Rooms</p>
-                      <p>9</p>
-                    </li>
-                    <li class="flex">
-                      <p class="fw-6">Baths</p>
-                      <p>3</p>
-                    </li>
-                  </ul>
-                  <ul>
-                    <li class="flex">
-                      <p class="fw-6">Beds</p>
-                      <p>7.328</p>
-                    </li>
-                    <li class="flex">
-                      <p class="fw-6">Year buit</p>
-                      <p>2022</p>
-                    </li>
-                    <li class="flex">
-                      <p class="fw-6">Type</p>
-                      <p>Villa</p>
-                    </li>
-                    <li class="flex">
-                      <p class="fw-6">Status</p>
-                      <p>For sale</p>
-                    </li>
-                    <li class="flex">
-                      <p class="fw-6">Garage</p>
-                      <p>1</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="wg-property box-amenities spacing-3">
-                <div class="wg-title text-11 fw-6 text-color-heading">
-                  Amenities And Features
-                </div>
-                <div class="wrap-feature">
-                  <div class="box-feature">
-                    <ul>
-                      <li class="feature-item">
-                        Smoke alarm
-                      </li>
-                      <li class="feature-item">
-                        Carbon monoxide alarm
-                      </li>
-                      <li class="feature-item">
-                        First aid kit
-                      </li>
-                      <li class="feature-item">
-                        Self check-in with lockbox
-                      </li>
-                      <li class="feature-item">
-                        Security cameras
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="box-feature">
-                    <ul>
-                      <li class="feature-item">
-                        Hangers
-                      </li>
-                      <li class="feature-item">
-                        Bed linens
-                      </li>
-                      <li class="feature-item">
-                        Extra pillows & blankets
-                      </li>
-                      <li class="feature-item">
-                        Iron
-                      </li>
-                      <li class="feature-item">
-                        TV with standard cable
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="box-feature">
-                    <ul>
-                      <li class="feature-item">
-                        Refrigerator
-                      </li>
-                      <li class="feature-item">
-                        Microwave
-                      </li>
-                      <li class="feature-item">
-                        Dishwasher
-                      </li>
-                      <li class="feature-item">
-                        Coffee maker
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div class="wg-property single-property-map spacing-11">
-                <div class="wg-title text-11 fw-6 text-color-heading">Get Direction</div>
-                <iframe class="map"
-                  src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d135905.11693909427!2d-73.95165795400088!3d41.17584829642291!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1727094281524!5m2!1sen!2s"
-                  style="border:0;" allowfullscreen="" loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade"></iframe>
-                <div class="info-map">
-                  <ul class="box-left">
-                    <li>
-                      <span class="label fw-6">Address</span>
-                      <div class="text text-variant-1">150 sqft</div>
-                    </li>
-                    <li>
-                      <span class="label fw-6">City</span>
-                      <div class="text text-variant-1">#1234</div>
-                    </li>
-                    <li>
-                      <span class="label fw-6">State/county</span>
-                      <div class="text text-variant-1">$7,500</div>
-                    </li>
-                  </ul>
-                  <ul class="box-right">
-                    <li>
-                      <span class="label fw-6">Postal code</span>
-                      <div class="text text-variant-1">7.328</div>
-                    </li>
-                    <li>
-                      <span class="label fw-6">Area</span>
-                      <div class="text text-variant-1">7.328</div>
-                    </li>
-                    <li>
-                      <span class="label fw-6">Country</span>
-                      <div class="text text-variant-1">2024</div>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div class="wg-property single-property-floor spacing-4">
-                <div class="wg-title text-11 fw-6 text-color-heading">Floor Plans</div>
-                <ul class="box-floor" id="parent-floor">
-                  <li class="floor-item">
-                    <div class="floor-header" role="button" data-bs-target="#floor-one" data-bs-toggle="collapse"
-                      aria-expanded="false" aria-controls="floor-one">
-                      <div class="inner-left">
-                        <i class="icon icon-CaretDown"></i>
-                        <span class="text-btn">First Floor</span>
-                      </div>
-                      <ul class="inner-right">
-                        <li class="flex items-center gap-8">
-                          <i class="icon icon-beds-3"></i>
-                          2 Bedroom
-                        </li>
-                        <li class="flex items-center gap-8">
-                          <i class="icon icon-baths"></i>
-                          2 Bathroom
-                        </li>
-                      </ul>
-                    </div>
-                    <div id="floor-one" class="collapse show" data-bs-parent="#parent-floor">
-                      <div class="faq-body">
-                        <div class="box-img">
-                          <img src="images/section/floor.jpg" alt="img-floor">
-                        </div>
-                      </div>
-                    </div>
+            </form>
+          </div> {% endcomment %}
+          {% comment %} <div class="wg-property single-property-nearby spacing-7">
+            <div class="wg-title text-11 fw-6 text-color-heading">What’s Nearby?</div>
+            <p class="description text-color-default">Explore nearby amenities to precisely locate
+              your property and identify surrounding conveniences, providing a comprehensive
+              overview of the living environment and the property's convenience.</p>
+            <div class="row box-nearby">
+              <div class="col-md-5">
+                <ul class="box-left">
+                  <li class="item-nearby">
+                    <span class="fw-7 label text-4">School:</span>
+                    <span>0.7 km</span>
                   </li>
-                  <li class="floor-item">
-                    <div class="floor-header collapsed" role="button" data-bs-target="#floor-two"
-                      data-bs-toggle="collapse" aria-expanded="false" aria-controls="floor-two">
-                      <div class="inner-left">
-                        <i class="icon icon-CaretDown"></i>
-                        <span class="text-btn">Second Floor</span>
-                      </div>
-                      <ul class="inner-right">
-                        <li class="flex items-center gap-8">
-                          <i class="icon icon-beds-3"></i>
-                          2 Bedroom
-                        </li>
-                        <li class="flex items-center gap-8">
-                          <i class="icon icon-baths"></i>
-                          2 Bathroom
-                        </li>
-                      </ul>
-                    </div>
-                    <div id="floor-two" class="collapse" data-bs-parent="#parent-floor">
-                      <div class="faq-body">
-                        <div class="box-img">
-                          <img src="images/section/floor.jpg" alt="img-floor">
-                        </div>
-                      </div>
-                    </div>
+                  <li class="item-nearby">
+                    <span class="fw-7 label text-4">University:</span>
+                    <span>1.3 km</span>
+                  </li>
+                  <li class="item-nearby">
+                    <span class="fw-7 label text-4">Grocery center:</span>
+                    <span>0.6 km</span>
+                  </li>
+                  <li class="item-nearby">
+                    <span class="fw-7 label text-4">Market:</span>
+                    <span>1.1 km</span>
                   </li>
                 </ul>
               </div>
-              <div class="wg-property box-attachments spacing-5">
-                <div class="wg-title text-11 fw-6 text-color-heading">File Attachments</div>
-                <div class="row">
-                  <div class="col-sm-6">
-                    <a href="#" target="_blank" class="attachments-item">
-                      <div class="box-icon w-60">
-                        <img src="images/items/download-1.png" alt="file">
-                      </div>
-                      <span>Villa-Document.pdf</span>
-                      <i class="icon icon-DownloadSimple"></i>
-                    </a>
-                  </div>
-                  <div class="col-sm-6">
-                    <a href="#" target="_blank" class="attachments-item">
-                      <div class="box-icon w-60">
-                        <img src="images/items/download-2.png" alt="file">
-                      </div>
-                      <span>Villa-Document.pdf</span>
-                      <i class="icon icon-DownloadSimple"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="wg-property box-virtual-tour spacing-6">
-                <div class="wg-title text-11 fw-6 text-color-heading">360 Virtual Tour</div>
-                <div class="image-wrap">
-                  <img src="images/section/property-detail-2.jpg" alt="">
-                  <div class="box-icon">
-                    <div class="icons">
-                      <i class="icon-360"></i>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="wg-property box-loan spacing-4">
-                <div class="wg-title text-11 fw-6 text-color-heading">Loan Calculator</div>
-                <form class="form-pre-approved">
-                  <div class="cols ">
-                    <fieldset>
-                      <label class=" text-1 fw-6 mb-12" for="amount">Total Amount</label>
-                      <input type="number" id="amount" placeholder="1000">
-                    </fieldset>
-                    <div class="wrap-input">
-                      <fieldset class="payment">
-                        <label class="text-1 fw-6 mb-12" for="payment">Down Payment</label>
-                        <input type="number" id="payment" placeholder="2000">
-                      </fieldset>
-                      <fieldset class="percent">
-                        <input class="input-percent" type="text" value="20%">
-                      </fieldset>
-                    </div>
-                  </div>
-                  <div class="cols">
-                    <fieldset class="interest-rate">
-                      <label class="text-1 fw-6 mb-12" for="interest-rate">Interest Rate</label>
-                      <input type="number" id="interest-rate" placeholder="0">
-                    </fieldset>
-                    <div class="select">
-                      <label class="text-1 fw-6 mb-12">Amortization Period (months)</label>
-                      <div class="nice-select" tabindex="0">
-                        <span class="current">Select amortization period</span>
-                        <ul class="list">
-                          <li data-value="" class="option selected">Select amortization period
-                          </li>
-                          <li data-value="1 month" class="option">1 month</li>
-                          <li data-value="2 months" class="option">2 months</li>
-                          <li data-value="3 months" class="option">3 months</li>
-                          <li data-value="4 months" class="option">4 months</li>
-                          <li data-value="5 months" class="option">5 months</li>
-                          <li data-value="6 months" class="option">6 months</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="cols">
-                    <fieldset>
-                      <label class=" text-1 fw-6 mb-12" for="tax">Property Tax</label>
-                      <input type="number" id="tax" placeholder="$3000">
-                    </fieldset>
-                    <fieldset>
-                      <label class=" text-1 fw-6 mb-12" for="insurance">Home Insurance</label>
-                      <input type="number" id="insurance" placeholder="$3000">
-                    </fieldset>
-                  </div>
-
-                  <div class="wrap-btn flex items-center justify-between ">
-                    <a href="#" class="tf-btn bg-color-primary  pd-22 fw-7">
-                      Calculate now <i class="icon-arrow-right-2 fw-4
-                                            "></i>
-                    </a>
-                    <p class="text-1 mb-0 fw-5 text-color-heading">Your estimated monthly payment:
-                      <span>$599.25</span>
-                    </p>
-                  </div>
-                </form>
-              </div>
-              <div class="wg-property single-property-nearby spacing-7">
-                <div class="wg-title text-11 fw-6 text-color-heading">What’s Nearby?</div>
-                <p class="description text-color-default">Explore nearby amenities to precisely locate
-                  your property and identify surrounding conveniences, providing a comprehensive
-                  overview of the living environment and the property's convenience.</p>
-                <div class="row box-nearby">
-                  <div class="col-md-5">
-                    <ul class="box-left">
-                      <li class="item-nearby">
-                        <span class="fw-7 label text-4">School:</span>
-                        <span>0.7 km</span>
-                      </li>
-                      <li class="item-nearby">
-                        <span class="fw-7 label text-4">University:</span>
-                        <span>1.3 km</span>
-                      </li>
-                      <li class="item-nearby">
-                        <span class="fw-7 label text-4">Grocery center:</span>
-                        <span>0.6 km</span>
-                      </li>
-                      <li class="item-nearby">
-                        <span class="fw-7 label text-4">Market:</span>
-                        <span>1.1 km</span>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="col-md-5">
-                    <ul class="box-right">
-                      <li class="item-nearby">
-                        <span class="fw-7 label text-4">Hospital:</span>
-                        <span>0.4 km</span>
-                      </li>
-                      <li class="item-nearby">
-                        <span class="fw-7 label text-4">Metro station:</span>
-                        <span>1.8 km</span>
-                      </li>
-                      <li class="item-nearby">
-                        <span class="fw-7 label text-4">Gym, wellness:</span>
-                        <span>1.3 km</span>
-                      </li>
-                      <li class="item-nearby">
-                        <span class="fw-7 label text-4">River:</span>
-                        <span>2.1 km</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <div class="wg-property mb-0 box-comment spacing-8">
-                <div class="wrap-comment">
-                  <h4 class="title">Guest Reviews</h4>
-                  <ul class="comment-list">
-                    <li>
-                      <div class="comment-item">
-                        <div class="image-wrap">
-                          <img src="images/avatar/avatar-1.jpg" alt="">
-                        </div>
-                        <div class="content">
-                          <div class="user">
-                            <div class="author ">
-                              <h6 class="name mb-5">Viola Lucas</h6>
-                              <div class="time">
-                                August 13, 2023
-                              </div>
-                            </div>
-                            <div class="ratings">
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                            </div>
-                          </div>
-                          <div class="comment">
-                            <p>It's really easy to use and it is exactly what I am looking
-                              for.
-                              A lot of good looking templates & it's highly customizable.
-                              Live
-                              support is helpful, solved my issue in no time.</p>
-                            <div class="group-image">
-                              <img src="images/blog/comment-1.jpg" alt="">
-                              <img src="images/blog/comment-2.jpg" alt="">
-                              <img src="images/blog/comment-3.jpg" alt="">
-                            </div>
-                            <div class="action action-button-list">
-                              <div class="action-item action-button btn-action">
-                                <div class="icons">
-                                  <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                      d="M12.375 6.75H10.6875M4.66949 14.0625C4.66124 14.025 4.64849 13.9875 4.63049 13.9515C4.18724 13.0515 3.93749 12.039 3.93749 10.9687C3.93587 9.89238 4.19282 8.83136 4.68674 7.875M4.66949 14.0625C4.72649 14.3362 4.53224 14.625 4.23824 14.625H3.55724C2.89049 14.625 2.27249 14.2365 2.07824 13.599C1.82399 12.7665 1.68749 11.8837 1.68749 10.9687C1.68749 9.804 1.90874 8.69175 2.31074 7.67025C2.54024 7.08975 3.12524 6.75 3.74999 6.75H4.53974C4.89374 6.75 5.09849 7.167 4.91474 7.47C4.83434 7.60234 4.7578 7.73742 4.68674 7.875M4.66949 14.0625H5.63999C6.0027 14.0623 6.36307 14.1205 6.70724 14.235L9.04274 15.015C9.38691 15.1295 9.74728 15.1877 10.11 15.1875H13.122C13.5855 15.1875 14.0347 15.0022 14.3257 14.6407C15.6143 13.0434 16.3156 11.0523 16.3125 9C16.3125 8.6745 16.2952 8.35275 16.2615 8.03625C16.1797 7.2705 15.4905 6.75 14.721 6.75H12.3765C11.913 6.75 11.6332 6.207 11.8327 5.7885C12.191 5.03444 12.3763 4.20985 12.375 3.375C12.375 2.92745 12.1972 2.49823 11.8807 2.18176C11.5643 1.86529 11.135 1.6875 10.6875 1.6875C10.5383 1.6875 10.3952 1.74676 10.2897 1.85225C10.1843 1.95774 10.125 2.10082 10.125 2.25V2.72475C10.125 3.1545 10.0425 3.57975 9.88349 3.97875C9.65549 4.54875 9.18599 4.97625 8.64374 5.265C7.81128 5.7092 7.0807 6.32228 6.49874 7.065C6.12524 7.5405 5.57924 7.875 4.97474 7.875H4.68674"
-                                      stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
-                                  </svg>
-                                </div>
-                                <div class="text-2">Useful</div>
-                              </div>
-                              <div class="action-item action-button btn-action">
-                                <div class="icons">
-                                  <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                      d="M5.62501 11.25H7.31251M13.3305 3.9375C13.3388 3.975 13.3515 4.0125 13.3695 4.0485C13.8128 4.9485 14.0625 5.961 14.0625 7.03125C14.0641 8.10762 13.8072 9.16864 13.3133 10.125M13.3305 3.9375C13.2735 3.66375 13.4678 3.375 13.7618 3.375H14.4428C15.1095 3.375 15.7275 3.7635 15.9218 4.401C16.176 5.2335 16.3125 6.11625 16.3125 7.03125C16.3125 8.196 16.0913 9.30825 15.6893 10.3298C15.4598 10.9103 14.8748 11.25 14.25 11.25H13.4603C13.1063 11.25 12.9015 10.833 13.0853 10.53C13.1657 10.3977 13.2422 10.2626 13.3133 10.125M13.3305 3.9375H12.36C11.9973 3.93772 11.6369 3.87948 11.2928 3.765L8.95726 2.985C8.61309 2.87053 8.25272 2.81228 7.89001 2.8125H4.87801C4.41451 2.8125 3.96526 2.99775 3.67426 3.35925C2.38572 4.95658 1.68441 6.94774 1.68751 9C1.68751 9.3255 1.70476 9.64725 1.73851 9.96375C1.82026 10.7295 2.50951 11.25 3.27901 11.25H5.62351C6.08701 11.25 6.36676 11.793 6.16726 12.2115C5.80897 12.9656 5.6237 13.7902 5.62501 14.625C5.62501 15.0726 5.8028 15.5018 6.11927 15.8182C6.43574 16.1347 6.86496 16.3125 7.31251 16.3125C7.46169 16.3125 7.60477 16.2532 7.71026 16.1477C7.81575 16.0423 7.87501 15.8992 7.87501 15.75V15.2753C7.87501 14.8455 7.95751 14.4203 8.11651 14.0213C8.34451 13.4513 8.81401 13.0238 9.35626 12.735C10.1887 12.2908 10.9193 11.6777 11.5013 10.935C11.8748 10.4595 12.4208 10.125 13.0253 10.125H13.3133"
-                                      stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
-                                  </svg>
-                                </div>
-                                <div class="text-2">Not helpful</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="comment-item">
-                        <div class="image-wrap">
-                          <img src="images/avatar/avatar-2.jpg" alt="">
-                        </div>
-                        <div class="content">
-                          <div class="user">
-                            <div class="author ">
-                              <h6 class="name mb-5">Viola Lucas</h6>
-                              <div class="time">
-                                August 13, 2023
-                              </div>
-                            </div>
-                            <div class="ratings">
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                            </div>
-                          </div>
-                          <div class="comment">
-                            <p>It's really easy to use and it is exactly what I am looking
-                              for.
-                              A lot of good looking templates & it's highly customizable.
-                              Live
-                              support is helpful, solved my issue in no time.</p>
-                            <div class="action action-button-list">
-                              <div class="action-item action-button btn-action">
-                                <div class="icons">
-                                  <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                      d="M12.375 6.75H10.6875M4.66949 14.0625C4.66124 14.025 4.64849 13.9875 4.63049 13.9515C4.18724 13.0515 3.93749 12.039 3.93749 10.9687C3.93587 9.89238 4.19282 8.83136 4.68674 7.875M4.66949 14.0625C4.72649 14.3362 4.53224 14.625 4.23824 14.625H3.55724C2.89049 14.625 2.27249 14.2365 2.07824 13.599C1.82399 12.7665 1.68749 11.8837 1.68749 10.9687C1.68749 9.804 1.90874 8.69175 2.31074 7.67025C2.54024 7.08975 3.12524 6.75 3.74999 6.75H4.53974C4.89374 6.75 5.09849 7.167 4.91474 7.47C4.83434 7.60234 4.7578 7.73742 4.68674 7.875M4.66949 14.0625H5.63999C6.0027 14.0623 6.36307 14.1205 6.70724 14.235L9.04274 15.015C9.38691 15.1295 9.74728 15.1877 10.11 15.1875H13.122C13.5855 15.1875 14.0347 15.0022 14.3257 14.6407C15.6143 13.0434 16.3156 11.0523 16.3125 9C16.3125 8.6745 16.2952 8.35275 16.2615 8.03625C16.1797 7.2705 15.4905 6.75 14.721 6.75H12.3765C11.913 6.75 11.6332 6.207 11.8327 5.7885C12.191 5.03444 12.3763 4.20985 12.375 3.375C12.375 2.92745 12.1972 2.49823 11.8807 2.18176C11.5643 1.86529 11.135 1.6875 10.6875 1.6875C10.5383 1.6875 10.3952 1.74676 10.2897 1.85225C10.1843 1.95774 10.125 2.10082 10.125 2.25V2.72475C10.125 3.1545 10.0425 3.57975 9.88349 3.97875C9.65549 4.54875 9.18599 4.97625 8.64374 5.265C7.81128 5.7092 7.0807 6.32228 6.49874 7.065C6.12524 7.5405 5.57924 7.875 4.97474 7.875H4.68674"
-                                      stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
-                                  </svg>
-                                </div>
-                                <div class="text-2">Useful</div>
-                              </div>
-                              <div class="action-item action-button btn-action">
-                                <div class="icons">
-                                  <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                      d="M5.62501 11.25H7.31251M13.3305 3.9375C13.3388 3.975 13.3515 4.0125 13.3695 4.0485C13.8128 4.9485 14.0625 5.961 14.0625 7.03125C14.0641 8.10762 13.8072 9.16864 13.3133 10.125M13.3305 3.9375C13.2735 3.66375 13.4678 3.375 13.7618 3.375H14.4428C15.1095 3.375 15.7275 3.7635 15.9218 4.401C16.176 5.2335 16.3125 6.11625 16.3125 7.03125C16.3125 8.196 16.0913 9.30825 15.6893 10.3298C15.4598 10.9103 14.8748 11.25 14.25 11.25H13.4603C13.1063 11.25 12.9015 10.833 13.0853 10.53C13.1657 10.3977 13.2422 10.2626 13.3133 10.125M13.3305 3.9375H12.36C11.9973 3.93772 11.6369 3.87948 11.2928 3.765L8.95726 2.985C8.61309 2.87053 8.25272 2.81228 7.89001 2.8125H4.87801C4.41451 2.8125 3.96526 2.99775 3.67426 3.35925C2.38572 4.95658 1.68441 6.94774 1.68751 9C1.68751 9.3255 1.70476 9.64725 1.73851 9.96375C1.82026 10.7295 2.50951 11.25 3.27901 11.25H5.62351C6.08701 11.25 6.36676 11.793 6.16726 12.2115C5.80897 12.9656 5.6237 13.7902 5.62501 14.625C5.62501 15.0726 5.8028 15.5018 6.11927 15.8182C6.43574 16.1347 6.86496 16.3125 7.31251 16.3125C7.46169 16.3125 7.60477 16.2532 7.71026 16.1477C7.81575 16.0423 7.87501 15.8992 7.87501 15.75V15.2753C7.87501 14.8455 7.95751 14.4203 8.11651 14.0213C8.34451 13.4513 8.81401 13.0238 9.35626 12.735C10.1887 12.2908 10.9193 11.6777 11.5013 10.935C11.8748 10.4595 12.4208 10.125 13.0253 10.125H13.3133"
-                                      stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
-                                  </svg>
-                                </div>
-                                <div class="text-2">Not helpful</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                    <li>
-                      <div class="comment-item">
-                        <div class="image-wrap">
-                          <img src="images/avatar/avatar-3.jpg" alt="">
-                        </div>
-                        <div class="content">
-                          <div class="user">
-                            <div class="author ">
-                              <h6 class="name mb-5">Viola Lucas</h6>
-                              <div class="time">
-                                August 13, 2023
-                              </div>
-                            </div>
-                            <div class="ratings">
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                              <i class="icon-star"></i>
-                            </div>
-                          </div>
-                          <div class="comment">
-                            <p>It's really easy to use and it is exactly what I am looking
-                              for.
-                              A lot of good looking templates & it's highly customizable.
-                              Live
-                              support is helpful, solved my issue in no time.</p>
-                            <div class="action action-button-list">
-                              <div class="action-item action-button btn-action">
-                                <div class="icons">
-                                  <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                      d="M12.375 6.75H10.6875M4.66949 14.0625C4.66124 14.025 4.64849 13.9875 4.63049 13.9515C4.18724 13.0515 3.93749 12.039 3.93749 10.9687C3.93587 9.89238 4.19282 8.83136 4.68674 7.875M4.66949 14.0625C4.72649 14.3362 4.53224 14.625 4.23824 14.625H3.55724C2.89049 14.625 2.27249 14.2365 2.07824 13.599C1.82399 12.7665 1.68749 11.8837 1.68749 10.9687C1.68749 9.804 1.90874 8.69175 2.31074 7.67025C2.54024 7.08975 3.12524 6.75 3.74999 6.75H4.53974C4.89374 6.75 5.09849 7.167 4.91474 7.47C4.83434 7.60234 4.7578 7.73742 4.68674 7.875M4.66949 14.0625H5.63999C6.0027 14.0623 6.36307 14.1205 6.70724 14.235L9.04274 15.015C9.38691 15.1295 9.74728 15.1877 10.11 15.1875H13.122C13.5855 15.1875 14.0347 15.0022 14.3257 14.6407C15.6143 13.0434 16.3156 11.0523 16.3125 9C16.3125 8.6745 16.2952 8.35275 16.2615 8.03625C16.1797 7.2705 15.4905 6.75 14.721 6.75H12.3765C11.913 6.75 11.6332 6.207 11.8327 5.7885C12.191 5.03444 12.3763 4.20985 12.375 3.375C12.375 2.92745 12.1972 2.49823 11.8807 2.18176C11.5643 1.86529 11.135 1.6875 10.6875 1.6875C10.5383 1.6875 10.3952 1.74676 10.2897 1.85225C10.1843 1.95774 10.125 2.10082 10.125 2.25V2.72475C10.125 3.1545 10.0425 3.57975 9.88349 3.97875C9.65549 4.54875 9.18599 4.97625 8.64374 5.265C7.81128 5.7092 7.0807 6.32228 6.49874 7.065C6.12524 7.5405 5.57924 7.875 4.97474 7.875H4.68674"
-                                      stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
-                                  </svg>
-                                </div>
-                                <div class="text-2">Useful</div>
-                              </div>
-                              <div class="action-item action-button btn-action">
-                                <div class="icons">
-                                  <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                                    xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                      d="M5.62501 11.25H7.31251M13.3305 3.9375C13.3388 3.975 13.3515 4.0125 13.3695 4.0485C13.8128 4.9485 14.0625 5.961 14.0625 7.03125C14.0641 8.10762 13.8072 9.16864 13.3133 10.125M13.3305 3.9375C13.2735 3.66375 13.4678 3.375 13.7618 3.375H14.4428C15.1095 3.375 15.7275 3.7635 15.9218 4.401C16.176 5.2335 16.3125 6.11625 16.3125 7.03125C16.3125 8.196 16.0913 9.30825 15.6893 10.3298C15.4598 10.9103 14.8748 11.25 14.25 11.25H13.4603C13.1063 11.25 12.9015 10.833 13.0853 10.53C13.1657 10.3977 13.2422 10.2626 13.3133 10.125M13.3305 3.9375H12.36C11.9973 3.93772 11.6369 3.87948 11.2928 3.765L8.95726 2.985C8.61309 2.87053 8.25272 2.81228 7.89001 2.8125H4.87801C4.41451 2.8125 3.96526 2.99775 3.67426 3.35925C2.38572 4.95658 1.68441 6.94774 1.68751 9C1.68751 9.3255 1.70476 9.64725 1.73851 9.96375C1.82026 10.7295 2.50951 11.25 3.27901 11.25H5.62351C6.08701 11.25 6.36676 11.793 6.16726 12.2115C5.80897 12.9656 5.6237 13.7902 5.62501 14.625C5.62501 15.0726 5.8028 15.5018 6.11927 15.8182C6.43574 16.1347 6.86496 16.3125 7.31251 16.3125C7.46169 16.3125 7.60477 16.2532 7.71026 16.1477C7.81575 16.0423 7.87501 15.8992 7.87501 15.75V15.2753C7.87501 14.8455 7.95751 14.4203 8.11651 14.0213C8.34451 13.4513 8.81401 13.0238 9.35626 12.735C10.1887 12.2908 10.9193 11.6777 11.5013 10.935C11.8748 10.4595 12.4208 10.125 13.0253 10.125H13.3133"
-                                      stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
-                                  </svg>
-                                </div>
-                                <div class="text-2">Not helpful</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                  <a href="#" class="tf-btn style-border fw-7 pd-1">
-                    <span>View all reivew </span>
-                    <i class="icon-arrow-right-2 fw-4"></i>
-                  </a>
-                </div>
-                <div class="box-send ">
-                  <div class="heading-box">
-                    <h4 class="title fw-7">Add Review</h4>
-                    <p>Your email address will not be published</p>
-                  </div>
-                  <form class="form-add-review">
-                    <div class="cols">
-                      <fieldset class="name">
-                        <label class="text-1 fw-6 " for="name1">Name</label>
-                        <input type="text" class="tf-input style-2" placeholder="Your Name*" tabindex="2"
-                          aria-required="true" id="name1" name="name" required="">
-                      </fieldset>
-                      <fieldset class="email">
-                        <label class="text-1 fw-6" for="email1">Email</label>
-                        <input type="email" class="tf-input style-2" placeholder="Your Email*" tabindex="2"
-                          aria-required="true" id="email1" name="email" required="">
-                      </fieldset>
-                    </div>
-                    <div class="checkbox-item style-1">
-                      <label>
-                        <span class="text-1 fw-4">Save your name, email for the next time
-                          review</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </div>
-                    <fieldset class="message">
-                      <label class="text-1 fw-6" for="message">Review</label>
-                      <textarea id="message" class="tf-input" name="message" rows="4" placeholder="Your review"
-                        tabindex="4" aria-required="true" required=""></textarea>
-                    </fieldset>
-                    <button class="tf-btn bg-color-primary pd-24 fw-7" type="submit">
-                      Post Comment <i class="icon-arrow-right-2 fw-4
-                                            "></i>
-                    </button>
-                  </form>
-                </div>
+              <div class="col-md-5">
+                <ul class="box-right">
+                  <li class="item-nearby">
+                    <span class="fw-7 label text-4">Hospital:</span>
+                    <span>0.4 km</span>
+                  </li>
+                  <li class="item-nearby">
+                    <span class="fw-7 label text-4">Metro station:</span>
+                    <span>1.8 km</span>
+                  </li>
+                  <li class="item-nearby">
+                    <span class="fw-7 label text-4">Gym, wellness:</span>
+                    <span>1.3 km</span>
+                  </li>
+                  <li class="item-nearby">
+                    <span class="fw-7 label text-4">River:</span>
+                    <span>2.1 km</span>
+                  </li>
+                </ul>
               </div>
             </div>
-            <div class="col-xl-4 col-lg-5">
-              <div class=" tf-sidebar sticky-sidebar ">
-                <form class="form-contact-seller mb-30">
-                  <h4 class="heading-title mb-30">
-                    Contact Sellers
-                  </h4>
-                  <div class="seller-info">
-                    <div class="avartar">
-                      <img src="images/avatar/seller.jpg" alt="">
+          </div> {% endcomment %}
+          {% comment %} <div class="wg-property mb-0 box-comment spacing-8">
+            <div class="wrap-comment">
+              <h4 class="title">Guest Reviews</h4>
+              <ul class="comment-list">
+                <li>
+                  <div class="comment-item">
+                    <div class="image-wrap">
+                      <img src="{% static 'images/avatar/avatar-1.jpg' %}" alt="">
                     </div>
                     <div class="content">
-                      <h6 class="name">Shara Conner</h6>
-                      <ul class="contact">
-                        <li><i class="icon-phone-1"></i><span>1-333-345-6868</span></li>
-                        <li><i class="icon-mail"></i><a href="#">REM@gmail.com</a></li>
-                      </ul>
-                    </div>
-                  </div>
-                  <fieldset class="mb-12">
-                    <input type="text" class="form-control" placeholder="Full Name" name="name" id="name2" required="">
-                  </fieldset>
-                  <fieldset class="mb-30">
-                    <textarea name="message" cols="30" rows="10" placeholder="How can an agent help" id="message2"
-                      required=""></textarea>
-                  </fieldset>
-
-                  <a href="#" class="tf-btn bg-color-primary w-full">
-                    Send message</a>
-                </form>
-                <div class=" sidebar-ads mb-30">
-                  <div class="image-wrap">
-                    <img class="lazyload" data-src="images/blog/ads.jpg" src="images/blog/ads.jpg" alt="">
-                  </div>
-                  <div class="logo relative z-5">
-                    <img src="images/logo/logo-2%402x.png" alt="">
-                  </div>
-                  <div class="box-ads relative z-5">
-                    <div class="content ">
-                      <h4 class="title"><a href="property-detail-v1.html">We can help you find a
-                          local real estate agent</a> </h4>
-                      <div class="text-addres ">
-                        <p>Connect with a trusted agent who knows the market inside out -
-                          whether you’re buying or selling.</p>
+                      <div class="user">
+                        <div class="author ">
+                          <h6 class="name mb-5">Viola Lucas</h6>
+                          <div class="time">
+                            August 13, 2023
+                          </div>
+                        </div>
+                        <div class="ratings">
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                        </div>
+                      </div>
+                      <div class="comment">
+                        <p>It's really easy to use and it is exactly what I am looking
+                          for.
+                          A lot of good looking templates & it's highly customizable.
+                          Live
+                          support is helpful, solved my issue in no time.</p>
+                        <div class="group-image">
+                          <img src="{% static 'images/blog/comment-1.jpg' %}" alt="">
+                          <img src="{% static 'images/blog/comment-2.jpg' %}" alt="">
+                          <img src="{% static 'images/blog/comment-3.jpg' %}" alt="">
+                        </div>
+                        <div class="action action-button-list">
+                          <div class="action-item action-button btn-action">
+                            <div class="icons">
+                              <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M12.375 6.75H10.6875M4.66949 14.0625C4.66124 14.025 4.64849 13.9875 4.63049 13.9515C4.18724 13.0515 3.93749 12.039 3.93749 10.9687C3.93587 9.89238 4.19282 8.83136 4.68674 7.875M4.66949 14.0625C4.72649 14.3362 4.53224 14.625 4.23824 14.625H3.55724C2.89049 14.625 2.27249 14.2365 2.07824 13.599C1.82399 12.7665 1.68749 11.8837 1.68749 10.9687C1.68749 9.804 1.90874 8.69175 2.31074 7.67025C2.54024 7.08975 3.12524 6.75 3.74999 6.75H4.53974C4.89374 6.75 5.09849 7.167 4.91474 7.47C4.83434 7.60234 4.7578 7.73742 4.68674 7.875M4.66949 14.0625H5.63999C6.0027 14.0623 6.36307 14.1205 6.70724 14.235L9.04274 15.015C9.38691 15.1295 9.74728 15.1877 10.11 15.1875H13.122C13.5855 15.1875 14.0347 15.0022 14.3257 14.6407C15.6143 13.0434 16.3156 11.0523 16.3125 9C16.3125 8.6745 16.2952 8.35275 16.2615 8.03625C16.1797 7.2705 15.4905 6.75 14.721 6.75H12.3765C11.913 6.75 11.6332 6.207 11.8327 5.7885C12.191 5.03444 12.3763 4.20985 12.375 3.375C12.375 2.92745 12.1972 2.49823 11.8807 2.18176C11.5643 1.86529 11.135 1.6875 10.6875 1.6875C10.5383 1.6875 10.3952 1.74676 10.2897 1.85225C10.1843 1.95774 10.125 2.10082 10.125 2.25V2.72475C10.125 3.1545 10.0425 3.57975 9.88349 3.97875C9.65549 4.54875 9.18599 4.97625 8.64374 5.265C7.81128 5.7092 7.0807 6.32228 6.49874 7.065C6.12524 7.5405 5.57924 7.875 4.97474 7.875H4.68674"
+                                  stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
+                              </svg>
+                            </div>
+                            <div class="text-2">Useful</div>
+                          </div>
+                          <div class="action-item action-button btn-action">
+                            <div class="icons">
+                              <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M5.62501 11.25H7.31251M13.3305 3.9375C13.3388 3.975 13.3515 4.0125 13.3695 4.0485C13.8128 4.9485 14.0625 5.961 14.0625 7.03125C14.0641 8.10762 13.8072 9.16864 13.3133 10.125M13.3305 3.9375C13.2735 3.66375 13.4678 3.375 13.7618 3.375H14.4428C15.1095 3.375 15.7275 3.7635 15.9218 4.401C16.176 5.2335 16.3125 6.11625 16.3125 7.03125C16.3125 8.196 16.0913 9.30825 15.6893 10.3298C15.4598 10.9103 14.8748 11.25 14.25 11.25H13.4603C13.1063 11.25 12.9015 10.833 13.0853 10.53C13.1657 10.3977 13.2422 10.2626 13.3133 10.125M13.3305 3.9375H12.36C11.9973 3.93772 11.6369 3.87948 11.2928 3.765L8.95726 2.985C8.61309 2.87053 8.25272 2.81228 7.89001 2.8125H4.87801C4.41451 2.8125 3.96526 2.99775 3.67426 3.35925C2.38572 4.95658 1.68441 6.94774 1.68751 9C1.68751 9.3255 1.70476 9.64725 1.73851 9.96375C1.82026 10.7295 2.50951 11.25 3.27901 11.25H5.62351C6.08701 11.25 6.36676 11.793 6.16726 12.2115C5.80897 12.9656 5.6237 13.7902 5.62501 14.625C5.62501 15.0726 5.8028 15.5018 6.11927 15.8182C6.43574 16.1347 6.86496 16.3125 7.31251 16.3125C7.46169 16.3125 7.60477 16.2532 7.71026 16.1477C7.81575 16.0423 7.87501 15.8992 7.87501 15.75V15.2753C7.87501 14.8455 7.95751 14.4203 8.11651 14.0213C8.34451 13.4513 8.81401 13.0238 9.35626 12.735C10.1887 12.2908 10.9193 11.6777 11.5013 10.935C11.8748 10.4595 12.4208 10.125 13.0253 10.125H13.3133"
+                                  stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
+                              </svg>
+                            </div>
+                            <div class="text-2">Not helpful</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <a href="#" class="tf-btn fw-6 bg-color-primary w-full">
-                      Connect with an agent
-                    </a>
                   </div>
-                </div>
-                <form class="form-contact-agent">
-                  <h4 class="heading-title mb-30">
-                    Contact me
-                  </h4>
-                  <fieldset>
-                    <input type="text" class="form-control" placeholder="Your name" name="name" id="name3" required="">
-                  </fieldset>
-                  <fieldset>
-                    <input type="text" class="form-control" placeholder="Email" name="email" id="email3" required="">
-                  </fieldset>
-                  <fieldset class="phone">
-                    <input type="text" class="form-control " placeholder="Your phone number" name="phone" id="phone"
-                      required="">
-                  </fieldset>
-                  <fieldset>
-                    <textarea name="message" cols="30" rows="10" placeholder="Message" id="message3"
-                      required=""></textarea>
-                  </fieldset>
-                  <div class="wrap-btn">
-                    <a href="#" class="tf-btn bg-color-primary w-full"><svg width="20" height="20" viewbox="0 0 20 20"
-                        fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M18.125 5.625V14.375C18.125 14.8723 17.9275 15.3492 17.5758 15.7008C17.2242 16.0525 16.7473 16.25 16.25 16.25H3.75C3.25272 16.25 2.77581 16.0525 2.42417 15.7008C2.07254 15.3492 1.875 14.8723 1.875 14.375V5.625M18.125 5.625C18.125 5.12772 17.9275 4.65081 17.5758 4.29917C17.2242 3.94754 16.7473 3.75 16.25 3.75H3.75C3.25272 3.75 2.77581 3.94754 2.42417 4.29917C2.07254 4.65081 1.875 5.12772 1.875 5.625M18.125 5.625V5.8275C18.125 6.14762 18.0431 6.46242 17.887 6.74191C17.7309 7.0214 17.5059 7.25628 17.2333 7.42417L10.9833 11.27C10.6877 11.4521 10.3472 11.5485 10 11.5485C9.65275 11.5485 9.31233 11.4521 9.01667 11.27L2.76667 7.425C2.4941 7.25711 2.26906 7.02224 2.11297 6.74275C1.95689 6.46325 1.87496 6.14845 1.875 5.82833V5.625"
-                          stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                      </svg>
-                      Email agent</a>
-
+                </li>
+                <li>
+                  <div class="comment-item">
+                    <div class="image-wrap">
+                      <img src="{% static 'images/avatar/avatar-2.jpg' %}" alt="">
+                    </div>
+                    <div class="content">
+                      <div class="user">
+                        <div class="author ">
+                          <h6 class="name mb-5">Viola Lucas</h6>
+                          <div class="time">
+                            August 13, 2023
+                          </div>
+                        </div>
+                        <div class="ratings">
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                        </div>
+                      </div>
+                      <div class="comment">
+                        <p>It's really easy to use and it is exactly what I am looking
+                          for.
+                          A lot of good looking templates & it's highly customizable.
+                          Live
+                          support is helpful, solved my issue in no time.</p>
+                        <div class="action action-button-list">
+                          <div class="action-item action-button btn-action">
+                            <div class="icons">
+                              <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M12.375 6.75H10.6875M4.66949 14.0625C4.66124 14.025 4.64849 13.9875 4.63049 13.9515C4.18724 13.0515 3.93749 12.039 3.93749 10.9687C3.93587 9.89238 4.19282 8.83136 4.68674 7.875M4.66949 14.0625C4.72649 14.3362 4.53224 14.625 4.23824 14.625H3.55724C2.89049 14.625 2.27249 14.2365 2.07824 13.599C1.82399 12.7665 1.68749 11.8837 1.68749 10.9687C1.68749 9.804 1.90874 8.69175 2.31074 7.67025C2.54024 7.08975 3.12524 6.75 3.74999 6.75H4.53974C4.89374 6.75 5.09849 7.167 4.91474 7.47C4.83434 7.60234 4.7578 7.73742 4.68674 7.875M4.66949 14.0625H5.63999C6.0027 14.0623 6.36307 14.1205 6.70724 14.235L9.04274 15.015C9.38691 15.1295 9.74728 15.1877 10.11 15.1875H13.122C13.5855 15.1875 14.0347 15.0022 14.3257 14.6407C15.6143 13.0434 16.3156 11.0523 16.3125 9C16.3125 8.6745 16.2952 8.35275 16.2615 8.03625C16.1797 7.2705 15.4905 6.75 14.721 6.75H12.3765C11.913 6.75 11.6332 6.207 11.8327 5.7885C12.191 5.03444 12.3763 4.20985 12.375 3.375C12.375 2.92745 12.1972 2.49823 11.8807 2.18176C11.5643 1.86529 11.135 1.6875 10.6875 1.6875C10.5383 1.6875 10.3952 1.74676 10.2897 1.85225C10.1843 1.95774 10.125 2.10082 10.125 2.25V2.72475C10.125 3.1545 10.0425 3.57975 9.88349 3.97875C9.65549 4.54875 9.18599 4.97625 8.64374 5.265C7.81128 5.7092 7.0807 6.32228 6.49874 7.065C6.12524 7.5405 5.57924 7.875 4.97474 7.875H4.68674"
+                                  stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
+                              </svg>
+                            </div>
+                            <div class="text-2">Useful</div>
+                          </div>
+                          <div class="action-item action-button btn-action">
+                            <div class="icons">
+                              <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M5.62501 11.25H7.31251M13.3305 3.9375C13.3388 3.975 13.3515 4.0125 13.3695 4.0485C13.8128 4.9485 14.0625 5.961 14.0625 7.03125C14.0641 8.10762 13.8072 9.16864 13.3133 10.125M13.3305 3.9375C13.2735 3.66375 13.4678 3.375 13.7618 3.375H14.4428C15.1095 3.375 15.7275 3.7635 15.9218 4.401C16.176 5.2335 16.3125 6.11625 16.3125 7.03125C16.3125 8.196 16.0913 9.30825 15.6893 10.3298C15.4598 10.9103 14.8748 11.25 14.25 11.25H13.4603C13.1063 11.25 12.9015 10.833 13.0853 10.53C13.1657 10.3977 13.2422 10.2626 13.3133 10.125M13.3305 3.9375H12.36C11.9973 3.93772 11.6369 3.87948 11.2928 3.765L8.95726 2.985C8.61309 2.87053 8.25272 2.81228 7.89001 2.8125H4.87801C4.41451 2.8125 3.96526 2.99775 3.67426 3.35925C2.38572 4.95658 1.68441 6.94774 1.68751 9C1.68751 9.3255 1.70476 9.64725 1.73851 9.96375C1.82026 10.7295 2.50951 11.25 3.27901 11.25H5.62351C6.08701 11.25 6.36676 11.793 6.16726 12.2115C5.80897 12.9656 5.6237 13.7902 5.62501 14.625C5.62501 15.0726 5.8028 15.5018 6.11927 15.8182C6.43574 16.1347 6.86496 16.3125 7.31251 16.3125C7.46169 16.3125 7.60477 16.2532 7.71026 16.1477C7.81575 16.0423 7.87501 15.8992 7.87501 15.75V15.2753C7.87501 14.8455 7.95751 14.4203 8.11651 14.0213C8.34451 13.4513 8.81401 13.0238 9.35626 12.735C10.1887 12.2908 10.9193 11.6777 11.5013 10.935C11.8748 10.4595 12.4208 10.125 13.0253 10.125H13.3133"
+                                  stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
+                              </svg>
+                            </div>
+                            <div class="text-2">Not helpful</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </form>
-              </div>
+                </li>
+                <li>
+                  <div class="comment-item">
+                    <div class="image-wrap">
+                      <img src="{% static 'images/avatar/avatar-3.jpg' %}" alt="">
+                    </div>
+                    <div class="content">
+                      <div class="user">
+                        <div class="author ">
+                          <h6 class="name mb-5">Viola Lucas</h6>
+                          <div class="time">
+                            August 13, 2023
+                          </div>
+                        </div>
+                        <div class="ratings">
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                          <i class="icon-star"></i>
+                        </div>
+                      </div>
+                      <div class="comment">
+                        <p>It's really easy to use and it is exactly what I am looking
+                          for.
+                          A lot of good looking templates & it's highly customizable.
+                          Live
+                          support is helpful, solved my issue in no time.</p>
+                        <div class="action action-button-list">
+                          <div class="action-item action-button btn-action">
+                            <div class="icons">
+                              <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M12.375 6.75H10.6875M4.66949 14.0625C4.66124 14.025 4.64849 13.9875 4.63049 13.9515C4.18724 13.0515 3.93749 12.039 3.93749 10.9687C3.93587 9.89238 4.19282 8.83136 4.68674 7.875M4.66949 14.0625C4.72649 14.3362 4.53224 14.625 4.23824 14.625H3.55724C2.89049 14.625 2.27249 14.2365 2.07824 13.599C1.82399 12.7665 1.68749 11.8837 1.68749 10.9687C1.68749 9.804 1.90874 8.69175 2.31074 7.67025C2.54024 7.08975 3.12524 6.75 3.74999 6.75H4.53974C4.89374 6.75 5.09849 7.167 4.91474 7.47C4.83434 7.60234 4.7578 7.73742 4.68674 7.875M4.66949 14.0625H5.63999C6.0027 14.0623 6.36307 14.1205 6.70724 14.235L9.04274 15.015C9.38691 15.1295 9.74728 15.1877 10.11 15.1875H13.122C13.5855 15.1875 14.0347 15.0022 14.3257 14.6407C15.6143 13.0434 16.3156 11.0523 16.3125 9C16.3125 8.6745 16.2952 8.35275 16.2615 8.03625C16.1797 7.2705 15.4905 6.75 14.721 6.75H12.3765C11.913 6.75 11.6332 6.207 11.8327 5.7885C12.191 5.03444 12.3763 4.20985 12.375 3.375C12.375 2.92745 12.1972 2.49823 11.8807 2.18176C11.5643 1.86529 11.135 1.6875 10.6875 1.6875C10.5383 1.6875 10.3952 1.74676 10.2897 1.85225C10.1843 1.95774 10.125 2.10082 10.125 2.25V2.72475C10.125 3.1545 10.0425 3.57975 9.88349 3.97875C9.65549 4.54875 9.18599 4.97625 8.64374 5.265C7.81128 5.7092 7.0807 6.32228 6.49874 7.065C6.12524 7.5405 5.57924 7.875 4.97474 7.875H4.68674"
+                                  stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
+                              </svg>
+                            </div>
+                            <div class="text-2">Useful</div>
+                          </div>
+                          <div class="action-item action-button btn-action">
+                            <div class="icons">
+                              <svg width="18" height="18" viewbox="0 0 18 18" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M5.62501 11.25H7.31251M13.3305 3.9375C13.3388 3.975 13.3515 4.0125 13.3695 4.0485C13.8128 4.9485 14.0625 5.961 14.0625 7.03125C14.0641 8.10762 13.8072 9.16864 13.3133 10.125M13.3305 3.9375C13.2735 3.66375 13.4678 3.375 13.7618 3.375H14.4428C15.1095 3.375 15.7275 3.7635 15.9218 4.401C16.176 5.2335 16.3125 6.11625 16.3125 7.03125C16.3125 8.196 16.0913 9.30825 15.6893 10.3298C15.4598 10.9103 14.8748 11.25 14.25 11.25H13.4603C13.1063 11.25 12.9015 10.833 13.0853 10.53C13.1657 10.3977 13.2422 10.2626 13.3133 10.125M13.3305 3.9375H12.36C11.9973 3.93772 11.6369 3.87948 11.2928 3.765L8.95726 2.985C8.61309 2.87053 8.25272 2.81228 7.89001 2.8125H4.87801C4.41451 2.8125 3.96526 2.99775 3.67426 3.35925C2.38572 4.95658 1.68441 6.94774 1.68751 9C1.68751 9.3255 1.70476 9.64725 1.73851 9.96375C1.82026 10.7295 2.50951 11.25 3.27901 11.25H5.62351C6.08701 11.25 6.36676 11.793 6.16726 12.2115C5.80897 12.9656 5.6237 13.7902 5.62501 14.625C5.62501 15.0726 5.8028 15.5018 6.11927 15.8182C6.43574 16.1347 6.86496 16.3125 7.31251 16.3125C7.46169 16.3125 7.60477 16.2532 7.71026 16.1477C7.81575 16.0423 7.87501 15.8992 7.87501 15.75V15.2753C7.87501 14.8455 7.95751 14.4203 8.11651 14.0213C8.34451 13.4513 8.81401 13.0238 9.35626 12.735C10.1887 12.2908 10.9193 11.6777 11.5013 10.935C11.8748 10.4595 12.4208 10.125 13.0253 10.125H13.3133"
+                                  stroke="#A8ABAE" stroke-linecap="round" stroke-linejoin="round"></path>
+                              </svg>
+                            </div>
+                            <div class="text-2">Not helpful</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              <a href="#" class="tf-btn style-border fw-7 pd-1">
+                <span>View all reivew </span>
+                <i class="icon-arrow-right-2 fw-4"></i>
+              </a>
             </div>
-          </div>
-        </div>
-      </section>
-      <!-- section-property-detail -->
-
-      <!-- section-opinion -->
-      <section class="section-similar-properties tf-spacing-3 ">
-        <div class="tf-container">
-          <div class="row">
-            <div class="col-12">
-              <div class="heading-section mb-32">
-                <h2 class="title ">Similar Properties</h2>
+            <div class="box-send ">
+              <div class="heading-box">
+                <h4 class="title fw-7">Add Review</h4>
+                <p>Your email address will not be published</p>
               </div>
-              <div class="swiper style-pagination tf-sw-mobile-1" data-screen="991" data-preview="1" data-space="15">
-                <div class="swiper-wrapper tf-layout-mobile-xl  lg-col-3 wrap-agent wow fadeInUp" data-wow-delay=".2s">
-                  <div class="swiper-slide">
-                    <div class="box-house hover-img">
-                      <div class="image-wrap">
-                        <a href="property-detail-v1.html">
-                          <img class="lazyload" data-src="images/section/box-house-21.jpg"
-                            src="images/section/box-house-21.jpg" alt="">
-                        </a>
-                        <ul class="box-tag flex gap-8 ">
-                          <li class="flat-tag text-4 bg-main fw-6 text_white">Featured</li>
-                          <li class="flat-tag text-4 bg-3 fw-6 text_white">For Sale</li>
-                        </ul>
-                        <div class="list-btn flex gap-8 ">
-                          <a href="#" class="btn-icon save hover-tooltip"><i class="icon-save"></i>
-                            <span class="tooltip">Add Favorite</span>
-                          </a>
-                          <a href="#" class="btn-icon find hover-tooltip"><i class="icon-find-plus"></i>
-                            <span class="tooltip">Quick View</span>
-                          </a>
-                        </div>
-                      </div>
-                      <div class="content">
-                        <h5 class="title">
-                          <a href="property-detail-v1.html">Elegant studio flat</a>
-
-                        </h5>
-                        <p class="location text-1 flex items-center gap-8">
-                          <i class="icon-location"></i> 102 Ingraham St, Brooklyn, NY 11237
-                        </p>
-                        <ul class="meta-list flex">
-                          <li class="text-1 flex"><span>3</span>Beds</li>
-                          <li class="text-1 flex"><span>3</span>Baths</li>
-                          <li class="text-1 flex"><span>4,043</span>Sqft</li>
-                        </ul>
-                        <div class="bot flex justify-between items-center">
-                          <h5 class="price">
-                            $8.600
-                          </h5>
-                          <div class="wrap-btn flex">
-                            <a href="#" class="compare flex gap-8 items-center text-1"><i
-                                class="icon-compare"></i>Compare
-                            </a>
-                            <a href="property-detail-v1.html" class="tf-btn style-border pd-4">Details</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <div class="box-house hover-img">
-                      <div class="image-wrap">
-                        <a href="property-detail-v1.html">
-                          <img class="lazyload" data-src="images/section/box-house-18.jpg"
-                            src="images/section/box-house-18.jpg" alt="">
-                        </a>
-                        <ul class="box-tag flex gap-8 ">
-                          <li class="flat-tag text-4 bg-main fw-6 text_white">Featured</li>
-                          <li class="flat-tag text-4 bg-3 fw-6 text_white">For Sale</li>
-                        </ul>
-                        <div class="list-btn flex gap-8 ">
-                          <a href="#" class="btn-icon save hover-tooltip"><i class="icon-save"></i>
-                            <span class="tooltip">Add Favorite</span>
-                          </a>
-                          <a href="#" class="btn-icon find hover-tooltip"><i class="icon-find-plus"></i>
-                            <span class="tooltip">Quick View</span>
-                          </a>
-                        </div>
-                      </div>
-                      <div class="content">
-                        <h5 class="title">
-                          <a href="property-detail-v1.html">Elegant studio flat</a>
-
-                        </h5>
-                        <p class="location text-1 flex items-center gap-8">
-                          <i class="icon-location"></i> 102 Ingraham St, Brooklyn, NY 11237
-                        </p>
-                        <ul class="meta-list flex">
-                          <li class="text-1 flex"><span>3</span>Beds</li>
-                          <li class="text-1 flex"><span>3</span>Baths</li>
-                          <li class="text-1 flex"><span>4,043</span>Sqft</li>
-                        </ul>
-                        <div class="bot flex justify-between items-center">
-                          <h5 class="price">
-                            $8.600
-                          </h5>
-                          <div class="wrap-btn flex">
-                            <a href="#" class="compare flex gap-8 items-center text-1"><i
-                                class="icon-compare"></i>Compare
-                            </a>
-                            <a href="property-detail-v1.html" class="tf-btn style-border pd-4">Details</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <div class="box-house hover-img">
-                      <div class="image-wrap">
-                        <a href="property-detail-v1.html">
-                          <img class="lazyload" data-src="images/section/box-house-15.jpg"
-                            src="images/section/box-house-15.jpg" alt="">
-                        </a>
-                        <ul class="box-tag flex gap-8 ">
-                          <li class="flat-tag text-4 bg-main fw-6 text_white">Featured</li>
-                          <li class="flat-tag text-4 bg-3 fw-6 text_white">For Sale</li>
-                        </ul>
-                        <div class="list-btn flex gap-8 ">
-                          <a href="#" class="btn-icon save hover-tooltip"><i class="icon-save"></i>
-                            <span class="tooltip">Add Favorite</span>
-                          </a>
-                          <a href="#" class="btn-icon find hover-tooltip"><i class="icon-find-plus"></i>
-                            <span class="tooltip">Quick View</span>
-                          </a>
-                        </div>
-                      </div>
-                      <div class="content">
-                        <h5 class="title">
-                          <a href="property-detail-v1.html">Elegant studio flat</a>
-
-                        </h5>
-                        <p class="location text-1 flex items-center gap-8">
-                          <i class="icon-location"></i> 102 Ingraham St, Brooklyn, NY 11237
-                        </p>
-                        <ul class="meta-list flex">
-                          <li class="text-1 flex"><span>3</span>Beds</li>
-                          <li class="text-1 flex"><span>3</span>Baths</li>
-                          <li class="text-1 flex"><span>4,043</span>Sqft</li>
-                        </ul>
-                        <div class="bot flex justify-between items-center">
-                          <h5 class="price">
-                            $8.600
-                          </h5>
-                          <div class="wrap-btn flex">
-                            <a href="#" class="compare flex gap-8 items-center text-1"><i
-                                class="icon-compare"></i>Compare
-                            </a>
-                            <a href="property-detail-v1.html" class="tf-btn style-border pd-4">Details</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <form class="form-add-review">
+                <div class="cols">
+                  <fieldset class="name">
+                    <label class="text-1 fw-6 " for="name1">Name</label>
+                    <input type="text" class="tf-input style-2" placeholder="Your Name*" tabindex="2"
+                      aria-required="true" id="name1" name="name" required="">
+                  </fieldset>
+                  <fieldset class="email">
+                    <label class="text-1 fw-6" for="email1">Email</label>
+                    <input type="email" class="tf-input style-2" placeholder="Your Email*" tabindex="2"
+                      aria-required="true" id="email1" name="email" required="">
+                  </fieldset>
                 </div>
-                <div class="sw-pagination sw-pagination-mb-1 text-center d-lg-none d-block mt-20"></div>
-              </div>
+                <div class="checkbox-item style-1">
+                  <label>
+                    <span class="text-1 fw-4">Save your name, email for the next time
+                      review</span>
+                    <input type="checkbox">
+                    <span class="btn-checkbox"></span>
+                  </label>
+                </div>
+                <fieldset class="message">
+                  <label class="text-1 fw-6" for="message">Review</label>
+                  <textarea id="message" class="tf-input" name="message" rows="4" placeholder="Your review" tabindex="4"
+                    aria-required="true" required=""></textarea>
+                </fieldset>
+                <button class="tf-btn bg-color-primary pd-24 fw-7" type="submit">
+                  Post Comment <i class="icon-arrow-right-2 fw-4
+                                            "></i>
+                </button>
+              </form>
             </div>
-          </div>
+          </div> {% endcomment %}
         </div>
-      </section>
-      <!-- /section-opinion -->
-
-      <!-- section-CTA -->
-      <section class="section-CTA">
-        <div class="tf-container">
-          <div class="row">
-            <div class="col-12">
-              <div class="content-inner">
-                <img src="images/section/cta.png" alt="">
+        <div class="col-xl-4 col-lg-5">
+          <div class=" tf-sidebar sticky-sidebar ">
+            <form class="form-contact-seller mb-30">
+              <h4 class="heading-title mb-30">
+                Agent Info
+              </h4>
+              <div class="seller-info">
+                <div class="avartar">
+                  <img src="{{ property.agent.get_profile_picture }}" alt="">
+                </div>
                 <div class="content">
-                  <h4 class="text_white mb-8 ">Find a Local Real Estate Agent Today</h4>
-                  <p class="text_white text-1">If you’re looking to buy or sell a home. We’ll help you
-                    make
-                    the most money
-                    possible.</p>
+                  <h6 class="name">{{ property.agent.user.name }}</h6>
+                  <ul class="contact">
+                    <li><i class="icon-phone-1"></i><span>{{ property.agent.office_phone_no }}</span></li>
+                    <li><i class="icon-mail"></i><a href="#">{{ property.agent.user.email }}</a></li>
+                  </ul>
                 </div>
-                <a href="#" class="tf-btn style-2 fw-6 ">Find your location agent <i
-                    class="icon-MagnifyingGlass fw-6"></i></a>
+              </div>
+              {% comment %} <fieldset class="mb-12">
+                <input type="text" class="form-control" placeholder="Full Name" name="name" id="name2" required="">
+              </fieldset>
+              <fieldset class="mb-30">
+                <textarea name="message" cols="30" rows="10" placeholder="How can an agent help" id="message2"
+                  required=""></textarea>
+              </fieldset>
+
+              <a href="#" class="tf-btn bg-color-primary w-full">
+                Send message</a> {% endcomment %}
+            </form>
+            {% comment %} <div class=" sidebar-ads mb-30">
+              <div class="image-wrap">
+                <img class="lazyload" data-src="images/blog/ads.jpg" src="{% static 'images/blog/ads.jpg' %}" alt="">
+              </div>
+              <div class="logo relative z-5">
+                <img src="{% static 'images/logo/logo-2%402x.png' %}" alt="">
+              </div>
+              <div class="box-ads relative z-5">
+                <div class="content ">
+                  <h4 class="title"><a href="property-detail-v1.html">We can help you find a
+                      local real estate agent</a> </h4>
+                  <div class="text-addres ">
+                    <p>Connect with a trusted agent who knows the market inside out -
+                      whether you’re buying or selling.</p>
+                  </div>
+                </div>
+                <a href="#" class="tf-btn fw-6 bg-color-primary w-full">
+                  Connect with an agent
+                </a>
               </div>
             </div>
+            <form class="form-contact-agent">
+              <h4 class="heading-title mb-30">
+                Contact me
+              </h4>
+              <fieldset>
+                <input type="text" class="form-control" placeholder="Your name" name="name" id="name3" required="">
+              </fieldset>
+              <fieldset>
+                <input type="text" class="form-control" placeholder="Email" name="email" id="email3" required="">
+              </fieldset>
+              <fieldset class="phone">
+                <input type="text" class="form-control " placeholder="Your phone number" name="phone" id="phone"
+                  required="">
+              </fieldset>
+              <fieldset>
+                <textarea name="message" cols="30" rows="10" placeholder="Message" id="message3" required=""></textarea>
+              </fieldset>
+              <div class="wrap-btn">
+                <a href="#" class="tf-btn bg-color-primary w-full"><svg width="20" height="20" viewbox="0 0 20 20"
+                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M18.125 5.625V14.375C18.125 14.8723 17.9275 15.3492 17.5758 15.7008C17.2242 16.0525 16.7473 16.25 16.25 16.25H3.75C3.25272 16.25 2.77581 16.0525 2.42417 15.7008C2.07254 15.3492 1.875 14.8723 1.875 14.375V5.625M18.125 5.625C18.125 5.12772 17.9275 4.65081 17.5758 4.29917C17.2242 3.94754 16.7473 3.75 16.25 3.75H3.75C3.25272 3.75 2.77581 3.94754 2.42417 4.29917C2.07254 4.65081 1.875 5.12772 1.875 5.625M18.125 5.625V5.8275C18.125 6.14762 18.0431 6.46242 17.887 6.74191C17.7309 7.0214 17.5059 7.25628 17.2333 7.42417L10.9833 11.27C10.6877 11.4521 10.3472 11.5485 10 11.5485C9.65275 11.5485 9.31233 11.4521 9.01667 11.27L2.76667 7.425C2.4941 7.25711 2.26906 7.02224 2.11297 6.74275C1.95689 6.46325 1.87496 6.14845 1.875 5.82833V5.625"
+                      stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                  </svg>
+                  Email agent</a>
+
+              </div>
+            </form> {% endcomment %}
           </div>
         </div>
-      </section>
-      <!-- /section-CTA -->
-
+      </div>
     </div>
-    <!-- /main-content -->
+  </section>
+  <!-- section-property-detail -->
+
+  <!-- section-opinion -->
+  <section class="section-similar-properties tf-spacing-3 ">
+    <div class="tf-container">
+      <div class="row">
+        <div class="col-12">
+          <div class="heading-section mb-32">
+            <h2 class="title ">Similar Properties</h2>
+          </div>
+          <div class="swiper style-pagination tf-sw-mobile-1" data-screen="991" data-preview="1" data-space="15">
+            <div class="swiper-wrapper tf-layout-mobile-xl  lg-col-3 wrap-agent wow fadeInUp" data-wow-delay=".2s">
+              {% for similar in similar_properties %}
+              <div class="swiper-slide">
+                <div class="box-house hover-img">
+                  <div class="image-wrap">
+                    <a href="property-detail-v1.html">
+                      <img class="lazyload" data-src="{{ similar.main_image_url }}"
+                        src="{{ similar.main_image_url}}" alt="">
+                    </a>
+                    <ul class="box-tag flex gap-8 ">
+                      {% comment %} <li class="flat-tag text-4 bg-main fw-6 text_white">Featured</li>
+                      <li class="flat-tag text-4 bg-3 fw-6 text_white">For Sale</li> {% endcomment %}
+                    </ul>
+                    <div class="list-btn flex gap-8 ">
+                      {% comment %} <a href="#" class="btn-icon save hover-tooltip"><i class="icon-save"></i>
+                        <span class="tooltip">Add Favorite</span>
+                      </a> {% endcomment %}
+                      <a href="#" class="btn-icon find hover-tooltip"><i class="icon-find-plus"></i>
+                        <span class="tooltip">Quick View</span>
+                      </a>
+                    </div>
+                  </div>
+                  <div class="content">
+                    <h5 class="title">
+                      <a href="property-detail-v1.html">Elegant studio flat</a>
+
+                    </h5>
+                    <p class="location text-1 flex items-center gap-8">
+                      <i class="icon-location"></i> 102 Ingraham St, Brooklyn, NY 11237
+                    </p>
+                    <ul class="meta-list flex">
+                      <li class="text-1 flex"><span>3</span>Beds</li>
+                      <li class="text-1 flex"><span>3</span>Baths</li>
+                      <li class="text-1 flex"><span>4,043</span>Sqft</li>
+                    </ul>
+                    <div class="bot flex justify-between items-center">
+                      <h5 class="price">
+                        $8.600
+                      </h5>
+                      <div class="wrap-btn flex">
+                        <a href="#" class="compare flex gap-8 items-center text-1"><i class="icon-compare"></i>Compare
+                        </a>
+                        <a href="property-detail-v1.html" class="tf-btn style-border pd-4">Details</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+              
+            </div>
+            <div class="sw-pagination sw-pagination-mb-1 text-center d-lg-none d-block mt-20"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /section-opinion -->
+
+  <!-- section-CTA -->
+  <section class="section-CTA">
+    <div class="tf-container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content-inner">
+            <img src="{% static 'images/section/cta.png' %}" alt="">
+            <div class="content">
+              <h4 class="text_white mb-8 ">Find a Local Real Estate Agent Today</h4>
+              <p class="text_white text-1">If you’re looking to buy or sell a home. We’ll help you
+                make
+                the most money
+                possible.</p>
+            </div>
+            <a href="#" class="tf-btn style-2 fw-6 ">Find your location agent <i
+                class="icon-MagnifyingGlass fw-6"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- /section-CTA -->
+
+</div>
+<!-- /main-content -->
 {% endblock content %}

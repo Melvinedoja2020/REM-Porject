@@ -16,8 +16,8 @@
           <div class="box-title">
             <h2>Property listing</h2>
             <div class="right">
-              <div class="filter-popup" data-bs-toggle="modal" href="#modalFilter" role="button">
-                Filter
+              <div class="filter-popup" data-bs-toggle="modal" data-bs-target="#filterModal">
+                Filter Properties
                 <div class="icons">
                   <svg width="20" height="20" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M21 4H14" stroke="#F1913D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -118,17 +118,17 @@
                 <div class="tf-grid-layout lg-col-3 md-col-2">
 
                   {% for rents in properties %}
-                  {% comment %} <div class="box-house hover-img">
+                  <div class="box-house hover-img">
                     <div class="image-wrap">
                       <a href="{% url 'home:rent_property_detail' rents.slug %}">
-                        <img class="lazyload" data-src="images/section/box-house.jpg"
-                          src="{% static 'images/section/box-house.jpg' %}" alt="">
+                        <img class="lazyload" data-src="{{ rents.main_image_url }}" src="{{ rents.main_image_url }}"
+                          alt="">
                       </a>
                       <ul class="box-tag flex gap-8 ">
                         <li class="flat-tag text-4 bg-main fw-6 text_white">Featured
                         </li>
                         <li class="flat-tag text-4 bg-3 fw-6 text_white">For Sale</li>
-                      </ul> 
+                      </ul>
                       <div class="list-btn flex gap-8 ">
                         <a href="#" class="btn-icon save hover-tooltip"><i class="icon-save"></i>
                           <span class="tooltip">Add Favorite</span>
@@ -140,31 +140,30 @@
                     </div>
                     <div class="content">
                       <h5 class="title">
-                        <a href="property-detail-v1.html">Elegant studio flat</a>
+                        <a href="property-detail-v1.html">{{ rents.title }}</a>
 
                       </h5>
                       <p class="location text-1 flex items-center gap-6">
-                        <i class="icon-location"></i> 102 Ingraham St, Brooklyn, NY
+                        <i class="icon-location"></i> {{ rents.location }}
                         11237
                       </p>
                       <ul class="meta-list flex">
-                        <li class="text-1 flex"><span>3</span>Beds</li>
-                        <li class="text-1 flex"><span>3</span>Baths</li>
-                        <li class="text-1 flex"><span>4,043</span>Sqft</li>
+                        <li class="text-1 flex"><span>{{rents.bedrooms}}</span>Beds</li>
+                        <li class="text-1 flex"><span>{{rents.bathrooms}}</span>Baths</li>
+                        <li class="text-1 flex"><span>{{ rents.sqft}}</span>Sqft</li>
                       </ul>
                       <div class="bot flex justify-between items-center">
                         <h5 class="price">
-                          $8.600
+                          ${{ rents.price}}
                         </h5>
                         <div class="wrap-btn flex">
-                          <a href="#" class="compare flex gap-8 items-center text-1"><i class="icon-compare"></i>
-                            Compare
-                          </a>
-                          <a href="property-detail-v1.html" class="tf-btn style-border pd-4">Details</a>
+
+                          <a href="{% url 'home:rent_property_detail' rents.slug %}"
+                            class="tf-btn style-border pd-4">Details</a>
                         </div>
                       </div>
                     </div>
-                  </div> {% endcomment %}
+                  </div>
                   {% endfor %}
 
 
@@ -213,7 +212,8 @@
                         </h5>
                         <div class="wrap-btn flex">
 
-                          <a href="{% url 'home:rent_property_detail' rents.slug %}" class="tf-btn style-border pd-4">Details</a>
+                          <a href="{% url 'home:rent_property_detail' rents.slug %}"
+                            class="tf-btn style-border pd-4">Details</a>
                         </div>
                       </div>
                     </div>
@@ -274,6 +274,88 @@
       </div>
     </div>
   </section>
+
+  <!-- Filter Modal -->
+  <!-- Filter Modal (Slide from right like Offcanvas) -->
+  <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-end">
+      <form method="get" action="{% url 'home:property_rent_list' %}" id="propertyFilterForm"
+        class="modal-content border-0 rounded-start shadow-lg">
+        
+        <div class="modal-header bg-light border-bottom-0">
+          <h5 class="modal-title fw-semibold" id="filterModalLabel">Filter Properties</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+  
+        <div class="modal-body px-4">
+          <div class="row g-4">
+  
+            <div class="col-md-6">
+              {{ form.q.label_tag }}
+              {{ form.q }}
+            </div>
+  
+            <div class="col-md-6">
+              {{ form.location.label_tag }}
+              {{ form.location }}
+            </div>
+  
+            <div class="col-md-4">
+              {{ form.property_type.label_tag }}
+              {{ form.property_type }}
+            </div>
+  
+            {% if form.property_listing %}
+            <div class="col-md-4">
+              {{ form.property_listing.label_tag }}
+              {{ form.property_listing }}
+            </div>
+            {% endif %}
+  
+            <div class="col-md-4">
+              {{ form.amenities.label_tag }}
+              <div class="border rounded p-2" style="max-height: 130px; overflow-y: auto;">
+                {% for checkbox in form.amenities %}
+                <div class="form-check mb-1">
+                  {{ checkbox.tag }} <label class="form-check-label">{{ checkbox.choice_label }}</label>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+  
+            <div class="col-md-6">
+              {{ form.min_price.label_tag }}
+              {{ form.min_price }}
+            </div>
+  
+            <div class="col-md-6">
+              {{ form.max_price.label_tag }}
+              {{ form.max_price }}
+            </div>
+  
+            <div class="col-md-6">
+              {{ form.min_bedrooms.label_tag }}
+              {{ form.min_bedrooms }}
+            </div>
+  
+            <div class="col-md-6">
+              {{ form.min_bathrooms.label_tag }}
+              {{ form.min_bathrooms }}
+            </div>
+  
+          </div>
+        </div>
+  
+        <div class="modal-footer border-top-0 px-4 pb-4 pt-3">
+          <a href="{% url 'home:property_rent_list' %}" class="btn btn-outline-secondary rounded-pill">Clear Filters</a>
+          <button type="submit" class="btn text-white rounded-pill" style="background-color: #E8960F;">Apply Filters</button>
+        </div>
+  
+      </form>
+    </div>
+  </div>
+  
+
 
 </div>
 <!-- /main-content -->

@@ -1,6 +1,6 @@
 from django.db import models
 import auto_prefetch
-from core.helper.enums import Lead_Status_Choices, PaymentStatus, PropertyListingType, RentalApplicationChoices
+from core.helper.enums import Lead_Status_Choices, PaymentStatus, PropertyListingType, PropertyTypeChoices, RentalApplicationChoices
 from core.helper.media import MediaHelper
 from core.helper.models import TimeBasedModel, TitleTimeBasedModel
 from django.utils.text import slugify
@@ -19,9 +19,10 @@ class Property(TitleTimeBasedModel):
     )
     slug = models.SlugField(unique=True, blank=True)
     description = models.TextField()
-    property_type = auto_prefetch.ForeignKey(
-        "property.PropertyType", on_delete=models.CASCADE, 
-        related_name="properties", null=True, blank=True
+    property_type = models.CharField(
+        max_length=50, choices=PropertyTypeChoices.choices, 
+        default=PropertyTypeChoices.APARTMENT, null=True,
+        blank=True,
     )
     property_listing = models.CharField(
         max_length=200,
@@ -38,6 +39,14 @@ class Property(TitleTimeBasedModel):
     )
     
     is_available = models.BooleanField(default=True)
+
+    class Meta(auto_prefetch.Model.Meta):
+        ordering = ["-created_at"]
+        verbose_name = "Property"
+        verbose_name_plural = "Properties"
+
+    def __str__(self):
+        return f"{self.title} - {self.property_listing}"
     
 
 
@@ -95,6 +104,11 @@ class Amenity(TimeBasedModel):
     name = models.CharField(max_length=100)
     description = models.TextField()
 
+    class Meta(auto_prefetch.Model.Meta):
+        ordering = ["-created_at"]
+        verbose_name = "Amenity"
+        verbose_name_plural = "Amenities"
+
     def __str__(self):
         return self.name
 
@@ -117,6 +131,24 @@ class Lead(TimeBasedModel):
 
     def __str__(self):
         return f"Lead from {self.user.email} for {self.property.title}"
+
+
+class FavoriteProperty(TimeBasedModel):
+    user = auto_prefetch.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="favorites"
+    )
+    property = auto_prefetch.ForeignKey(
+        "property.Property", on_delete=models.CASCADE
+    )
+
+    class Meta(auto_prefetch.Model.Meta):
+        unique_together = ("user", "property")
+        ordering = ["-created_at"]
+        verbose_name = "Favorite Property"
+        verbose_name_plural = "Favorite Properties"
+
+    def __str__(self):
+        return f"{self.user.email} favorited {self.property.title}"
 
     # @property
     # def status_label(self):

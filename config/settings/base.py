@@ -86,6 +86,8 @@ LOCAL_APPS = [
     "core.applications.users",
     "core.applications.home",
     "core.applications.property",
+    "core.applications.subscriptions",
+    "core.applications.notifications",
     
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

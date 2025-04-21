@@ -111,6 +111,7 @@ class PropertyDetailView(DetailView):
     model = Property
     template_name = "pages/dashboard/property_detail.html"
     context_object_name = "property"
+    
 
 
 class PropertyListView(LoginRequiredMixin, ListView):

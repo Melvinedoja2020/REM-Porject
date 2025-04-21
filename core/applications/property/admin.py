@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from core.applications.property.models import Property, PropertyImage, Amenity
+from core.applications.property.models import Property, PropertyImage, Amenity, PropertyType
 
 # Register your models here.
 
@@ -24,6 +24,13 @@ class PropertyImageAdmin(admin.ModelAdmin):
 class AmenityAdmin(admin.ModelAdmin):
     list_display = ["name"]
     search_fields = ["name"]
+    ordering = ["-created_at"]
+
+
+@admin.register(PropertyType)
+class PropertyTypeAdmin(admin.ModelAdmin):
+    list_display = ["title"]
+    search_fields = ["title"]
     ordering = ["-created_at"]
 
     

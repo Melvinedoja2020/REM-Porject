@@ -3,6 +3,7 @@ from django.views.generic import CreateView, UpdateView, DetailView, ListView, D
 from django.urls import reverse_lazy
 
 from core.applications.property.models import Amenity, Lead, Property, PropertyImage, PropertyType
+from core.helper.enums import PropertyListingType, PropertyTypeChoices
 
 
 # Forms
@@ -162,6 +163,39 @@ class PropertyImageForm(forms.ModelForm):
         model = PropertyImage
         fields = ["property", "image"]
 
+
+class PropertySearchForm(forms.Form):
+    q = forms.CharField(label="Search", required=False)
+    location = forms.CharField(label="Location", required=False)
+    # property_type = forms.ModelChoiceField(
+    #     queryset=PropertyType.objects.all(), required=False, empty_label="Any Type"
+    # )
+    property_type = forms.ChoiceField(
+        choices=[("", "Any")] + list(PropertyTypeChoices.choices),
+        required=False,
+        label="Listing Type"
+    )
+    min_price = forms.DecimalField(label="Min Price", required=False, min_value=0)
+    max_price = forms.DecimalField(label="Max Price", required=False, min_value=0)
+    min_bedrooms = forms.IntegerField(label="Min Bedrooms", required=False, min_value=0)
+    min_bathrooms = forms.IntegerField(label="Min Bathrooms", required=False, min_value=0)
+    amenities = forms.ModelMultipleChoiceField(
+        queryset=Amenity.objects.all(), 
+        required=False, 
+        widget=forms.CheckboxSelectMultiple,
+        label="Amenities"
+    )
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if isinstance(field.widget, forms.Select):
+                field.widget.attrs.update({'class': 'form-select'})
+            elif isinstance(field.widget, forms.CheckboxSelectMultiple):
+                field.widget.attrs.update({'class': 'form-check-input'})
+            else:
+                field.widget.attrs.update({'class': 'form-control'})
 
 class LeadForm(forms.ModelForm):
     class Meta:

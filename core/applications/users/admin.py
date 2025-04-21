@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
 from .models import (
-    User, UserProfile, AgentProfile, RealEstateOwnerProfile, 
+    User, UserProfile, AgentProfile, 
     SocialMediaLinks
 )
 
@@ -72,11 +72,11 @@ class AgentProfileAdmin(admin.ModelAdmin):
         self.message_user(request, "Selected agents have been approved.")
     approve_agents.short_description = "Approve selected agents"
 
-@admin.register(RealEstateOwnerProfile)
-class RealEstateOwnerProfileAdmin(admin.ModelAdmin):
-    list_display = ["user", "phone_no", "address"]
-    search_fields = ["user__name"]
-    ordering = ["id"]
+# @admin.register(RealEstateOwnerProfile)
+# class RealEstateOwnerProfileAdmin(admin.ModelAdmin):
+#     list_display = ["user", "phone_no", "address"]
+#     search_fields = ["user__name"]
+#     ordering = ["id"]
 
 
 @admin.register(SocialMediaLinks)
