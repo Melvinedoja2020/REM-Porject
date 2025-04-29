@@ -1,0 +1,47 @@
+<div class="list-btn flex gap-8">
+  <button
+    class="btn-icon save hover-tooltip favorite-toggle transition-all duration-200"
+    data-id="{{ property.id }}"
+    aria-label="{% if property.id in favorite_property_ids %}Remove from favorites{% else %}Add to favorites{% endif %}"
+    aria-pressed="{% if property.id in favorite_property_ids %}true{% else %}false{% endif %}"
+    title="{% if property.id in favorite_property_ids %}Remove from favorites (click again to undo){% else %}Add to favorites{% endif %}"
+    data-tooltip-placement="top"
+  >
+    {% if property.id in favorite_property_ids %}
+      <i class="icon-save-filled text-red-500 animate-pop" aria-hidden="true"></i>
+    {% else %}
+      <i class="icon-save text-gray-400 hover:text-red-500 transition-colors" aria-hidden="true"></i>
+    {% endif %}
+    <span class="tooltip">
+      {% if property.id in favorite_property_ids %}
+        Remove Favorite
+      {% else %}
+        Add Favorite
+      {% endif %}
+    </span>
+  </button>
+</div>
+
+<style>
+  /* Micro-interaction: Subtle bounce when favorited */
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.animate-pop {
+  animation: pop 0.3s ease-out;
+}
+
+/* Smoother tooltips */
+.tooltip {
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+/* Focus state for keyboard users */
+.btn-icon:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+</style>

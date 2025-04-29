@@ -81,7 +81,7 @@
             <div class="loader">
             </div>
             <div class="icon">
-              <img src="{% static 'images/logo/loading.png' %}" alt="">
+              {% comment %} <img src="{% static 'images/logo/loading.png' %}" alt=""> {% endcomment %}
             </div>
           </div>
         </div>
@@ -237,6 +237,7 @@
                     </li> {% endcomment %}
                     <li><a href="{% url 'home:property_rent_list' %}">Rents</a></li>
                     <li><a href="#">Buy</a></li>
+                    <li><a href="{% url 'home:agent_list' %}">Agents</a></li>
                     <li><a href="#">Contact</a></li>
                   </ul>
                 </nav>
@@ -578,6 +579,7 @@
                     </li> {% endcomment %}
                     <li><a href="{% url 'home:property_rent_list' %}">Rents</a></li>
                     <li><a href="#">Buy</a></li>
+                    <li><a href="{% url 'home:agent_list' %}">Agents</a></li>
                     <li><a href="#">Contact</a></li>
                   </ul>
                 </nav>

@@ -30,3 +30,5 @@ class AgentApprovalRequiredMixin:
             )
             return redirect("home:home")
         return super().dispatch(request, *args, **kwargs)
+
+

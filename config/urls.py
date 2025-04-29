@@ -13,6 +13,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # home management
     path("", include("core.applications.home.urls", namespace="home")),
+    path("", include("core.applications.notifications.urls", namespace="notification")),
     path("property/", include("core.applications.property.urls", namespace="property")),
     # User management
     path("users/", include("core.applications.users.urls", namespace="users")),

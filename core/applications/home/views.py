@@ -1,11 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView, ListView, DetailView
 
 from core.applications.property.forms import PropertySearchForm
-from core.applications.property.models import Property
+from core.applications.property.models import FavoriteProperty, Property
 from core.applications.users.models import AgentProfile
 from core.helper.enums import PropertyListingType
 from django.db.models import Q
+from django.core.paginator import Paginator
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.decorators import method_decorator
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views import View
 # Create your views here.
 
 
@@ -82,7 +88,7 @@ class RentPropertyListView(ListView):
         return context
 
 
-class RentPropertyDetailView(DetailView):
+class PropertyDetailView(DetailView):
     model = Property
     template_name = "pages/property/property_detail.html"
     context_object_name = "property"
@@ -111,5 +117,76 @@ class RentPropertyDetailView(DetailView):
             .exclude(id=property.id)
             .order_by("?")[:3]
         )
-
+        if self.request.user.is_authenticated:
+            context["favorite_property_ids"] = list(
+                FavoriteProperty.objects.filter(user=self.request.user)
+                .values_list("property_id", flat=True)
+            )
+        else:
+            context["favorite_property_ids"] = []
         return context
+
+
+class AgentListView(LoginRequiredMixin, ListView):
+    model = AgentProfile
+    template_name = "pages/agents/agent_list.html"
+    context_object_name = "agents"
+    paginate_by = 2
+
+    def get_queryset(self):
+        return (
+            AgentProfile.objects
+            .filter(verified=True)
+            .select_related("user")  # load user object
+            .prefetch_related("user__social_media_links")  # load social links
+            .order_by("-rating")
+        )
+
+     
+class AgentDetailView(LoginRequiredMixin, DetailView):
+    model = AgentProfile
+    template_name = "pages/agents/agent_detail.html"
+    context_object_name = "agent"
+    
+    def get_object(self):
+        return get_object_or_404(AgentProfile, pk=self.kwargs.get("id"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        agent = self.get_object()
+        properties = agent.properties.filter(is_available=True)
+
+        paginator = Paginator(properties, 2)
+        page_number = self.request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+
+        context.update({
+            "properties": page_obj,
+            "property_count": properties.count()
+        })
+        return context
+    
+
+# Needed for AJAX without CSRF token (or add token client-side)
+@method_decorator(csrf_exempt, name="dispatch")
+class ToggleFavoriteView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        property_id = request.POST.get("property_id")
+        property_obj = get_object_or_404(Property, pk=property_id)
+
+        favorite, created = FavoriteProperty.objects.get_or_create(
+            user=request.user,
+            property=property_obj,
+        )
+
+        if not created:
+            favorite.delete()
+            return JsonResponse({"status": "removed"})
+        return JsonResponse({"status": "added"})
+
+
+class FavoriteCountAPI(LoginRequiredMixin, View):
+    def get(self, request):
+        return JsonResponse({
+            'count': request.user.favorites.count()
+        })

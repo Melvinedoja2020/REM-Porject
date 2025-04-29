@@ -1,6 +1,9 @@
 from django.contrib import admin
 
-from core.applications.property.models import Property, PropertyImage, Amenity, PropertyType
+from core.applications.property.models import (
+    Property, PropertyImage, Amenity, 
+    PropertyType, FavoriteProperty
+)
 
 # Register your models here.
 
@@ -32,5 +35,13 @@ class PropertyTypeAdmin(admin.ModelAdmin):
     list_display = ["title"]
     search_fields = ["title"]
     ordering = ["-created_at"]
+
+@admin.register(FavoriteProperty)
+class FavoritePropertyAdmin(admin.ModelAdmin):
+    list_display = ["user", "property"]
+    search_fields = ["user__username", "property__title"]
+    ordering = ["-created_at"]
+    list_filter = ["user"]
+
 
     

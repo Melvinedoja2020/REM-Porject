@@ -84,6 +84,12 @@ class Property(TitleTimeBasedModel):
         """Returns HTML for image preview (e.g. in admin)."""
         url = self.main_image_url
         return format_html('<img src="{}" width="120" height="80" style="object-fit:cover;" />', url)
+    
+    @property
+    def is_favorited_by_user(self, user):
+        if not user.is_authenticated:
+            return False
+        return self.favoriteproperty_set.filter(user=user).exists()
 
 
 class PropertyImage(TimeBasedModel):

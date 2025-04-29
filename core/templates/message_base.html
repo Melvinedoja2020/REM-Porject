@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+    .message-form {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .recipient-card {
+        border-left: 4px solid #E8960F;
+        background-color: #f8f9fa;
+    }
+    .message-textarea {
+        min-height: 200px;
+    }
+    .form-control:focus {
+        border-color: #E8960F;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .btn-send {
+        padding: 10px 24px;
+        font-weight: 500;
+    }
+    .character-count {
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="message-form">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom-0 pb-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">
+                        {% if recipient %}
+                        <i class="bi bi-person-circle me-2"></i>Message {{ recipient.user.name }}
+                        {% else %}
+                        <i class="bi bi-pencil-square me-2"></i>New Message
+                        {% endif %}
+                    </h2>
+                    <a href="{% url 'notification:message_list' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Inbox
+                    </a>
+                </div>
+            </div>
+            
+            <div class="card-body pt-0">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Recipient Section -->
+                    <div class="mb-4">
+                        {% if not recipient %}
+                        <div class="mb-3">
+                            <label for="{{ form.receiver.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-person-plus me-1"></i>Select Recipient
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                {{ form.receiver }}
+                            </div>
+                            {% if form.receiver.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.receiver.errors|join:", " }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <input type="hidden" name="receiver" value="{{ recipient.user.id }}">
+                        <div class="card recipient-card mb-3">
+                            <div class="card-body py-3">
+                                <div class="d-flex align-items-center">
+                                    <img src="{{ recipient.get_profile_picture }}" 
+                                         alt="{{ recipient.user.name }}" 
+                                         class="rounded-circle me-3" 
+                                         width="48" 
+                                         height="48">
+                                    <div>
+                                        <h5 class="mb-1">{{ recipient.user.name }}</h5>
+                                        <p class="text-muted mb-0">
+                                            <i class="bi bi-briefcase me-1"></i>{{ recipient.agent_type }}
+                                            {% if recipient.company_name %}
+                                            <span class="mx-2">•</span>
+                                            <i class="bi bi-building me-1"></i>{{ recipient.company_name }}
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Subject Field -->
+                    <div class="mb-4">
+                        <label for="{{ form.subject.id_for_label }}" class="form-label fw-semibold">
+                            <i class="bi bi-card-heading me-1"></i>Subject
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                            {{ form.subject }}
+                        </div>
+                        {% if form.subject.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.subject.errors|join:", " }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Message Field -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="{{ form.message.id_for_label }}" class="form-label fw-semibold">
+                                <i class="bi bi-chat-square-text me-1"></i>Your Message
+                            </label>
+                            <span class="character-count">0/1000</span>
+                        </div>
+                        {{ form.message }}
+                        {% if form.message.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.message.errors|join:", " }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="d-flex justify-content-between align-items-center border-top pt-4">
+                        <button type="reset" class="btn btn-outline-secondary">
+                            <i class="bi bi-eraser me-1"></i> Clear
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-send">
+                            <i class="bi bi-send me-1"></i> Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Character counter for message
+    const messageField = document.getElementById('{{ form.message.id_for_label }}');
+    const charCount = document.querySelector('.character-count');
+    
+    if (messageField && charCount) {
+        messageField.classList.add('message-textarea');
+        messageField.setAttribute('maxlength', '1000');
+        
+        messageField.addEventListener('input', function() {
+            const currentLength = this.value.length;
+            charCount.textContent = `${currentLength}/1000`;
+            
+            if (currentLength > 800) {
+                charCount.style.color = '#dc3545';
+            } else {
+                charCount.style.color = '#6c757d';
+            }
+        });
+        
+        // Initialize count
+        charCount.textContent = `${messageField.value.length}/1000`;
+    }
+    
+    // Add Bootstrap validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+});
+</script>
+{% endblock %}

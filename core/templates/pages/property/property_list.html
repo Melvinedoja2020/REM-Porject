@@ -124,19 +124,12 @@
                         <img class="lazyload" data-src="{{ rents.main_image_url }}" src="{{ rents.main_image_url }}"
                           alt="">
                       </a>
-                      <ul class="box-tag flex gap-8 ">
+                      {% comment %} <ul class="box-tag flex gap-8 ">
                         <li class="flat-tag text-4 bg-main fw-6 text_white">Featured
                         </li>
                         <li class="flat-tag text-4 bg-3 fw-6 text_white">For Sale</li>
-                      </ul>
-                      <div class="list-btn flex gap-8 ">
-                        <a href="#" class="btn-icon save hover-tooltip"><i class="icon-save"></i>
-                          <span class="tooltip">Add Favorite</span>
-                        </a>
-                        <a href="#" class="btn-icon find hover-tooltip"><i class="icon-find-plus"></i>
-                          <span class="tooltip">Quick View</span>
-                        </a>
-                      </div>
+                      </ul> {% endcomment %}
+                      {% include 'partials/_favorite_button.html' with property=rents %}
                     </div>
                     <div class="content">
                       <h5 class="title">
@@ -179,19 +172,7 @@
                         <img class="lazyload" data-src="{{ rents.main_image_url }}" src="{{ rents.main_image_url }}"
                           alt="">
                       </a>
-                      {% comment %} <ul class="box-tag flex gap-8 ">
-                        <li class="flat-tag text-4 bg-main fw-6 text_white">Featured
-                        </li>
-                        <li class="flat-tag text-4 bg-3 fw-6 text_white">For Sale</li>
-                      </ul> {% endcomment %}
-                      {% comment %} <div class="list-btn flex gap-8 ">
-                        <a href="#" class="btn-icon save hover-tooltip"><i class="icon-save"></i>
-                          <span class="tooltip">Add Favorite</span>
-                        </a>
-                        <a href="#" class="btn-icon find hover-tooltip"><i class="icon-find-plus"></i>
-                          <span class="tooltip">Quick View</span>
-                        </a>
-                      </div> {% endcomment %}
+                      {% include 'partials/_favorite_button.html' with property=rents %}
                     </div>
                     <div class="content">
                       <h5 class="title">
@@ -224,50 +205,7 @@
               </div>
             </div>
           </div>
-          <div class="wrap-pagination">
-            {% if page_obj.has_other_pages %}
-            <p class="text-1">
-              Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} results.
-            </p>
-
-            <ul class="wg-pagination">
-              <!-- Previous page arrow -->
-              {% if page_obj.has_previous %}
-              <li class="arrow">
-                <a href="?page={{ page_obj.previous_page_number }}"><i class="icon-arrow-left"></i></a>
-              </li>
-              {% else %}
-              <li class="arrow disabled">
-                <a href="#"><i class="icon-arrow-left"></i></a>
-              </li>
-              {% endif %}
-
-              <!-- Page numbers -->
-              {% for num in page_obj.paginator.page_range %}
-              {% if num == page_obj.number %}
-              <li class="active"><a href="#">{{ num }}</a></li>
-              {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
-              <li><a href="?page={{ num }}">{{ num }}</a></li>
-              {% elif num == 1 or num == page_obj.paginator.num_pages %}
-              <li><a href="?page={{ num }}">{{ num }}</a></li>
-              {% elif forloop.last or forloop.first %}
-              <li><a href="#">...</a></li>
-              {% endif %}
-              {% endfor %}
-
-              <!-- Next page arrow -->
-              {% if page_obj.has_next %}
-              <li class="arrow">
-                <a href="?page={{ page_obj.next_page_number }}"><i class="icon-arrow-right"></i></a>
-              </li>
-              {% else %}
-              <li class="arrow disabled">
-                <a href="#"><i class="icon-arrow-right"></i></a>
-              </li>
-              {% endif %}
-            </ul>
-            {% endif %}
-          </div>
+          {% include 'partials/paginations.html'%}
 
 
         </div>

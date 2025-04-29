@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+{% include 'partials/messages.html' %}
+
+
+<!-- .main-content -->
+<div class="page-content">
+
+  <!-- section-agent -->
+  <section class="section-agent ">
+    <div class="tf-container">
+      <div class="row">
+        <div class="box-title style-2 mb-48">
+          <h2>Agents</h2>
+          {% comment %} <div class="wrap-sort">
+            <form>
+              <fieldset>
+                <input class="" type="text" placeholder="Agent name" name="name" tabindex="2" aria-required="true">
+              </fieldset>
+            </form>
+
+          </div> {% endcomment %}
+        </div>
+        <div class=" tf-grid-layout-2 lg-col-4 md-col-3 sm-col-2">
+          {% for agent in agents %}
+          <div class="agent-item hover-img">
+            <div class="image-wrap">
+              <a href="{% url 'home:agent_detail' agent.id %}">
+                <img class="lazyload" data-src="{{ agent.get_profile_picture}}" alt="">
+              </a>
+              <ul class="tf-social style-3">
+                <li><a href="{{agent.user.social_media_links.facebook}}"><i class="icon-fb"></i></a></li>
+                <li><a href="{{ agent.user.social_media_links.twitter }}"><i class="icon-X"></i></a></li>
+                <li><a href="{{ agent.user.social_media_links.linkedin }}"><i class="icon-linked"></i></a></li>
+                <li><a href="{{ agent.user.social_media_links.instagram }}"><i class="icon-ins"></i></a></li>
+              </ul>
+            </div>
+            <div class="content">
+              <div class="author">
+                <h5 class="name lh-30"><a href="{% url 'home:agent_detail' agent.id %}">{{ agent.user.name }}</a></h5>
+                <p class="text-2 lh-18">{{ agent.agent_type}}</p>
+              </div>
+              <div class="wrap-btn-icon">
+                <!-- Update this line to include agent ID -->
+                <a href="{% url 'notification:message_create_to_agent' receiver_id=agent.user.id %}" class="btn-icon"
+                  title="Message this agent">
+                  <i class="bi bi-chat-dots"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+        {% include 'partials/paginations.html' %}
+      </div>
+    </div>
+  </section>
+  <!-- section-agent -->
+
+  {% comment %}
+  <!-- section-CTA -->
+  <section class="section-CTA">
+    <div class="tf-container">
+      <div class="row">
+        <div class="col-12">
+          <div class="content-inner">
+            <img src="{% static 'images/section/cta.png' %}" alt="">
+            <div class="content">
+              <h4 class="text_white mb-8 ">Find a Local Real Estate Agent Today</h4>
+              <p class="text_white text-1">If you’re looking to buy or sell a home. We’ll help you
+                make
+                the most money
+                possible.</p>
+            </div>
+            <a href="#" class="tf-btn style-2 fw-6 ">Find your location agent <i
+                class="icon-MagnifyingGlass fw-6"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section> {% endcomment %}
+  <!-- /section-CTA -->
+
+</div>
+<!-- /main-content -->
+
+{% endblock content %}

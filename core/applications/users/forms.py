@@ -2,7 +2,9 @@ from allauth.account.forms import SignupForm
 from allauth.socialaccount.forms import SignupForm as SocialSignupForm
 from django.contrib.auth import forms as admin_forms
 from django.forms import (
-    EmailField, EmailInput, FileInput, TextInput, CharField, ChoiceField, Select, URLInput
+    EmailField, EmailInput, FileInput, TextInput, 
+    CharField, ChoiceField, Select, URLInput, Textarea,
+    NumberInput
 )
 from django.utils.translation import gettext_lazy as _
 
@@ -226,23 +228,61 @@ class AgentProfileForm(ModelForm):
 
 
 
-class UsersProfile(ModelForm):
-    """ Form to handle Users Profile """
+class UsersProfileForm(ModelForm):
+    """
+    Form to handle user profile updates.
+    Accepts 'user' for potential future customization.
+    """
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super().__init__(*args, **kwargs)
+
+        # Example: if you want to conditionally disable fields later based on the user
+        if user:
+            self.user = user  # Save user to the form instance for future use
+
     class Meta:
         model = UserProfile
-        fields = ["phone_number", "address", "profile_picture"]
+        fields = [
+            "phone_number", "address", "profile_picture",
+            "preferred_location", "preferred_property_type",
+            "min_budget", "max_budget", "preferred_features", "is_premium"
+        ]
         widgets = {
             "phone_number": TextInput(attrs={
                 "placeholder": "Phone Number",
                 "class": "form-control"
             }),
-            "address": TextInput(attrs={
+            "address": Textarea(attrs={
                 "placeholder": "Address",
-                "class": "form-control"
+                "class": "form-control",
+                "rows": 2
             }),
             "profile_picture": FileInput(attrs={
                 "class": "form-control"
-            })
+            }),
+            "preferred_location": TextInput(attrs={
+                "placeholder": "Preferred Location",
+                "class": "form-control"
+            }),
+            "preferred_property_type": TextInput(attrs={
+                "placeholder": "Preferred Property Type",
+                "class": "form-control"
+            }),
+            "min_budget": NumberInput(attrs={
+                "placeholder": "Min Budget",
+                "class": "form-control"
+            }),
+            "max_budget": NumberInput(attrs={
+                "placeholder": "Max Budget",
+                "class": "form-control"
+            }),
+            "preferred_features": Textarea(attrs={
+                "placeholder": "Preferred Features (comma-separated or JSON)",
+                "class": "form-control",
+                "rows": 3
+            }),
+            
         }
 
 

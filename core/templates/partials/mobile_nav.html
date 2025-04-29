@@ -187,16 +187,20 @@
         <li class="menu-item ">
           <a href="{% url 'home:property_rent_list' %}" class="tem-menu-mobile "> Rents</a>
         </li>
+        <li class="menu-item "><a href="{% url 'home:agent_list' %}">Agents</a></li>
         <li class="menu-item ">
-          <a href="contact.html" class="tem-menu-mobile "> Contact</a>
+          <a href="#" class="tem-menu-mobile "> Contact</a>
         </li>
         {% if request.user.is_authenticated %}
         <li class="menu-item ">
           <a href="{% url 'users:agent_dashboard' %}" class="tem-menu-mobile "> Dashboard</a>
         </li>
-        {% if user.role == "CUSTOMER" %}
+        {% if user.role == "Prospective Buyer/Tenant" %}
         <li class="menu-item ">
           <a href="{% url 'users:user_profile' user.pk %}" class="tem-menu-mobile "> My Profile</a>
+        </li>
+        <li class="menu-item ">
+          <a href="{% url 'property:customers_favorite_list' %}" class="tem-menu-mobile "> My Favorites</a>
         </li>
         {% endif %}
         {% if user.role == "Agent" %}

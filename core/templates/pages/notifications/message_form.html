@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<style>
+  .message-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .recipient-display {
+    background-color: #f8fafc;
+    border-left: 4px solid #E8960F;
+    padding: 1rem;
+    border-radius: 0.375rem;
+  }
+
+  .message-textarea {
+    min-height: 200px;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .btn-action {
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+  }
+
+  .char-counter {
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: right;
+  }
+
+  .form-control:focus {
+    border-color: #E8960F;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+  }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 message-container">
+  <div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-bottom-0 pb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">
+          <i class="bi bi-envelope-plus me-2 text-primary"></i>
+          {% if recipient %}
+          Message {{ recipient.user.name }}
+          {% else %}
+          New Message
+          {% endif %}
+        </h2>
+        <a href="{% url 'notification:message_list' %}" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Back to Inbox
+        </a>
+      </div>
+    </div>
+
+    <div class="card-body pt-0">
+      <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <!-- Recipient Section -->
+        <div class="mb-4">
+          {% if not recipient %}
+          <div class="mb-3">
+            <label for="{{ form.receiver.id_for_label }}" class="form-label">
+              <i class="bi bi-person-fill me-1"></i> Recipient
+            </label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              {{ form.receiver }}
+            </div>
+            {% if form.receiver.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.receiver.errors|join:", " }}
+            </div>
+            {% endif %}
+          </div>
+          {% else %}
+          <input type="hidden" name="receiver" value="{{ recipient.user.id }}">
+          <div class="recipient-display mb-3">
+            <div class="d-flex align-items-center">
+              <div class="me-3">
+                <i class="bi bi-person-circle fs-3 text-primary"></i>
+              </div>
+              <div>
+                <h5 class="mb-1">{{ recipient.user.name }}</h5>
+                <p class="mb-0 text-muted">
+                  <i class="bi bi-briefcase me-1"></i>{{ recipient.agent_type }}
+                  {% if recipient.company_name %}
+                  <span class="mx-2">•</span>
+                  <i class="bi bi-building me-1"></i>{{ recipient.company_name }}
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Subject Field -->
+        <div class="mb-4">
+          <label for="{{ form.subject.id_for_label }}" class="form-label">
+            <i class="bi bi-card-heading me-1"></i> Subject
+          </label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+            {{ form.subject }}
+          </div>
+          {% if form.subject.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.subject.errors|join:", " }}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Message Field -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <label for="{{ form.message.id_for_label }}" class="form-label">
+              <i class="bi bi-pencil-square me-1"></i> Your Message
+            </label>
+            <span class="char-counter" id="charCounter">0/1000</span>
+          </div>
+          {{ form.message }}
+          {% if form.message.errors %}
+          <div class="invalid-feedback d-block">
+            {{ form.message.errors|join:", " }}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-between align-items-center border-top pt-4">
+          <button type="reset" class="btn btn-outline-secondary btn-action">
+            <i class="bi bi-eraser me-1"></i> Clear
+          </button>
+          <button type="submit" class="btn btn-primary btn-action">
+            <i class="bi bi-send me-1"></i> Send Message
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Character counter functionality
+    const messageField = document.getElementById('{{ form.message.id_for_label }}');
+    const charCounter = document.getElementById('charCounter');
+
+    if (messageField && charCounter) {
+      messageField.classList.add('message-textarea');
+      messageField.setAttribute('maxlength', '1000');
+
+      messageField.addEventListener('input', function () {
+        const currentLength = this.value.length;
+        charCounter.textContent = `${currentLength}/1000`;
+
+        // Change color when approaching limit
+        if (currentLength > 800) {
+          charCounter.style.color = '#dc3545';
+        } else {
+          charCounter.style.color = '#6b7280';
+        }
+      });
+
+      // Initialize counter
+      charCounter.textContent = `${messageField.value.length}/1000`;
+    }
+
+    // Form validation
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  });
+
+</script>
+{% endblock %}

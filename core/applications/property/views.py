@@ -5,7 +5,7 @@ from django.views.generic import (
 )
 
 from core.applications.property.forms import LeadForm, PropertyForm, PropertyImageForm
-from core.applications.property.models import Lead, Property, PropertyImage, PropertyType
+from core.applications.property.models import FavoriteProperty, Lead, Property, PropertyImage, PropertyType
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
@@ -13,6 +13,7 @@ from django.shortcuts import redirect
 
 from core.helper.enums import PropertyListingType, UserRoleChoice
 from core.helper.mixins import AgentApprovalRequiredMixin
+from django.views import View
 # Create your views here.
 
 
@@ -210,21 +211,22 @@ class LeadListView(ListView):
     context_object_name = "leads"
 
 
-# class RentalApplicationCreateView(CreateView):
-#     model = RentalApplication
-#     form_class = RentalApplicationForm
-#     template_name = "rental_application_form.html"
-#     success_url = reverse_lazy("rental_application_list")
+class FavoriteListView(LoginRequiredMixin, ListView):
+    model = FavoriteProperty
+    template_name = "pages/dashboard/customers_favorite_list.html"
+    context_object_name = "favorites"
 
+    def get_queryset(self):
+        return (
+            FavoriteProperty.objects.filter(user=self.request.user)
+            .select_related("property")
+            .prefetch_related("property__images", "property__amenities")
+        )
+    
 
-# class PaymentCreateView(CreateView):
-#     model = Payment
-#     form_class = PaymentForm
-#     template_name = "payment_form.html"
-#     success_url = reverse_lazy("payment_list")
-
-
-# class NotificationListView(ListView):
-#     model = Notification
-#     template_name = "notification_list.html"
-#     context_object_name = "notifications"
+class FavoriteDeleteView(LoginRequiredMixin, DeleteView):
+    model = FavoriteProperty
+    template_name = "pages/dashboard/favorite_delete.html"
+    success_url = reverse_lazy("property:customers_favorite_list")
+    
+    

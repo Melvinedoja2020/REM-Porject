@@ -9,12 +9,12 @@ from django.views.generic import DetailView
 from django.views.generic import RedirectView
 from django.views.generic import UpdateView, CreateView
 
-from core.applications.users.forms import AgentProfileForm, SocialMediaLinksForm, SuperCustomUserCreationForm
-from core.applications.users.models import AgentProfile, SocialMediaLinks, User
+from core.applications.users.forms import AgentProfileForm, SocialMediaLinksForm, SuperCustomUserCreationForm, UsersProfileForm
+from core.applications.users.models import AgentProfile, SocialMediaLinks, User, UserProfile
 from core.helper.enums import UserRoleChoice
 from django.views.generic import TemplateView
 
-from core.helper.mixins import AgentApprovalRequiredMixin
+from core.helper.mixins import AgentApprovalRequiredMixin, RoleRequiredMixin
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
@@ -35,6 +35,9 @@ class BaseProfileView(LoginRequiredMixin, DetailView):
 
         if user.role == UserRoleChoice.AGENT.value:
             context["profile"] = user.agent_profile
+        elif user.role == UserRoleChoice.CUSTOMER.value:
+            context["profile"] = user.profile
+        
         # elif user.role == UserRoleChoice.REAL_ESTATE_OWNER.value:
         #     context["profile"] = user.real_estate_owner_profile
         else:
@@ -43,10 +46,46 @@ class BaseProfileView(LoginRequiredMixin, DetailView):
         return context
 
 
-class UserProfileView(BaseProfileView):
-    model = User
+class UserProfileView(LoginRequiredMixin, UpdateView):
+    model = UserProfile
+    form_class = UsersProfileForm
     template_name = "users/user_profile.html"
 
+    def get_object(self, queryset=None):
+        """Get or create user profile for the logged-in user."""
+        profile, created = UserProfile.objects.get_or_create(user=self.request.user)
+        return profile
+
+    def get_context_data(self, **kwargs):
+        """Include social media form and profile picture in the context."""
+        context = super().get_context_data(**kwargs)
+        social_media, _ = SocialMediaLinks.objects.get_or_create(user=self.request.user)
+        context["social_media_form"] = SocialMediaLinksForm(instance=social_media)
+        context["profile_picture"] = self.get_object().get_profile_picture
+        return context
+
+    def get_form_kwargs(self):
+        """Include the logged-in user in form kwargs."""
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        """Handle POST for both user profile and social media form."""
+        self.object = self.get_object()
+        profile_form = self.get_form()
+        social_media_form = SocialMediaLinksForm(
+            request.POST, instance=self.object.user.social_media_links
+        )
+
+        if profile_form.is_valid() and social_media_form.is_valid():
+            profile_form.save()
+            social_media_form.save()
+            messages.success(request, "Your profile was updated successfully.")
+            return redirect("users:user_profile", pk=request.user.pk)
+
+        return self.form_invalid(profile_form)
+    
 
 class AgentProfileView(LoginRequiredMixin, UpdateView):
     model = AgentProfile
@@ -140,22 +179,11 @@ user_redirect_view = UserRedirectView.as_view()
 
 
 class AgentDashboardView(
-    LoginRequiredMixin, UserPassesTestMixin, 
-    AgentApprovalRequiredMixin, TemplateView
+    RoleRequiredMixin, LoginRequiredMixin, TemplateView
 ):
     template_name = "users/agent_dashboard.html"
-
-    def test_func(self):
-        return self.request.user.role == UserRoleChoice.AGENT.value
-    
-    def handle_no_permission(self):
-        """Redirect unauthorized users with a message"""
-        messages.error(self.request, "You are not authorized to access this page.")
-        return super().handle_no_permission()
-    
-    def get_context_data(self, **kwargs):
-        """Pass dashboard data to the template"""
-        context = super().get_context_data(**kwargs)
+    required_role = UserRoleChoice.AGENT.value
+    error_message = "Only agents can access the agent dashboard."
 
 
 
@@ -166,4 +194,9 @@ class SuperUserSignupView(CreateView):
     success_url = reverse_lazy('admin:login')
 
 
-# superuser_signup = SuperUserSignupView.as_view()
+class UserDashboardView(
+    RoleRequiredMixin, LoginRequiredMixin, TemplateView
+):
+    template_name = "users/user_dashboard.html"
+    required_role = UserRoleChoice.CUSTOMER.value
+    error_message = "Only customers can access the user dashboard."

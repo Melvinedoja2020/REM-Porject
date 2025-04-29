@@ -62,3 +62,9 @@ class VerificationStatusChoices(TextChoices):
     
 
 
+class NotificationType(TextChoices):
+    NEW_LISTING = ("New Listing", "New Listing")
+    PRICE_CHANGING = ("Price changing", "Price changing")
+    MESSAGE = ("Message", "Message")
+    VIEWING = ("Viewing", "Viewing")
+    FAVORITE = ("Favorite", "Favorite")
