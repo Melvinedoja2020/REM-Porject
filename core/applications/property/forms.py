@@ -2,11 +2,10 @@ from django import forms
 from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
 from django.urls import reverse_lazy
 
-from core.applications.property.models import Amenity, Lead, Property, PropertyImage, PropertyType
+from core.applications.property.models import Amenity, Lead, Property, PropertyImage, PropertySubscription, PropertyType
 from core.helper.enums import PropertyListingType, PropertyTypeChoices
 
 
-# Forms
 
 class PropertyForm(forms.ModelForm):
     amenities = forms.ModelMultipleChoiceField(
@@ -196,6 +195,21 @@ class PropertySearchForm(forms.Form):
                 field.widget.attrs.update({'class': 'form-check-input'})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
+
+class PropertySubscriptionForm(forms.ModelForm):
+    class Meta:
+        model = PropertySubscription
+        fields = ["location", "property_type"]
+        widgets = {
+            "location": forms.TextInput(attrs={
+                "placeholder": "Enter location",
+                "class": "flex-grow",
+            }),
+            "property_type": forms.Select(attrs={
+                "class": "flex-grow",
+            }),
+        }
+
 
 class LeadForm(forms.ModelForm):
     class Meta:

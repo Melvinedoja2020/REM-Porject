@@ -46,8 +46,8 @@ def send_notification_email(notification):
         'site_url': settings.SITE_URL
     }
     
-    html_message = render_to_string('notifications/email_notification.html', context)
-    text_message = render_to_string('notifications/email_notification.txt', context)
+    html_message = render_to_string('pages/notifications/email_notification.html', context)
+    text_message = render_to_string('pages/notifications/email_notification.txt', context)
     
     send_mail(
         subject,

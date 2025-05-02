@@ -1,0 +1,40 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+{% block content %}
+<!-- main-content -->
+<div class="main-content">
+  <!-- main-content-wrap -->
+  <div class="main-content-inner">
+    <!-- main-content-wrap -->
+    <div class="main-content-wrap">
+      <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+        <h3>Subscribe</h3>
+        
+      </div>
+      <!-- new-attribute -->
+      <div class="wg-box">
+        <form method="post" class="form-new-product form-style-1">
+          {% csrf_token %}
+          <fieldset class="name">
+            <div class="body-title">{{form.location.label}}</div>
+            {{ form.location}}
+          </fieldset>
+          <fieldset class="name">
+            <div class="body-title">{{ form.property_type.label}}</div>
+            {{ form.property_type }}
+          </fieldset>
+          <div class="bot">
+            <div></div>
+            <button class="tf-button w208" type="submit">Subscribe</button>
+          </div>
+        </form>
+      </div>
+      <!-- /new-category -->
+    </div>
+    <!-- /main-content-wrap -->
+  </div>
+  <!-- /main-content-wrap -->
+  <!-- bottom-page -->
+
+
+  {% endblock content %}

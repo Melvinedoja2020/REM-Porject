@@ -12,6 +12,9 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
+from django.core.mail import send_mail
+from django.contrib import messages
+from django.conf import settings
 # Create your views here.
 
 
@@ -147,7 +150,7 @@ class AgentDetailView(LoginRequiredMixin, DetailView):
     model = AgentProfile
     template_name = "pages/agents/agent_detail.html"
     context_object_name = "agent"
-    
+
     def get_object(self):
         return get_object_or_404(AgentProfile, pk=self.kwargs.get("id"))
 
@@ -165,6 +168,37 @@ class AgentDetailView(LoginRequiredMixin, DetailView):
             "property_count": properties.count()
         })
         return context
+
+    def post(self, request, *args, **kwargs):
+        agent = self.get_object()
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        phone = request.POST.get("phone")
+        message = request.POST.get("message")
+
+        full_message = f"""
+        You received a message from a user on your agent profile page:
+        
+        Name: {name}
+        Email: {email}
+        Phone: {phone}
+        
+        Message:
+        {message}
+        """
+
+        try:
+            send_mail(
+                subject=f"New inquiry from {name}",
+                message=full_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[agent.user.email],  # Assuming AgentProfile has OneToOne to User
+            )
+            messages.success(request, "Your message has been sent successfully.")
+        except Exception as e:
+            messages.error(request, "An error occurred while sending your message. Please try again.")
+
+        return self.get(request, *args, **kwargs)
     
 
 # Needed for AJAX without CSRF token (or add token client-side)

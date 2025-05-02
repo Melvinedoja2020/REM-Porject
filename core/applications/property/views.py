@@ -1,11 +1,12 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import (
-    CreateView, UpdateView, ListView, DetailView, DeleteView
+    CreateView, UpdateView, ListView, DetailView, DeleteView,
+    FormView
 )
 
-from core.applications.property.forms import LeadForm, PropertyForm, PropertyImageForm
-from core.applications.property.models import FavoriteProperty, Lead, Property, PropertyImage, PropertyType
+from core.applications.property.forms import LeadForm, PropertyForm, PropertyImageForm, PropertySubscriptionForm
+from core.applications.property.models import FavoriteProperty, Lead, Property, PropertyImage, PropertySubscription, PropertyType
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
@@ -228,5 +229,56 @@ class FavoriteDeleteView(LoginRequiredMixin, DeleteView):
     model = FavoriteProperty
     template_name = "pages/dashboard/favorite_delete.html"
     success_url = reverse_lazy("property:customers_favorite_list")
+
+
+class PropertySubscriptionListView(LoginRequiredMixin, ListView):
+    model = PropertySubscription
+    template_name = "subscriptions/list.html"
+    context_object_name = "subscriptions"
+    
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)
+
+
+class CreatePropertySubscriptionView(LoginRequiredMixin, FormView):
+    form_class = PropertySubscriptionForm
+    template_name = "pages/dashboard/subscription_form.html"
+    success_url = reverse_lazy("users:user_dashboard")
+    
+    def form_valid(self, form):
+        subscription, created = PropertySubscription.objects.get_or_create(
+            user=self.request.user,
+            location=form.cleaned_data["location"],
+            property_type=form.cleaned_data["property_type"],
+        )
+        if created:
+            messages.success(self.request, "✅ Subscribed successfully to property alerts.")
+        else:
+            messages.info(self.request, "ℹ️ You’re already subscribed to this preference.")
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, "❌ There was an error with your subscription. Please try again.")
+        return super().form_invalid(form)
+
+
+class PropertySubscriptionUpdateView(LoginRequiredMixin, UpdateView):
+    model = PropertySubscription
+    form_class = PropertySubscriptionForm
+    template_name = "subscriptions/form.html"
+    success_url = reverse_lazy("subscriptions:list")
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)
+
+
+class PropertySubscriptionDeleteView(LoginRequiredMixin, DeleteView):
+    model = PropertySubscription
+    template_name = "subscriptions/confirm_delete.html"
+    success_url = reverse_lazy("subscriptions:list")
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)
     
     

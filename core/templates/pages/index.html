@@ -423,7 +423,7 @@
                   market with us</h2>
                 <p class="text-1 split-text split-lines-transform" data-wow-duration="1s">REM agents bring the expertise
                   you need to succeed in today’s market—powered by a trusted network of agents across
-                   offices worldwide. With strong global connections and local market knowledge, we give you a
+                  offices worldwide. With strong global connections and local market knowledge, we give you a
                   competitive edge that goes far beyond what you’ll find online.
               </div>
               <a href="#" class="tf-btn bg-color-primary pd-19 fw-7 wow animate__fadeInUp animate__animated"
@@ -442,7 +442,7 @@
   <!-- /section-appraisal -->
 
   <!-- Categories -->
-  {% comment %} <section class="tf-spacing-1 section-categories pb-0">
+  <section class="tf-spacing-1 section-categories pb-0">
     <div class="tf-container">
       <div class="heading-section text-center mb-48">
         <h2 class="title split-text effect-right">Try Searching For</h2>
@@ -532,7 +532,7 @@
         </div>
       </div>
     </div>
-  </section> {% endcomment %}
+  </section>
   <!-- End Categories -->
 
   <!-- section-popular-searches -->
@@ -588,14 +588,15 @@
                           <i class="icon-compare"></i>
                           Compare
                         </a> {% endcomment %}
-                        <a href="{% url 'home:rent_property_detail' property.slug %}" class="tf-btn style-border pd-4">Details</a>
+                        <a href="{% url 'home:rent_property_detail' property.slug %}"
+                          class="tf-btn style-border pd-4">Details</a>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               {% endfor %}
-              
+
             </div>
             <div class="sw-wrap-btn">
               <div class="swiper-button-prev sw-button nav-prev-layout">
@@ -872,9 +873,20 @@
                 price.</p>
             </div>
           </div>
-          <p class="text-1 text-center mb-48">You can obtain more information and an appraisal of your
-            property by <a href="#">clicking this link</a> now.</p>
-          <a href="#" class="tf-btn bg-color-primary pd-3 fw-6 mx-auto">Get Started Now</a>
+          {% if request.user.is_authenticated and user.role == "Prospective Buyer/Tenant" and not request.user.property_subscriptions.exists %}
+          <section class="subscribe-section text-center py-5">
+            <p class="text-1 mb-4">
+              You can obtain more information and get notified about matching properties by
+              <a href="{% url 'property:create-subscription' %}" class="text-decoration-underline fw-bold">
+                clicking this link
+              </a> now.
+            </p>
+            <a href="{% url 'property:create-subscription' %}" class="tf-btn bg-color-primary pd-3 fw-6 mx-auto">
+              Get Started Now
+            </a>
+          </section>
+          {% endif %}
+
         </div>
       </div>
     </div>

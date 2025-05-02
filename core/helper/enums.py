@@ -68,3 +68,5 @@ class NotificationType(TextChoices):
     MESSAGE = ("Message", "Message")
     VIEWING = ("Viewing", "Viewing")
     FAVORITE = ("Favorite", "Favorite")
+    AVAILABILITY_UPDATE = ("Availability Update", "Availability Update")
+    VIEWING_UPDATE = ("Viewing Update", "Viewing Update")

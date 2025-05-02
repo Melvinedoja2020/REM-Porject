@@ -93,6 +93,7 @@ class NotificationPreference(TitleTimeBasedModel):
     price_change = models.BooleanField(default=True)
     new_message = models.BooleanField(default=True)
     viewing_update = models.BooleanField(default=True)
+    email_notifications = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Notification Preferences for {self.user}"

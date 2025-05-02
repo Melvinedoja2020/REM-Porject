@@ -118,6 +118,36 @@ class Amenity(TimeBasedModel):
     def __str__(self):
         return self.name
 
+
+from django.db import models
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class PropertySubscription(TimeBasedModel):
+    user = auto_prefetch.ForeignKey(
+        "users.User", on_delete=models.CASCADE, 
+        related_name="property_subscriptions"
+    )
+    location = models.CharField(max_length=255, blank=True, null=True)
+    property_type = models.CharField(
+        max_length=50,
+        choices=PropertyTypeChoices.choices,
+        blank=True,
+        null=True
+    )
+
+    class Meta(auto_prefetch.Model.Meta):
+        verbose_name = "Property Subscription"
+        verbose_name_plural = "Property Subscriptions"
+        unique_together = (
+            "user", "location", 
+            "property_type"
+        )
+
+    def __str__(self):
+        return f"{self.user} subscribes to {self.property_type or 'any type'} in {self.location or 'any location'}"
+
 class Lead(TimeBasedModel):
     agent = auto_prefetch.ForeignKey(
         "users.AgentProfile", on_delete=models.CASCADE, related_name="leads"

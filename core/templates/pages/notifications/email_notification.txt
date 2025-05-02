@@ -1,0 +1,13 @@
+{{ site_name }}
+{{ "-" * site_name|length }}
+
+{{ notification.title }}
+{{ "=" * notification.title|length }}
+
+{{ notification.message }}
+
+Visit {{ site_name }}: {{ site_url }}
+
+---
+You are receiving this message because you have a {{ site_name }} account.
+© {{ site_name }} | {{ site_url }}
