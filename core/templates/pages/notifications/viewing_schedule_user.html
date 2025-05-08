@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Viewing Scheduled</title>
+</head>
+<body>
+  <p>Hi {{ user.full_name }},</p>
+
+  <p>Your property viewing has been <strong>successfully scheduled</strong>.</p>
+
+  <h3>Viewing Details</h3>
+  <ul>
+    <li><strong>Property:</strong> {{ property.title }}</li>
+    <li><strong>Location:</strong> {{ property.address }}</li>
+    <li><strong>Date & Time:</strong> {{ viewing.scheduled_time|date:"F j, Y @ g:i A" }}</li>
+    <li><strong>Agent:</strong> {{ agent.full_name }} ({{ agent.phone_number }})</li>
+  </ul>
+
+  <p>
+    You can view full details on your dashboard:<br>
+    <a href="{{ dashboard_url }}">{{ dashboard_url }}</a>
+  </p>
+
+  <p>Thank you for choosing our platform.</p>
+</body>
+</html>

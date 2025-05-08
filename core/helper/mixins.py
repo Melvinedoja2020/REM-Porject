@@ -32,3 +32,11 @@ class AgentApprovalRequiredMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
+
+class AgentRequiredMixin(LoginRequiredMixin):
+    """Verify that the current user is an agent"""
+    def dispatch(self, request, *args, **kwargs):
+        if not hasattr(request.user, 'agentprofile'):
+            messages.error(request, "This section is for agents only")
+            return redirect('home:home')
+        return super().dispatch(request, *args, **kwargs)

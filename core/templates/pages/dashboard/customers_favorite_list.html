@@ -67,7 +67,7 @@
               </div>
               <div class="flex items-center justify-between gap20 flex-grow">
                 <div class="name">
-                  <a href="product-list.html" class="body-title-2">{{ favorite.property.title }}</a>
+                  <a href="" class="body-title-2">{{ favorite.property.title }}</a>
                 </div>
                 <div class="body-text">${{ favorite.property.price}}</div>
                 <div class="body-text">{{ favorite.property.location}}</div>
@@ -77,14 +77,16 @@
                 <div class="body-text">{{ favorite.property.created_at|date:"d/m/Y"}}</div>
                 <div class="list-icon-function">
                   <div class="item eye">
+                    <a href="{% url 'property:favorite_lead_create' favorite.id %}" class="btn btn-outline-secondary">Send Inquiry</a>
+                  </div>
+                  <div class="item eye">
                     <i class="icon-eye"></i>
                   </div>
                   <div class="item edit">
                     <i class="icon-edit-3"></i>
                   </div>
-                  <div class="item trash delete-favorite"
-                  data-favorite-id="{{ favorite.id }}"
-                  data-url="{% url 'property:delete_favorite' favorite.id %}">
+                  <div class="item trash delete-favorite" data-favorite-id="{{ favorite.id }}"
+                    data-url="{% url 'property:delete_favorite' favorite.id %}">
                     <i class="icon-trash-2"></i>
                   </div>
                 </div>

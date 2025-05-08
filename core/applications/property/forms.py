@@ -1,9 +1,8 @@
+from django.utils import timezone
 from django import forms
-from django.views.generic import CreateView, UpdateView, DetailView, ListView, DeleteView
-from django.urls import reverse_lazy
-
-from core.applications.property.models import Amenity, Lead, Property, PropertyImage, PropertySubscription, PropertyType
+from core.applications.property.models import Amenity, Lead, Property, PropertyImage, PropertySubscription, PropertyType, PropertyViewing
 from core.helper.enums import PropertyListingType, PropertyTypeChoices
+from django.core.exceptions import ValidationError
 
 
 
@@ -14,12 +13,20 @@ class PropertyForm(forms.ModelForm):
         required=False,  # Allow properties without amenities
         label="Select Amenities",
     )
-    property_type = forms.ModelChoiceField(
-        queryset=PropertyType.objects.all(),
+    # property_type = forms.ModelChoiceField(
+    #     queryset=PropertyType.objects.all(),
+    #     widget=forms.Select(attrs={
+    #         "class": "mb-10","id": "property_type_select"
+    #     }),
+    #     label="Property Type",
+    # )
+    property_type = forms.ChoiceField(
+        choices=PropertyTypeChoices.choices,
         widget=forms.Select(attrs={
-            "class": "mb-10","id": "property_type_select"
+            "class": "mb-10",
+            "id": "property_type_select"
         }),
-        label="Property Type",
+        label="Property Type"
     )
     new_property_type = forms.CharField(
         required=False,
@@ -104,7 +111,7 @@ class PropertyForm(forms.ModelForm):
         if not property_type and not new_property_type:
             raise forms.ValidationError(
                 "Please select a property type or enter a new one.",
-                code='missing_property_type'
+                code="missing_property_type"
             )
 
         # If new property type is entered
@@ -113,7 +120,7 @@ class PropertyForm(forms.ModelForm):
             if len(new_property_type) < 3:
                 raise forms.ValidationError(
                     "Property type must be at least 3 characters.",
-                    code='invalid_property_type_length'
+                    code="invalid_property_type_length"
                 )
 
             # Check for existing type (case insensitive)
@@ -133,7 +140,7 @@ class PropertyForm(forms.ModelForm):
 
             # Clear the temporary new_property_type field
             cleaned_data["new_property_type"] = ""
-            if hasattr(self.instance, 'new_property_type'):
+            if hasattr(self.instance, "new_property_type"):
                 self.instance.new_property_type = ""
 
         return cleaned_data
@@ -141,12 +148,12 @@ class PropertyForm(forms.ModelForm):
     def save(self, commit=True):
         # Ensure property_type is properly set before saving
         instance = super().save(commit=False)
-        if not instance.property_type and hasattr(self, 'cleaned_data'):
-            instance.property_type = self.cleaned_data.get('property_type')
+        if not instance.property_type and hasattr(self, "cleaned_data"):
+            instance.property_type = self.cleaned_data.get("property_type")
         
         if commit:
             instance.save()
-            self.save_m2m()  # Don't forget this for ManyToMany fields
+            self.save_m2m()  # Don"t forget this for ManyToMany fields
             
         return instance
     
@@ -190,11 +197,11 @@ class PropertySearchForm(forms.Form):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
             if isinstance(field.widget, forms.Select):
-                field.widget.attrs.update({'class': 'form-select'})
+                field.widget.attrs.update({"class": "form-select"})
             elif isinstance(field.widget, forms.CheckboxSelectMultiple):
-                field.widget.attrs.update({'class': 'form-check-input'})
+                field.widget.attrs.update({"class": "form-check-input"})
             else:
-                field.widget.attrs.update({'class': 'form-control'})
+                field.widget.attrs.update({"class": "form-control"})
 
 class PropertySubscriptionForm(forms.ModelForm):
     class Meta:
@@ -211,35 +218,65 @@ class PropertySubscriptionForm(forms.ModelForm):
         }
 
 
-class LeadForm(forms.ModelForm):
+class LeadCreateForm(forms.ModelForm):
     class Meta:
         model = Lead
-        fields = ["agent", "user", "property", "message", "status"]
+        fields = ["property_link", "message", "status", "notes"]
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop("user", None)
+        property_queryset = kwargs.pop("property_queryset", None)
+        super().__init__(*args, **kwargs)
+
+        if property_queryset is not None:
+            self.fields["property_link"].queryset = property_queryset
+
+    def clean(self):
+        cleaned_data = super().clean()
+        property_link = cleaned_data.get("property_link")
+        
+        if self.user and property_link:
+            if Lead.objects.filter(
+                user=self.user,
+                property_link=property_link
+            ).exists():
+                raise ValidationError(
+                    "You already have an existing lead for this property. "
+                    "Please check your leads list or contact the agent."
+                )
+        return cleaned_data
 
 
-# class ChatMessageForm(forms.ModelForm):
-#     class Meta:
-#         model = ChatMessage
-#         fields = ["sender", "receiver", "message"]
+class LeadStatusForm(forms.ModelForm):
+    class Meta:
+        model = Lead
+        fields = ["status", "notes"]
+        widgets = {
+            "status": forms.Select(attrs={"class": "form-select"}),
+            "notes": forms.Textarea(attrs={
+                "rows": 3,
+                "class": "form-control",
+                "placeholder": "Add private notes..."
+            })
+        }
 
+class ViewingScheduleForm(forms.ModelForm):
+    class Meta:
+        model = PropertyViewing
+        fields = ["scheduled_time"]
+        widgets = {
+            "scheduled_time": forms.DateTimeInput(
+                attrs={
+                    "type": "datetime-local",
+                    "class": "form-control",
+                    "min": timezone.now().strftime("%Y-%m-%dT%H:%M")
+                }
+            )
+        }
 
-# class RentalApplicationForm(forms.ModelForm):
-#     class Meta:
-#         model = RentalApplication
-#         fields = ["user", "property", "agent", "status"]
-
-
-# class PaymentForm(forms.ModelForm):
-#     class Meta:
-#         model = Payment
-#         fields = ["user", "property", "amount", "payment_method", "payment_status", "transaction_id"]
-
-
-# class NotificationForm(forms.ModelForm):
-#     class Meta:
-#         model = Notification
-#         fields = ["recipient", "message", "is_read"]
-
-
-# Views
+    def clean_scheduled_time(self):
+        scheduled_time = self.cleaned_data["scheduled_time"]
+        if scheduled_time < timezone.now():
+            raise ValidationError("Viewing time cannot be in the past")
+        return scheduled_time
 

@@ -1,0 +1,14 @@
+Hi {{ user.full_name }},
+
+Your property viewing has been successfully scheduled.
+
+Here are the details:
+- Property: {{ property.title }}
+- Location: {{ property.address }}
+- Scheduled Date & Time: {{ viewing.scheduled_time|date:"F j, Y @ g:i A" }}
+- Agent: {{ agent.full_name }} ({{ agent.phone_number }})
+
+You can view the full details on your dashboard:
+{{ dashboard_url }}
+
+Thank you for using our platform.

@@ -1,3 +1,4 @@
+import contextlib
 from django.apps import AppConfig
 
 
@@ -6,7 +7,5 @@ class NotificationsConfig(AppConfig):
 
     
     def ready(self):
-        try:
-            import core.applications.notifications.signals  # noqa F401
-        except ImportError:
-            pass
+        with contextlib.suppress(ImportError):
+            import core.applications.notifications.signals  # noqa: F401

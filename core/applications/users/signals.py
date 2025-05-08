@@ -2,6 +2,8 @@ from django.contrib.auth.models import Group, Permission
 from django.db.models.signals import post_migrate, post_save
 from django.dispatch import receiver
 
+from core.applications.notifications.models import NotificationPreference
+from core.applications.property.models import User
 from core.applications.users.models import AgentProfile
 from django.core.mail import send_mail
 from django.conf import settings
@@ -31,3 +33,8 @@ def notify_agent_approval(sender, instance, created, **kwargs):
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[instance.user.email],
         )
+
+@receiver(post_save, sender=User)
+def create_user_notification_pref(sender, instance, created, **kwargs):
+    if created:
+        NotificationPreference.objects.get_or_create(user=instance)

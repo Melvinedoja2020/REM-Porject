@@ -160,6 +160,9 @@ LOGGING = {
     },
 }
 
+SITE_URL = env("SITE_URL", default="http://localhost:8000")
+SITE_NAME = env("SITE_NAME", default="Real Estate Market Place")
+
 # Sentry
 # ------------------------------------------------------------------------------
 # SENTRY_DSN = env("SENTRY_DSN")

@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from core.applications.property.models import (
     Property, PropertyImage, Amenity, 
-    PropertyType, FavoriteProperty
+    PropertyType, FavoriteProperty, PropertySubscription, Lead
 )
 
 # Register your models here.
@@ -43,5 +43,19 @@ class FavoritePropertyAdmin(admin.ModelAdmin):
     ordering = ["-created_at"]
     list_filter = ["user"]
 
+
+@admin.register(PropertySubscription)
+class PropertySubscriptionAdmin(admin.ModelAdmin):
+    list_display = ["user", "location", "property_type"]
+    search_fields = ["user__username", "location", "property_type"]
+    ordering = ["-created_at"]
+    list_filter = ["user", "property_type"]
+
+@admin.register(Lead)
+class LeadAdmin(admin.ModelAdmin):
+    list_display = ["property_link", "user", "status"]
+    search_fields = ["property_link", "user__username"]
+    ordering = ["-created_at"]
+    list_filter = ["status", "property_link"]
 
     

@@ -1,0 +1,74 @@
+<!-- templates/emails/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ subject|default:"Notification" }}</title>
+  <style>
+    /* Basic styles for email clients */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+      font-family: Arial, sans-serif;
+    }
+    .email-wrapper {
+      width: 100%;
+      background-color: #f7f7f7;
+      padding: 20px 0;
+    }
+    .email-content {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 4px rgba(0,0,0,0.05);
+    }
+    .email-header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #dddddd;
+    }
+    .email-header h1 {
+      font-size: 24px;
+      color: #333333;
+    }
+    .email-body {
+      padding: 20px 0;
+      color: #555555;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .email-footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999999;
+      border-top: 1px solid #eeeeee;
+      padding-top: 20px;
+      margin-top: 30px;
+    }
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="email-content">
+      <div class="email-header">
+        <h1>{{ subject|default:"Real Estate Notification" }}</h1>
+      </div>
+      <div class="email-body">
+        {% block content %}
+        <!-- Content goes here -->
+        {% endblock %}
+      </div>
+      <div class="email-footer">
+        &copy; {{ now|date:"Y" }} Your Company Name. All rights reserved.
+      </div>
+    </div>
+  </div>
+</body>
+</html>

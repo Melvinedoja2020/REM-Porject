@@ -70,3 +70,16 @@ class NotificationType(TextChoices):
     FAVORITE = ("Favorite", "Favorite")
     AVAILABILITY_UPDATE = ("Availability Update", "Availability Update")
     VIEWING_UPDATE = ("Viewing Update", "Viewing Update")
+    NEW_LEAD = ("New Lead", "New Lead")
+
+class PropertyViewingChoices(TextChoices):
+    PENDING = ("Pending", "Pending")
+    CONFIRMED = ("Confirmed", "Confirmed")
+    CANCELLED = ("Cancelled", "Cancelled")
+
+class LeadStatus(TextChoices):
+    NEW = "NEW", "New Lead"
+    CONTACTED = "CONTACTED", "Contacted"
+    VIEWING_SCHEDULED = "VIEWING_SCHEDULED", "Viewing Scheduled"
+    FOLLOW_UP = "FOLLOW_UP", "Follow Up Required"
+    CLOSED = "CLOSED", "Closed"

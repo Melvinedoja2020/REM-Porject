@@ -1,0 +1,18 @@
+Hi {{ agent.name }},
+
+You have scheduled a new property viewing.
+
+Lead Information:
+- Name: {{ user.name }}
+- Email: {{ user.email }}
+- Property: {{ property.title }}
+- Location: {{ property.address }}
+- Scheduled Date & Time: {{ viewing.scheduled_time|date:"F j, Y @ g:i A" }}
+
+Please ensure you are available for the scheduled time and reach out to the client if needed.
+
+Dashboard access:
+{{ dashboard_url }}
+
+Best regards,
+The Team

@@ -1,12 +1,15 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, ListView, View, DetailView
 
 from core.applications.notifications.forms import MessageForm, ReplyForm
 from core.applications.notifications.models import Message
 from django.contrib import messages as django_messages
 from django.db.models import Q
+
+from core.utils.utils import create_notification
+from core.helper.enums import NotificationType
 
 # Create your views here.
 
@@ -37,12 +40,10 @@ class MessageDetailView(LoginRequiredMixin, View):
     def get(self, request, pk, *args, **kwargs):
         message = get_object_or_404(Message, pk=pk)
 
-        # Check permissions
         if request.user not in [message.sender, message.receiver]:
             django_messages.error(request, "You don't have permission to view this message.")
             return redirect('notification:message_list')
 
-        # Mark as read if receiver is viewing
         if message.receiver == request.user:
             message.mark_as_read()
 
@@ -50,14 +51,18 @@ class MessageDetailView(LoginRequiredMixin, View):
         return render(request, 'pages/notifications/message_detail.html', {
             'message': message,
             'form': form,
-            'replies': message.replies.all()
+            'replies': message.replies.all().order_by('created_at')
         })
 
     def post(self, request, pk, *args, **kwargs):
         message = get_object_or_404(Message, pk=pk)
 
-        # Check permissions
         if request.user not in [message.sender, message.receiver]:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'error': "You don't have permission to view this message."
+                }, status=403)
             django_messages.error(request, "You don't have permission to view this message.")
             return redirect('notification:message_list')
 
@@ -65,17 +70,57 @@ class MessageDetailView(LoginRequiredMixin, View):
         if form.is_valid():
             reply = form.save(commit=False)
             reply.sender = request.user
-            reply.receiver = message.sender if request.user == message.receiver else message.receiver
+            reply.receiver = (
+                message.sender if request.user == message.receiver else message.receiver
+            )
             reply.parent_message = message
             reply.property = message.property
             reply.save()
+
+            # Create notification
+            create_notification(
+                user=reply.receiver,
+                notification_type=NotificationType.MESSAGE,
+                title=f"New message from {getattr(reply.sender, 'get_full_name', lambda: reply.sender.username)()}",
+                message=reply.message,
+                property=reply.property,
+                extra_data={'message_id': str(reply.id)},
+                link=request.build_absolute_uri(
+                    reverse('notification:message_detail', kwargs={'pk': message.pk})
+                )
+            )
+
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # Get profile picture URL
+                profile_picture = ''
+                if hasattr(request.user, 'profile'):
+                    profile_picture = request.user.profile.get_profile_picture()
+                elif hasattr(request.user, 'agent_profile'):
+                    profile_picture = request.user.agent_profile.get_profile_picture()
+                
+                return JsonResponse({
+                    'success': True,
+                    'sender_name': getattr(reply.sender, 'get_full_name', lambda: reply.sender.username)(),
+                    'sender_avatar': profile_picture,
+                    'message_content': reply.message,
+                    'created_at': reply.created_at.strftime("%b %d, %Y %H:%M")
+                })
+
             django_messages.success(request, "Your reply has been sent.")
             return redirect('notification:message_detail', pk=message.pk)
+
+        # Form is invalid
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid form data',
+                'errors': form.errors.get_json_data()
+            }, status=400)
 
         return render(request, 'pages/notifications/message_detail.html', {
             'message': message,
             'form': form,
-            'replies': message.replies.all()
+            'replies': message.replies.all().order_by('created_at')
         })
 
 

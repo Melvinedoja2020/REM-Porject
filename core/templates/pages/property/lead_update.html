@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+  .btn-primary {
+    background-color: #E8960F;
+    border-color: #E8960F;
+  }
+  
+  .btn-primary:hover, .btn-primary:focus {
+    background-color: #cf830d;
+    border-color: #cf830d;
+  }
+  
+  .btn-outline-primary {
+    color: #E8960F;
+    border-color: #E8960F;
+  }
+  
+  .btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: #E8960F;
+    border-color: #E8960F;
+    color: white;
+  }
+  
+  .text-primary {
+    color: #E8960F !important;
+  }
+  
+  .border-primary {
+    border-color: #E8960F !important;
+  }
+  
+  .card-header {
+    font-weight: 600;
+    background-color: white;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+  }
+  
+  .property-info-card {
+    transition: all 0.3s ease;
+  }
+  
+  .property-info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+</style>
+
+
+
+<div class="container-fluid px-4 px-lg-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mt-4">
+      <i class="fas fa-user-edit text-primary me-2"></i>Update Lead
+    </h1>
+    <a href="{% url 'property:lead_detail' object.pk %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Lead
+    </a>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i>Lead Information</h5>
+        </div>
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                {{ form.status|as_crispy_field }}
+              </div>
+              {% comment %} <div class="col-md-6 mb-3">
+                {{ form.source|as_crispy_field }}
+              </div> {% endcomment %}
+            </div>
+            <div class="mb-3">
+              {{ form.notes|as_crispy_field }}
+            </div>
+            
+            <div class="d-flex justify-content-between border-top pt-3 mt-4">
+              <a href="{% url 'property:lead_detail' object.pk %}" class="btn btn-outline-secondary">
+                <i class="fas fa-times me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0"><i class="fas fa-home text-primary me-2"></i>Associated Property</h5>
+        </div>
+        <div class="card-body">
+          {% if property %}
+          <div class="property-info-card card border-0 bg-light">
+            <div class="card-body">
+              <div class="d-flex">
+                <div class="flex-shrink-0 me-3">
+                  {% if property.images.first %}
+                  <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}"
+                    class="rounded" style="width: 80px; height: 60px; object-fit: cover;">
+                  {% else %}
+                  <div class="bg-white rounded d-flex align-items-center justify-content-center"
+                    style="width: 80px; height: 60px;">
+                    <i class="fas fa-home text-muted"></i>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1">
+                    <a href="{{ property.get_absolute_url }}" class="text-decoration-none">
+                      {{ property.title }}
+                    </a>
+                  </h6>
+                  <p class="text-muted small mb-1">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    {{ property.address|truncatechars:30 }}
+                  </p>
+                  <p class="mb-0">
+                    <span class="badge bg-light text-dark me-1">
+                      {{ property.get_property_type_display }}
+                    </span>
+                    <span class="badge bg-light text-dark">
+                      ${{ property.price|floatformat:"0" }}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% else %}
+          <div class="text-center py-3">
+            <i class="fas fa-home fa-2x text-muted mb-3 opacity-25"></i>
+            <p class="text-muted">No property associated with this lead</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0"><i class="fas fa-user text-primary me-2"></i>Client Information</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="avatar-lg bg-light rounded-circle me-3">
+              <i class="fas fa-user fa-2x text-primary align-middle"></i>
+            </div>
+            <div>
+              <h5 class="mb-1">{{ object.user.name|default:object.user.email }}</h5>
+              <p class="text-muted mb-1">
+                <i class="fas fa-envelope me-1"></i>{{ object.user.email }}
+              </p>
+              {% if object.user.phone %}
+              <p class="text-muted mb-0">
+                <i class="fas fa-phone me-1"></i>{{ object.user.phone }}
+              </p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

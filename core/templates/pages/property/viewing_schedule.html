@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+  .btn-primary {
+    background-color: #E8960F;
+    border-color: #E8960F;
+  }
+  
+  .btn-primary:hover, .btn-primary:focus {
+    background-color: #cf830d;
+    border-color: #cf830d;
+  }
+  
+  .btn-outline-primary {
+    color: #E8960F;
+    border-color: #E8960F;
+  }
+  
+  .btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: #E8960F;
+    border-color: #E8960F;
+    color: white;
+  }
+  
+  .alert-info {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #495057;
+  }
+  
+  .card-header {
+    background-color: white;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(0,0,0,.125);
+  }
+  
+  .time-slot-btn.active {
+    background-color: #E8960F;
+    border-color: #E8960F;
+    color: white;
+  }
+  
+  .text-primary {
+    color: #E8960F !important;
+  }
+</style>
+
+<div class="container-fluid px-4 px-lg-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mt-4">
+      <i class="fas fa-calendar-plus me-2 text-primary"></i>Schedule Viewing
+    </h1>
+    <a href="{% url 'property:lead_detail' lead.pk %}" class="btn btn-outline-secondary">
+      <i class="fas fa-arrow-left me-2"></i>Back to Lead
+    </a>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h5 class="mb-0"><i class="fas fa-calendar-day text-primary me-2"></i>Viewing Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info mb-4 border-0">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-info-circle fa-lg me-3 text-primary"></i>
+              <div>
+                <h6 class="alert-heading mb-1">Scheduling for {{ lead.user.name|default:lead.user.email }}</h6>
+                <p class="small mb-0">
+                  <i class="fas fa-home me-1 text-muted"></i>
+                  Property: {{ lead.property_link.title }}
+                </p>
+                <p class="small mb-0">
+                  <i class="fas fa-map-marker-alt me-1 text-muted"></i>
+                  {{ lead.property_link.address|truncatechars:40 }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-4">
+                <h6 class="mb-3 text-primary"><i class="far fa-calendar me-2"></i>Select Date & Time</h6>
+                {{ form.scheduled_time|as_crispy_field }}
+              </div>
+              <div class="col-md-6 mb-4">
+                <div class="card border-0 bg-light">
+                  <div class="card-body">
+                    <h6 class="mb-3 text-primary"><i class="far fa-clock me-2"></i>Quick Time Slots</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                      <button type="button" class="btn btn-outline-primary time-slot-btn" data-time="09:00">
+                        <i class="far fa-sun me-1"></i>9:00 AM
+                      </button>
+                      <button type="button" class="btn btn-outline-primary time-slot-btn" data-time="11:00">
+                        <i class="fas fa-sun me-1"></i>11:00 AM
+                      </button>
+                      <button type="button" class="btn btn-outline-primary time-slot-btn" data-time="14:00">
+                        <i class="far fa-clock me-1"></i>2:00 PM
+                      </button>
+                      <button type="button" class="btn btn-outline-primary time-slot-btn" data-time="16:00">
+                        <i class="fas fa-clock me-1"></i>4:00 PM
+                      </button>
+                    </div>
+                    <p class="small text-muted mt-2 mb-0">
+                      <i class="fas fa-info-circle me-1"></i>
+                      Click to auto-fill time slot
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {% if form.notes %}
+            <div class="mb-4">
+              <h6 class="mb-3 text-primary"><i class="fas fa-sticky-note me-2"></i>Additional Notes</h6>
+              {{ form.notes|as_crispy_field }}
+            </div>
+            {% endif %}
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4 pt-3 border-top">
+              <a href="{% url 'property:lead_detail' lead.pk %}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-times me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-calendar-check me-2"></i>Schedule Viewing
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block javascript %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split('T')[0];
+    const dateTimeInput = document.querySelector('input[type="datetime-local"]');
+    
+    // Set min attribute for date input
+    dateTimeInput.min = today + 'T00:00';
+    
+    // Set default to next day at 9am if empty
+    if (!dateTimeInput.value) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const formattedDate = tomorrow.toISOString().split('T')[0];
+      dateTimeInput.value = formattedDate + 'T09:00';
+    }
+
+    // Time slot button functionality
+    document.querySelectorAll('.time-slot-btn').forEach(button => {
+      button.addEventListener('click', function () {
+        // Remove active class from all buttons
+        document.querySelectorAll('.time-slot-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        const time = this.getAttribute('data-time');
+        const currentDate = dateTimeInput.value ? dateTimeInput.value.split('T')[0] : today;
+        dateTimeInput.value = currentDate + 'T' + time;
+        
+        // Focus on the date time input
+        dateTimeInput.focus();
+      });
+    });
+    
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    form.addEventListener('submit', function(event) {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      form.classList.add('was-validated');
+    }, false);
+  });
+</script>
+{% endblock %}
+{% endblock %}

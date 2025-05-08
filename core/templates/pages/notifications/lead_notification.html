@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <p>Hello {{ agent.full_name }},</p>
+
+    <p>You have a new lead from <strong>{{ user.full_name }}</strong> for the property "<strong>{{ property.title }}</strong>".</p>
+
+    <h4>Lead Details:</h4>
+    <ul>
+      <li><strong>Name:</strong> {{ user.full_name }}</li>
+      <li><strong>Email:</strong> {{ user.email }}</li>
+      <li><strong>Phone:</strong> {{ user.phone_number }}</li>
+      <li><strong>Property:</strong> {{ property.title }}</li>
+      <li><strong>Submitted:</strong> {{ lead.created_at|date:"F j, Y, g:i a" }}</li>
+    </ul>
+
+    <p>
+      <a href="" style="padding: 10px 15px; background-color: #E8960F; color: white; text-decoration: none; border-radius: 5px;">
+        View in Dashboard
+      </a>
+    </p>
+
+    <p>Thank you,<br>{{ settings.DEFAULT_FROM_EMAIL }}</p>
+  </body>
+</html>

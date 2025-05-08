@@ -1,0 +1,16 @@
+Hello {{ agent.name }},
+
+You have a new lead from {{ user.name }} for the property "{{ property.title }}".
+
+Details:
+- Name: {{ user.name }}
+- Email: {{ user.email }}
+- Phone: {{ user.phone_number }}
+- Property: {{ property.title }}
+- Submitted on: {{ lead.created_at|date:"F j, Y, g:i a" }}
+
+Please log in to your dashboard to follow up:
+{{ dashboard_url }}
+
+Thank you,
+{{ settings.DEFAULT_FROM_EMAIL }}

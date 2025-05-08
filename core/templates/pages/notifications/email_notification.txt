@@ -1,8 +1,8 @@
 {{ site_name }}
-{{ "-" * site_name|length }}
+{% comment %} {{ "-" * site_name }} {% endcomment %}
 
 {{ notification.title }}
-{{ "=" * notification.title|length }}
+{% comment %} {{ "=" * notification.title|length }} {% endcomment %}
 
 {{ notification.message }}
 

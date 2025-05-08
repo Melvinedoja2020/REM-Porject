@@ -1,8 +1,9 @@
 from django.urls import path
 
 from core.applications.property.views import (
-    FavoriteDeleteView, PropertyCreateView, PropertyListView, PropertyUpdateView, 
-    PropertyDeleteView, FavoriteListView, CreatePropertySubscriptionView
+    FavoriteDeleteView, FavoriteLeadCreateView, LeadDetailView, LeadListView, 
+    LeadUpdateView, PropertyCreateView, PropertyListView, PropertyUpdateView, 
+    PropertyDeleteView, FavoriteListView, CreatePropertySubscriptionView, ViewingScheduleView    
 )
 
 app_name = "property"
@@ -14,6 +15,14 @@ urlpatterns = [
     path("delete/<uuid:pk>/delete/", PropertyDeleteView.as_view(), name="property_delete"),
     path("my-favorites/", FavoriteListView.as_view(), name="customers_favorite_list"),
     path("favorite/delete/<uuid:pk>/", FavoriteDeleteView.as_view(), name="delete_favorite"),
+    path("favorites/<uuid:pk>/lead/", FavoriteLeadCreateView.as_view(), name="favorite_lead_create"),
+
     path("subscribe/", CreatePropertySubscriptionView.as_view(), name="create-subscription"),
+
+    path("leads/", LeadListView.as_view(), name="lead_list"),
+    # path("leads/create/", LeadCreateView.as_view(), name="lead_create"),
+    path("leads/<str:pk>/", LeadDetailView.as_view(), name="lead_detail"),
+    path("leads/<str:pk>/update/", LeadUpdateView.as_view(), name="lead_update"),
+    path("leads/<str:pk>/schedule/", ViewingScheduleView.as_view(), name="schedule_viewing"),
 
 ]

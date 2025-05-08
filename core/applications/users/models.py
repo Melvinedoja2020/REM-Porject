@@ -61,15 +61,13 @@ class User(AbstractUser):
     
     @property
     def is_customer(self) -> bool:
-        return self.role == self.RoleChoices.CUSTOMER.value
+        return self.role == UserRoleChoice.CUSTOMER.value
 
     @property
     def is_agent(self) -> bool:
-        return self.role == self.RoleChoices.AGENT.value
+        return self.role == UserRoleChoice.AGENT.value
 
-    @property
-    def is_real_estate_owner(self) -> bool:
-        return self.role == self.RoleChoices.REAL_ESTATE_OWNER.value
+    
 
 
 class BaseProfile(UIDTimeBasedModel):
@@ -165,6 +163,11 @@ class AgentProfile(BaseProfile):
     )
     verified = BooleanField(default=False)
 
+    class Meta(auto_prefetch.Model.Meta):
+        verbose_name = "Agent Profile"
+        verbose_name_plural = "Agent Profiles"
+        ordering = ["-id"]
+
     def clean(self):
         """Validate agent-specific fields"""
         if self.agent_type == AgentTypeChoices.REAL_ESTATE_AGENT:
@@ -173,10 +176,9 @@ class AgentProfile(BaseProfile):
             if not self.license_number:
                 raise ValidationError({"license_number": "License number is required for real estate agents."})
 
-    class Meta(auto_prefetch.Model.Meta):
-        verbose_name = "Agent Profile"
-        verbose_name_plural = "Agent Profiles"
-        ordering = ["-id"]
+    def __str__(self):
+        return self.user.name
+    
 
 
 

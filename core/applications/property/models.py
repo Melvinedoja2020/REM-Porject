@@ -1,11 +1,13 @@
 from django.db import models
 import auto_prefetch
-from core.helper.enums import Lead_Status_Choices, PaymentStatus, PropertyListingType, PropertyTypeChoices, RentalApplicationChoices
+from core.helper.enums import Lead_Status_Choices, LeadStatus, PaymentStatus, PropertyListingType, PropertyTypeChoices, PropertyViewingChoices, RentalApplicationChoices
 from core.helper.media import MediaHelper
 from core.helper.models import TimeBasedModel, TitleTimeBasedModel
 from django.utils.text import slugify
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class PropertyType(TitleTimeBasedModel):
@@ -148,33 +150,12 @@ class PropertySubscription(TimeBasedModel):
     def __str__(self):
         return f"{self.user} subscribes to {self.property_type or 'any type'} in {self.location or 'any location'}"
 
-class Lead(TimeBasedModel):
-    agent = auto_prefetch.ForeignKey(
-        "users.AgentProfile", on_delete=models.CASCADE, related_name="leads"
-    )
-    user = auto_prefetch.ForeignKey(
-        "users.User", on_delete=models.CASCADE, related_name="leads"
-    )
-    property = auto_prefetch.ForeignKey(
-        "property.Property", on_delete=models.CASCADE, related_name="interested_users"
-    )
-    message = models.TextField()
-    status = models.CharField(
-        max_length=20,
-        choices=Lead_Status_Choices.choices,
-        default=Lead_Status_Choices.NEW,
-    )
-
-    def __str__(self):
-        return f"Lead from {self.user.email} for {self.property.title}"
-
-
 class FavoriteProperty(TimeBasedModel):
     user = auto_prefetch.ForeignKey(
         "users.User", on_delete=models.CASCADE, related_name="favorites"
     )
     property = auto_prefetch.ForeignKey(
-        "property.Property", on_delete=models.CASCADE
+        "property.Property", on_delete=models.CASCADE, related_name="favorited_by"
     )
 
     class Meta(auto_prefetch.Model.Meta):
@@ -190,47 +171,101 @@ class FavoriteProperty(TimeBasedModel):
     # def status_label(self):
     #     return dict(Lead_Status_Choices.choices).get(self.status, "Unknown")
 
-
-# class Payment(TimeBasedModel):
-#     user = auto_prefetch.ForeignKey(
-#         "users.User", on_delete=models.CASCADE, related_name="payments"
-#     )
-#     property = auto_prefetch.ForeignKey(
-#         "property.Property", on_delete=models.CASCADE, related_name="payments"
-#     )
-#     amount = models.DecimalField(max_digits=10, decimal_places=2)
-#     payment_method = models.CharField(
-#         max_length=20, choices=[("paystack", "Paystack"), ("stripe", "Stripe")]
-#     )
-#     payment_status = models.CharField(
-#         max_length=20,
-#         choices=PaymentStatus.choices,
-#         default=PaymentStatus.PENDING,
-#     )
-#     transaction_id = models.CharField(max_length=255, unique=True)
-
-#     def __str__(self):
-#         return f"Payment of {self.amount} by {self.user.email} for {self.property.title}"
-
-#     @property
-#     def is_successful(self):
-#         return self.payment_status == PaymentStatus.SUCCESS
-
-#     @property
-#     def formatted_amount(self):
-#         return f"${self.amount:,.2f}"
+class PropertyViewing(TimeBasedModel):
+    user = auto_prefetch.ForeignKey("users.User", on_delete=models.CASCADE)
+    property = auto_prefetch.ForeignKey("property.Property", on_delete=models.CASCADE)
+    scheduled_time = models.DateTimeField()
+    status = models.CharField(
+        max_length=20,
+        choices=PropertyViewingChoices.choices,
+        default=PropertyViewingChoices.PENDING,
+    )
+    lead = auto_prefetch.ForeignKey(
+        "property.Lead",
+        on_delete=models.CASCADE,
+        related_name="viewings",  # This is fine
+        null=True,
+        blank=True,
+    )
+    scheduled_time = models.DateTimeField()
+    notes = models.TextField(blank=True)
+    cancellation_reason = models.TextField(blank=True)
 
 
-# class Notification(TimeBasedModel):
-#     recipient = models.ForeignKey(
-#         "users.User", on_delete=models.CASCADE, related_name="notifications"
-#     )
-#     message = models.TextField()
-#     is_read = models.BooleanField(default=False)
+    class Meta(auto_prefetch.Model.Meta):
+        ordering = ["-scheduled_time"]
+        verbose_name = "Property Viewing"
+        verbose_name_plural = "Property Viewings"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["property", "scheduled_time"],
+                name="unique_property_viewing_time",
+                condition=models.Q(status__in=["PENDING", "CONFIRMED"])
+            )
+        ]
 
-#     def __str__(self):
-#         return f"Notification for {self.recipient.email}"
+    
+    def clean(self):
+        if self.scheduled_time < timezone.now():
+            raise ValidationError("Viewing time cannot be in the past")
+        
+        if self.lead and self.lead.property != self.property:
+            raise ValidationError("Viewing property must match lead property")
 
-#     @property
-#     def short_message(self):
-#         return self.message[:50] + "..." if len(self.message) > 50 else self.message
+    def __str__(self):
+        return f"Viewing for {self.property.title} at {self.scheduled_time.strftime('%Y-%m-%d %H:%M')}"
+
+
+
+class Lead(TimeBasedModel):
+    agent = auto_prefetch.ForeignKey(
+        "users.AgentProfile", on_delete=models.CASCADE, related_name="leads"
+    )
+    user = auto_prefetch.ForeignKey(
+        "users.User", on_delete=models.CASCADE, related_name="leads"
+    )
+    property_link  = auto_prefetch.ForeignKey(
+        "property.Property", on_delete=models.CASCADE, related_name="interested_users"
+    )
+    scheduled_viewing = models.ForeignKey(
+        "property.PropertyViewing",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="lead_scheduled",  
+    )
+    notes = models.TextField(blank=True)
+    last_contact = models.DateTimeField(null=True, blank=True)
+    message = models.TextField()
+    status = models.CharField(
+        max_length=20,
+        choices=Lead_Status_Choices.choices,
+        default=Lead_Status_Choices.NEW,
+    )
+
+    class Meta(auto_prefetch.Model.Meta):
+        unique_together = [['user', 'property_link']]
+        ordering = ['-created_at']
+        verbose_name = "Lead"
+        verbose_name_plural = "Leads"
+
+    @property
+    def upcoming_viewing(self):
+        return self.viewings.filter(
+            status__in=[PropertyViewingChoices.PENDING, PropertyViewingChoices.CONFIRMED],
+            scheduled_time__gte=timezone.now()
+        ).first()
+
+    @property
+    def property(self):
+        """Provides backward-compatible access to property_link"""
+        return self.property_link
+    
+    def clean(self):
+        if self.status == LeadStatus.VIEWING_SCHEDULED and not self.viewings.exists():
+            raise ValidationError("At least one viewing must be scheduled for this status")
+
+    def __str__(self):
+        return f"Lead #{self.id}: {self.user.email} for {self.property.title}"
+
+    

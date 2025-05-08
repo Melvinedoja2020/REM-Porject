@@ -1,0 +1,25 @@
+{% extends "email_base.html" %}
+
+{% block content %}
+<h2>New Lead Notification</h2>
+<p>Hello {{ agent.full_name }},</p>
+
+<p>You have a new lead for your property <strong>{{ property.title }}</strong>:</p>
+
+<div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+    <h3 style="margin-top: 0;">Lead Details</h3>
+    <p><strong>From:</strong> {{ user.full_name }} ({{ lead.user.email }})</p>
+    {% if user.phone_number %}<p><strong>Phone:</strong> {{ user.phone_number }}</p>{% endif %}
+    <p><strong>Property:</strong> {{ property.title }}</p>
+    <p><strong>Message:</strong> {{ lead.message|default:"No message provided" }}</p>
+</div>
+
+<a href="{{ dashboard_url }}/leads/{{ lead.id }}" 
+   style="background: #0d6efd; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+    View Lead in Dashboard
+</a>
+
+<p style="margin-top: 30px;">
+    <small>This lead was generated through your listing on {{ site_name }}.</small>
+</p>
+{% endblock %}
