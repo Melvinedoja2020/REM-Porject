@@ -143,7 +143,7 @@
               <div class="header-inner-wrap">
                 <div class="header-logo">
                   <a href="{% url 'home:home' %}" class="site-logo">
-                    <img class="logo_header" alt="" src="{% static 'images/logo/logo-4%402x.png' %}"
+                    <img class="logo_header" alt="" src="{% static 'images/logo/REM2.png' %}"
                       data-light="{% static 'images/logo/REM2.png' %}" data-dark="{% static 'images/logo/REM2.png' %}">
                   </a>
                 </div>
@@ -282,7 +282,7 @@
                       </ul>
                     </li> {% endcomment %}
                     <li><a href="{% url 'home:property_rent_list' %}">Rents</a></li>
-                    <li><a href="#">Buy</a></li>
+                    {% comment %} <li><a href="#">Buy</a></li> {% endcomment %}
                     <li><a href="{% url 'home:agent_list' %}">Agents</a></li>
                     <li><a href="#">Contact</a></li>
                   </ul>
@@ -517,7 +517,7 @@
                       </ul>
                     </li> {% endcomment %}
                     <li><a href="{% url 'home:property_rent_list' %}">Rents</a></li>
-                    <li><a href="#">Buy</a></li>
+                    {% comment %} <li><a href="#">Buy</a></li> {% endcomment %}
                     <li><a href="{% url 'home:agent_list' %}">Agents</a></li>
                     <li><a href="#">Contact</a></li>
                   </ul>

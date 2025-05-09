@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView, ListView, DetailView
 
+from core.applications.home.forms import ContactForm
 from core.applications.property.forms import PropertySearchForm
 from core.applications.property.models import FavoriteProperty, Property
 from core.applications.users.models import AgentProfile
@@ -15,6 +16,9 @@ from django.views import View
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.conf import settings
+from django.views.generic.edit import FormView
+from django.urls import reverse_lazy
+from django.core.mail import EmailMessage
 # Create your views here.
 
 
@@ -32,6 +36,32 @@ class HomeView(TemplateView):
         )
         return context
 
+
+class ContactUsView(FormView):
+    template_name = "pages/contact.html"
+    form_class = ContactForm
+    success_url = reverse_lazy("contact")
+
+    def form_valid(self, form):
+        name = form.cleaned_data['name']
+        email = form.cleaned_data['email']
+        subject = form.cleaned_data['subject']
+        message = form.cleaned_data['message']
+
+        full_message = f"Message from {name} <{email}>:\n\n{message}"
+
+        email_message = EmailMessage(
+            subject=subject,
+            body=full_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[settings.CONTACT_EMAIL],
+            reply_to=[email]  # This ensures the admin can reply directly to the user
+        )
+        email_message.send()
+
+        messages.success(self.request, 'Your message has been sent successfully.')
+        return super().form_valid(form)
+    
 
 class RentPropertyListView(ListView):
     model = Property
