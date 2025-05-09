@@ -1,15 +1,17 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, ListView, View, DetailView
 
 from core.applications.notifications.forms import MessageForm, ReplyForm
-from core.applications.notifications.models import Message
+from core.applications.notifications.models import Message, Notification
 from django.contrib import messages as django_messages
 from django.db.models import Q
 
 from core.utils.utils import create_notification
 from core.helper.enums import NotificationType
+from django.contrib import messages
 
 # Create your views here.
 
@@ -161,3 +163,48 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
         form.instance.sender = self.request.user
         django_messages.success(self.request, "Your message has been sent.")
         return super().form_valid(form)
+
+
+class NotificationListView(LoginRequiredMixin, ListView):
+    model = Notification
+    context_object_name = "notifications"
+    template_name = "pages/notifications/notification_list.html"
+    paginate_by = 20  # optional
+
+    def get_queryset(self):
+        return Notification.objects.filter(
+            user=self.request.user
+        )
+
+
+class NotificationDetailView(LoginRequiredMixin, DetailView):
+    model = Notification
+    context_object_name = "notification"
+    template_name = "pages/notifications/notification_detail.html"
+
+    def get_queryset(self):
+        return Notification.objects.filter(
+            user=self.request.user
+        )
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if not self.object.is_read:
+            self.object.is_read = True
+            self.object.save(update_fields=["is_read"])
+
+        # Optional: Redirect if link is provided
+        if self.object.link:
+            return redirect(self.object.link)
+
+        return super().get(request, *args, **kwargs)
+
+class MarkAllNotificationsReadView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        notifications = Notification.objects.filter(
+            user=request.user, is_read=False
+        )
+        notifications.update(is_read=True)
+        messages.success(request, "All notifications marked as read.")
+        return redirect("notifications:list")

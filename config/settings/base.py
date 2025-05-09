@@ -183,8 +183,9 @@ TEMPLATES = [
         "OPTIONS": {
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors favorites_context
             "context_processors": [
-                "core.applications.home.context_processors.favorite_property_ids",
-                "core.applications.home.context_processors.favorites_context",
+                "core.applications.home.context_processors.user_context",
+                # "core.applications.home.context_processors.favorite_property_ids",
+                # "core.applications.home.context_processors.favorites_context",
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",

@@ -17,19 +17,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <!-- Theme Style -->
-  <link rel="stylesheet" type="text/css" href="{% static '/assets/css/animate.min.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static '/assets/css/animation.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static '/assets/css/bootstrap.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static '/assets/css/bootstrap-select.min.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static '/assets/css/style.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/animate.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/animation.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/bootstrap-select.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'assets/css/style.css' %}">
 
 
 
   <!-- Font -->
-  <link rel="stylesheet" href="{% static '/assets/font/fonts.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/font/fonts.css' %}">
 
   <!-- Icon -->
-  <link rel="stylesheet" href="{% static '/assets/icon/style.css' %}">
+  <link rel="stylesheet" href="{% static 'assets/icon/style.css' %}">
 
   <!-- Favicon and Touch Icons  -->
   <link rel="shortcut icon" href="{% static 'images/logo/REM.png' %}">
@@ -316,7 +316,7 @@
                       <li>
                         <div class="noti-item w-full wg-user active">
                           <div class="image">
-                            <img src="{% static '/assets/images/avatar/user-11.png' %}" alt="">
+                            <img src="{% static 'assets/images/avatar/user-11.png' %}" alt="">
                           </div>
                           <div class="flex-grow">
                             <div class="flex items-center justify-between">
@@ -330,7 +330,7 @@
                       <li>
                         <div class="noti-item w-full wg-user active">
                           <div class="image">
-                            <img src="{% static '/assets/images/avatar/user-12.png' %}" alt="">
+                            <img src="{% static 'assets/images/avatar/user-12.png' %}" alt="">
                           </div>
                           <div class="flex-grow">
                             <div class="flex items-center justify-between">
@@ -344,7 +344,7 @@
                       <li>
                         <div class="noti-item w-full wg-user active">
                           <div class="image">
-                            <img src="{% static '/assets/images/avatar/user-13.png' %}" alt="">
+                            <img src="{% static 'assets/images/avatar/user-13.png' %}" alt="">
                           </div>
                           <div class="flex-grow">
                             <div class="flex items-center justify-between">
@@ -358,7 +358,7 @@
                       <li>
                         <div class="noti-item w-full wg-user active">
                           <div class="image">
-                            <img src="{% static '/assets/images/avatar/user-11.png' %}" alt="">
+                            <img src="{% static 'assets/images/avatar/user-11.png' %}" alt="">
                           </div>
                           <div class="flex-grow">
                             <div class="flex items-center justify-between">
@@ -378,7 +378,7 @@
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton2"
                       data-bs-toggle="dropdown" aria-expanded="false">
                       <span class="header-item">
-                        <span class="text-tiny">1</span>
+                        <span class="text-tiny">{{unmarked_notifications}}</span>
                         <i class="icon-message-square"></i>
                       </span>
                     </button>
@@ -386,52 +386,22 @@
                       <li>
                         <h6>Notifications</h6>
                       </li>
-                      <li>
-                        <div class="message-item item-1">
-                          <div class="image">
-                            <i class="icon-noti-1"></i>
-                          </div>
-                          <div>
-                            <div class="body-title-2">Discount available</div>
-                            <div class="text-tiny">Morbi sapien massa, ultricies at rhoncus at, ullamcorper nec diam
+                      {% for latest_notification in latest_notifications %}
+                        <li>
+                          <div class="message-item item-1">
+                            <div class="image">
+                              <i class="icon-noti-1"></i>
+                            </div>
+                            <div>
+                              <div class="body-title-2">{{ latest_notification.notification_type}}</div>
+                              <div class="text-tiny">{{ latest_notification.message|truncatechars:10}}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div class="message-item item-2">
-                          <div class="image">
-                            <i class="icon-noti-2"></i>
-                          </div>
-                          <div>
-                            <div class="body-title-2">Account has been verified</div>
-                            <div class="text-tiny">Mauris libero ex, iaculis vitae rhoncus et</div>
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div class="message-item item-3">
-                          <div class="image">
-                            <i class="icon-noti-3"></i>
-                          </div>
-                          <div>
-                            <div class="body-title-2">Order shipped successfully</div>
-                            <div class="text-tiny">Integer aliquam eros nec sollicitudin sollicitudin</div>
-                          </div>
-                        </div>
-                      </li>
-                      <li>
-                        <div class="message-item item-4">
-                          <div class="image">
-                            <i class="icon-noti-4"></i>
-                          </div>
-                          <div>
-                            <div class="body-title-2">Order pending: <span>ID 305830</span></div>
-                            <div class="text-tiny">Ultricies at rhoncus at ullamcorper</div>
-                          </div>
-                        </div>
-                      </li>
-                      <li><a href="#" class="tf-button w-full">View all</a></li>
+                        </li>
+                        {% endfor %}
+                      
+                      <li><a href="{% url 'notification:list' %}" class="tf-button w-full">View all</a></li>
                     </ul>
                   </div>
                 </div>
@@ -457,7 +427,7 @@
                       data-bs-toggle="dropdown" aria-expanded="false">
                       <span class="header-user wg-user">
                         {% comment %} <span class="image">
-                          <img src="{{{% static '/assets/images/avatar/user-1.png' %}}}" alt="">
+                          <img src="{{{% static 'assets/images/avatar/user-1.png' %}}}" alt="">
                         </span> {% endcomment %}
                         <span class="flex flex-column">
                           <span class="body-title mb-2">{{ request.user.name }}</span>
@@ -502,22 +472,22 @@
   <!-- /#wrapper -->
 
   <!-- Javascript -->
-  <script src="{% static '/assets/js/jquery.min.js' %}"></script>
-  <script src="{% static '/assets/js/bootstrap.min.js' %}"></script>
-  <script src="{% static '/assets/js/bootstrap-select.min.js' %}"></script>
-  <script src="{% static '/assets/js/zoom.js' %}"></script>
-  <script src="{% static '/assets/js/jvectormap-1.2.2.min.js' %}"></script>
-  <script src="{% static '/assets/js/jvectormap-us-lcc.js' %}"></script>
-  <script src="{% static '/assets/js/jvectormap.js' %}"></script>
-  <script src="{% static '/assets/js/apexcharts/apexcharts.js' %}"></script>
-  <script src="{% static '/assets/js/apexcharts/line-chart-1.js' %}"></script>
-  <script src="{% static '/assets/js/apexcharts/line-chart-2.js' %}"></script>
-  <script src="{% static '/assets/js/apexcharts/line-chart-3.js' %}"></script>
-  <script src="{% static '/assets/js/apexcharts/line-chart-4.js' %}"></script>
-  <script src="{% static '/assets/js/apexcharts/line-chart-7.js' %}"></script>
-  <script src="{% static '/assets/js/switcher.js' %}"></script>
-  <script src="{% static '/assets/js/theme-settings.js' %}"></script>
-  <script src="{% static '/assets/js/main.js' %}"></script>
+  <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'assets/js/bootstrap-select.min.js' %}"></script>
+  <script src="{% static 'assets/js/zoom.js' %}"></script>
+  <script src="{% static 'assets/js/jvectormap-1.2.2.min.js' %}"></script>
+  <script src="{% static 'assets/js/jvectormap-us-lcc.js' %}"></script>
+  <script src="{% static 'assets/js/jvectormap.js' %}"></script>
+  <script src="{% static 'assets/js/apexcharts/apexcharts.js' %}"></script>
+  <script src="{% static 'assets/js/apexcharts/line-chart-1.js' %}"></script>
+  <script src="{% static 'assets/js/apexcharts/line-chart-2.js' %}"></script>
+  <script src="{% static 'assets/js/apexcharts/line-chart-3.js' %}"></script>
+  <script src="{% static 'assets/js/apexcharts/line-chart-4.js' %}"></script>
+  <script src="{% static 'assets/js/apexcharts/line-chart-7.js' %}"></script>
+  <script src="{% static 'assets/js/switcher.js' %}"></script>
+  <script src="{% static 'assets/js/theme-settings.js' %}"></script>
+  <script src="{% static 'assets/js/main.js' %}"></script>
 
 </body>
 

@@ -1,22 +1,26 @@
-def favorite_property_ids(request):
-    """
-    Context processor to get the list of favorite property IDs for the authenticated user.
-    This is used to check if a property is favorited by the user.
-    """
-    if request.user.is_authenticated:
-        ids = list(request.user.favorites.values_list("property_id", flat=True))
-    else:
-        ids = []
-    return {"favorite_property_ids": ids}
+from core.applications.notifications.models import Notification
 
 
-def favorites_context(request):
+def user_context(request):
     """
-    Context processor to check if the user has any favorite properties.
-    This is used to display the favorites icon in the navigation bar.
+    Unified context processor to provide:
+    - Favorite property IDs
+    - Whether user has any favorites
+    - Latest notifications (limit 5)
+    - Unread notifications count
     """
-    return {
-        'user_has_favorites': request.user.favorites.exists() 
-            if request.user.is_authenticated 
-            else False
+    context = {
+        "favorite_property_ids": [],
+        "user_has_favorites": False,
+        "unmarked_notifications": 0,
+        "latest_notifications": [],
     }
+
+    if request.user.is_authenticated:
+        user = request.user
+        context["favorite_property_ids"] = list(user.favorites.values_list("property_id", flat=True))
+        context["user_has_favorites"] = user.favorites.exists()
+        context["latest_notifications"] = Notification.objects.filter(user=user).order_by("-created_at")[:5]
+        context["unmarked_notifications"] = Notification.objects.filter(user=user, is_read=False).count()
+
+    return context
