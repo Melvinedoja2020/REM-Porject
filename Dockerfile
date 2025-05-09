@@ -1,105 +1,72 @@
-
-# define an alias for the specific python version used in this file.
+# Use Python 3.12 slim as the base image
 FROM docker.io/python:3.12.5-slim-bookworm AS python
 
-# Python build stage
+# Build stage for compiling dependencies and wheels
 FROM python AS python-build-stage
 
 ARG BUILD_ENVIRONMENT=production
 
-# Install apt packages
+# Install necessary system dependencies for building Python packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
-  # dependencies for building Python packages
   build-essential \
-  # psycopg2 dependencies
-  libpq-dev
+  libpq-dev \
+  libsnappy-dev \
+  gettext \
+  binutils \
+  libproj-dev \
+  gdal-bin \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Requirements are installed here to ensure they will be cached.
+# Copy the requirements file and install Python dependencies
 COPY ./requirements .
 
-# Create Python Dependency and Sub-Dependency Wheels.
-RUN pip wheel --wheel-dir /usr/src/app/wheels  \
-  -r ${BUILD_ENVIRONMENT}.txt
+# Create wheels for faster installation during final stage
+RUN pip wheel --wheel-dir /usr/src/app/wheels -r ${BUILD_ENVIRONMENT}.txt
 
-
-# Python 'run' stage
+# Production stage for final image setup
 FROM python AS python-run-stage
 
 ARG BUILD_ENVIRONMENT=production
 ARG APP_HOME=/app
 
+# Set Python environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV BUILD_ENV=${BUILD_ENVIRONMENT}
 
 WORKDIR ${APP_HOME}
 
-RUN addgroup --system django \
-    && adduser --system --ingroup django django
+# Create a Django user and group for better security
+RUN addgroup --system django && adduser --system --ingroup django django
 
-
-# Install required system dependencies
+# Install the necessary system dependencies in production
 RUN apt-get update && apt-get install --no-install-recommends -y \
-  # psycopg2 dependencies
   libpq-dev \
-  # Translations dependencies
   gettext \
-  # video codecs
-  # kafka compression
-  libsnappy-dev\
-  # Geodjango dependencies
+  libsnappy-dev \
   binutils \
   libproj-dev \
   gdal-bin \
-  # cleaning up unused files
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-  && rm -rf /var/lib/apt/lists/*
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# All absolute dir copies ignore workdir instruction. All relative dir copies are wrt to the workdir instruction
-# copy python dependency wheels from python-build-stage
-COPY --from=python-build-stage /usr/src/app/wheels  /wheels/
+# Copy the wheels from the build stage
+COPY --from=python-build-stage /usr/src/app/wheels /wheels/
 
-# use wheels to install python dependencies
-RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-  && rm -rf /wheels/
+# Install Python dependencies from the wheel cache
+RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* && rm -rf /wheels/
 
-# Install Node.js
-# RUN apt-get update && apt-get install -y curl
-# RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
-# RUN apt-get install -y nodejs
-
-# WORKDIR ${APP_HOME}/core/static
-# # Copy the package.json from the correct location
-# COPY ./core/static/package.json .
-
-# # Copy tailwind config file from its location
-# COPY ./core/static/tailwind.config.js .
-
-# # Install Node.js dependencies
-# RUN npm install
-
-
-# Run Tailwind CSS build
-# RUN npx tailwindcss -o css/style.css --minify
-
-# WORKDIR ${APP_HOME}
-
-# copy application code to WORKDIR
+# Copy the application code into the Docker image
 COPY --chown=django:django . ${APP_HOME}
 
-# make django owner of the WORKDIR directory as well.
+# Set proper permissions for the application folder
 RUN chown django:django ${APP_HOME}
-# Copy entrypoint script
+
+# Ensure the entrypoint script has executable permissions
 COPY entrypoint.sh /entrypoint.sh
-
-# Switch to root user to change permissions
-USER root
-
-# Make the script executable
 RUN chmod +x /entrypoint.sh
 
-# Switch back to django user
+# Set the Django user to run the app
 USER django
 
-# Set the entrypoint script as the default command
+# Set the entrypoint script to execute on container start
 CMD ["/entrypoint.sh"]
