@@ -20,9 +20,9 @@ $(document).ready(function () {
                 {title: 'Table styles'},
                 {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
             ],
-            content_css: [
-                '//fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap',
-              ]
+            // content_css: [
+            //     '//fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap',
+            //   ]
         });
     }
 });
