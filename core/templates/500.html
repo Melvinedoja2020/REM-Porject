@@ -1,10 +1,61 @@
-{% extends "base.html" %}
-
-{% block title %}Server Error{% endblock title %}
+{% extends 'base.html' %}
+{% load static %}
 {% block content %}
-  <h1>Ooops!!! 500</h1>
-  <h3>Looks like something went wrong!</h3>
-  <p>
-    We track these errors automatically, but if the problem persists feel free to contact us. In the meantime, try refreshing.
-  </p>
+
+    <!-- flat-title -->
+    <section class="flat-title ">
+      <div class="tf-container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="title-inner ">
+              <ul class="breadcrumb">
+                <li><a class="home fw-6 text-color-3" href="{% url 'home:home' %}">Home</a></li>
+                <li>Server Error</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- /flat-title -->
+
+    <!-- .main-content -->
+    <div class="page-content">
+
+      <div class="tf-container tf-spacing-1 pt-0">
+        <div class="error-404 text-center">
+          <h1 class="mb-20 title">Ooops!!! 500</h1>
+          <p class="mb-40">Looks like something went wrong!<br>
+            We track these errors automatically, but if the problem persists feel free to contact us.<br>
+            In the meantime, try refreshing.
+          </p>
+          <a href="index.html" class="tf-btn bg-color-primary rounded-4 pd-3 fw-6 mx-auto">Back to home</a>
+        </div>
+
+      </div>
+
+      <!-- section-CTA -->
+      <section class="section-CTA">
+        <div class="tf-container">
+          <div class="row">
+            <div class="col-12">
+              <div class="content-inner">
+                <img src="images/section/cta.png" alt="">
+                <div class="content">
+                  <h4 class="text_white mb-8 ">Find a Local Real Estate Agent Today</h4>
+                  <p class="text_white text-1">If you're looking to buy or sell a home. We'll help you
+                    make
+                    the most money
+                    possible.</p>
+                </div>
+                <a href="#" class="tf-btn style-2 fw-6 ">Find your location agent <i
+                    class="icon-MagnifyingGlass fw-6"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /section-CTA -->
+
+    </div>
 {% endblock content %}
