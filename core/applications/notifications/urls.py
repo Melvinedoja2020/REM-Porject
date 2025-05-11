@@ -18,7 +18,7 @@ urlpatterns = [
     path("messages/<uuid:pk>/", MessageDetailView.as_view(), name="message_detail"),
     path('messages/<uuid:pk>/reply/', MessageDetailView.as_view(), name='send_reply'),
 
-    path("", NotificationListView.as_view(), name="list"),
-    path("<int:pk>/", NotificationDetailView.as_view(), name="notification_detail"),
+    path("notifications", NotificationListView.as_view(), name="notification_list"),
+    path("<str:pk>/", NotificationDetailView.as_view(), name="notification_detail"),
     path("mark-all-read/", MarkAllNotificationsReadView.as_view(), name="mark_all_read"),
 ]

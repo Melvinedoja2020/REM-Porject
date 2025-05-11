@@ -306,14 +306,14 @@
                 </div>
                 <div class="popup-wrap noti type-header">
                   <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
+                    {% comment %} <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1"
                       data-bs-toggle="dropdown" aria-expanded="false">
                       <span class="header-item">
                         <span class="text-tiny">1</span>
                         <i class="icon-bell"></i>
                       </span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton1">
+                    </button> {% endcomment %}
+                    {% comment %} <ul class="dropdown-menu dropdown-menu-end has-content" aria-labelledby="dropdownMenuButton1">
                       <li>
                         <h6>Message</h6>
                       </li>
@@ -374,7 +374,7 @@
                         </div>
                       </li>
                       <li><a href="#" class="tf-button w-full">View all</a></li>
-                    </ul>
+                    </ul> {% endcomment %}
                   </div>
                 </div>
                 <div class="popup-wrap message type-header">
@@ -405,7 +405,7 @@
                       </li>
                       {% endfor %}
 
-                      <li><a href="{% url 'notification:list' %}" class="tf-button w-full">View all</a></li>
+                      <li><a href="{% url 'notification:notification_list' %}" class="tf-button w-full">View all</a></li>
                     </ul>
                   </div>
                 </div>
