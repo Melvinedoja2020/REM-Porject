@@ -31,6 +31,9 @@
             </div>
           </div>
         </div>
+        <a href="{% url 'home:property_gallery' property_id=property.id %}" class="btn btn-outline-secondary">
+          View Property Gallery
+        </a>
 
         <!-- Thumbnails Swiper Pagination -->
         <div class="swiper thumbs-sw-pagi style-2 mt-3" data-preview="6" data-space="15" data-moblie="3"
@@ -62,7 +65,7 @@
               <div class="title text-5 fw-6 text-color-heading">
                 {{ property.title }}
               </div>
-              
+
               <div class="price text-5 fw-6 text-color-heading">
                 ${{ property.price}}
                 <span class="h5 lh-30 fw-4 text-color-default"></span>
@@ -82,13 +85,15 @@
               <div class="action">
                 <ul class="list-action">
 
-                  
-                  <li><a ><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
-                        xmlns="http://www.w3.org/2000/svg">
+
+                  <li><a><svg width="18" height="18" viewbox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path>Add Favorite{% include 'partials/_favorite_button.html' with property=property %}</path>
-                        <script>console.log("Main property ID:", "{{ property.id }}");</script>
+                        <script>
+                          console.log("Main property ID:", "{{ property.id }}");
+
+                        </script>
                       </svg>
-                    </a></li> 
+                    </a></li>
                   {% comment %} <li><a href="#"><svg width="18" height="18" viewbox="0 0 18 18" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -846,8 +851,8 @@
                 <div class="box-house hover-img">
                   <div class="image-wrap">
                     <a href="property-detail-v1.html">
-                      <img class="lazyload" data-src="{{ similar.main_image_url }}"
-                        src="{{ similar.main_image_url}}" alt="">
+                      <img class="lazyload" data-src="{{ similar.main_image_url }}" src="{{ similar.main_image_url}}"
+                        alt="">
                     </a>
                     <ul class="box-tag flex gap-8 ">
                       {% comment %} <li class="flat-tag text-4 bg-main fw-6 text_white">Featured</li>
@@ -873,16 +878,18 @@
                         ${{ similar.price|floatformat:0 }}
                       </h5>
                       <div class="wrap-btn flex">
-                        {% comment %} <a href="#" class="compare flex gap-8 items-center text-1"><i class="icon-compare"></i>Compare {% endcomment %}
+                        {% comment %} <a href="#" class="compare flex gap-8 items-center text-1"><i
+                            class="icon-compare"></i>Compare {% endcomment %}
                         </a>
-                        <a href="{% url 'home:rent_property_detail' similar.slug %}" class="tf-btn style-border pd-4">Details</a>
+                        <a href="{% url 'home:rent_property_detail' similar.slug %}"
+                          class="tf-btn style-border pd-4">Details</a>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               {% endfor %}
-              
+
             </div>
             <div class="sw-pagination sw-pagination-mb-1 text-center d-lg-none d-block mt-20"></div>
           </div>

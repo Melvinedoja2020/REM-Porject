@@ -3,7 +3,7 @@ from django.views.generic import TemplateView, ListView, DetailView
 
 from core.applications.home.forms import ContactForm
 from core.applications.property.forms import PropertySearchForm
-from core.applications.property.models import FavoriteProperty, Property
+from core.applications.property.models import FavoriteProperty, Property, PropertyImage
 from core.applications.users.models import AgentProfile
 from core.helper.enums import PropertyListingType
 from django.db.models import Q
@@ -158,6 +158,38 @@ class PropertyDetailView(DetailView):
         else:
             context["favorite_property_ids"] = []
         return context
+
+class PropertyGalleryView(ListView):
+    """
+    A class-based view to display a gallery of images for a specific property.
+    Implements pagination, template rendering, and context enhancement.
+    """
+    model = PropertyImage
+    template_name = "pages/property/gallery.html"
+    context_object_name = "images"
+    paginate_by = 12  # Show 12 images per page
+    
+    def get_queryset(self):
+        """
+        Override the default queryset to filter images for the specified property.
+        """
+        self.property = get_object_or_404(
+            Property, 
+            pk=self.kwargs["property_id"]
+        )
+        return super().get_queryset().filter(
+            property=self.property
+        ).order_by("-created_at")  # Show newest first
+    
+    def get_context_data(self, **kwargs):
+        """
+        Add the property object to the template context.
+        """
+        context = super().get_context_data(**kwargs)
+        context["property"] = self.property
+        context["page_title"] = f"Photo Gallery - {self.property.title}"
+        return context
+
 
 
 class AgentListView(LoginRequiredMixin, ListView):

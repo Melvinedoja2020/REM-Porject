@@ -1,7 +1,7 @@
 from django.urls import path
 
 from core.applications.home.views import (
-    FavoriteCountAPI, HomeView, PropertyDetailView, RentPropertyListView, 
+    FavoriteCountAPI, HomeView, PropertyDetailView, PropertyGalleryView, RentPropertyListView, 
     AgentListView, AgentDetailView, ToggleFavoriteView
 )
 
@@ -21,5 +21,8 @@ urlpatterns = [
         "agent/<slug:id>/", AgentDetailView.as_view(), name="agent_detail"
     ),
     path("property/favorite/", ToggleFavoriteView.as_view(), name="toggle_favorite"),
-    path("api/user/favorites/count/", FavoriteCountAPI.as_view(), name="favorites_count_api")
+    path("api/user/favorites/count/", FavoriteCountAPI.as_view(), name="favorites_count_api"),
+     path(
+        "property/<str:property_id>/gallery/", PropertyGalleryView.as_view(), name="property_gallery"
+    ),
 ]
