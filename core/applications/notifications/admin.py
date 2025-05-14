@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Notification, NotificationPreference, 
+    Announcement, Notification, NotificationPreference, 
     Message, ViewingSchedule
 )
 # Register your models here.
@@ -21,3 +21,9 @@ class NotificationPreferenceAdmin(admin.ModelAdmin):
     list_filter = ["email_notifications", "push_notifications"]
 
 
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ["title", "created_at", "updated_at", "visible"]
+    search_fields = ["title", "content"]
+    list_filter = ["created_at", "updated_at"]
+    ordering = ["-created_at"]

@@ -2,7 +2,7 @@ from django.urls import path
 
 from core.applications.home.views import (
     FavoriteCountAPI, HomeView, PropertyDetailView, PropertyGalleryView, RentPropertyListView, 
-    AgentListView, AgentDetailView, ToggleFavoriteView
+    AgentListView, AgentDetailView, ToggleFavoriteView, PropertyTypeListView
 )
 
 
@@ -22,7 +22,8 @@ urlpatterns = [
     ),
     path("property/favorite/", ToggleFavoriteView.as_view(), name="toggle_favorite"),
     path("api/user/favorites/count/", FavoriteCountAPI.as_view(), name="favorites_count_api"),
-     path(
+    path(
         "property/<str:property_id>/gallery/", PropertyGalleryView.as_view(), name="property_gallery"
     ),
+    path("properties/type/<str:type>/", PropertyTypeListView.as_view(), name="property_type_list"),
 ]

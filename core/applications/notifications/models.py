@@ -1,6 +1,7 @@
 from django.db import models
 from core.helper.enums import NotificationType
 from core.helper.models import TitleTimeBasedModel
+from django.utils import timezone
 import auto_prefetch
 
 # Messaging between users (agent <-> user)
@@ -96,3 +97,27 @@ class NotificationPreference(TitleTimeBasedModel):
 
     def __str__(self):
         return f"Notification Preferences for {self.user}"
+
+
+class Announcement(TitleTimeBasedModel):
+    message = models.TextField()
+    start_date = models.DateTimeField(default=timezone.now)
+    end_date = models.DateTimeField()
+    priority = models.PositiveSmallIntegerField(
+        choices=[(1, "Low"), (2, "Medium"), (3, "High")],
+        default=2
+    )
+    
+
+    class Meta(auto_prefetch.Model.Meta):
+        verbose_name = "Announcement"
+        verbose_name_plural = "Announcements"
+        ordering = ["-start_date"]
+
+    def __str__(self):
+        return self.title
+    
+    @property
+    def is_current(self):
+        now = timezone.now()
+        return self.is_active and (self.start_date <= now <= self.end_date)

@@ -5,12 +5,12 @@ from core.applications.home.forms import ContactForm
 from core.applications.property.forms import PropertySearchForm
 from core.applications.property.models import FavoriteProperty, Property, PropertyImage
 from core.applications.users.models import AgentProfile
-from core.helper.enums import PropertyListingType
+from core.helper.enums import PropertyListingType, PropertyTypeChoices
 from django.db.models import Q
 from django.core.paginator import Paginator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.decorators import method_decorator
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.core.mail import send_mail
@@ -190,7 +190,28 @@ class PropertyGalleryView(ListView):
         context["page_title"] = f"Photo Gallery - {self.property.title}"
         return context
 
+class PropertyTypeListView(ListView):
+    model = Property
+    template_name = "pages/property/property_type_list.html"
+    context_object_name = "properties"
+    paginate_by = 12  
 
+    def get_queryset(self):
+        type_value = self.kwargs.get("type")
+        try:
+            PropertyTypeChoices(type_value)
+        except ValueError:
+            raise Http404("Invalid property type")
+
+        return Property.objects.filter(property_type=type_value, is_available=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        type_value = self.kwargs.get("type")
+        context["property_type_label"] = PropertyTypeChoices(type_value).label
+        return context
+
+    
 
 class AgentListView(LoginRequiredMixin, ListView):
     model = AgentProfile

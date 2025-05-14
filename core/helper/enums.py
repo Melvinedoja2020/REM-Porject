@@ -83,3 +83,14 @@ class LeadStatus(TextChoices):
     VIEWING_SCHEDULED = "VIEWING_SCHEDULED", "Viewing Scheduled"
     FOLLOW_UP = "FOLLOW_UP", "Follow Up Required"
     CLOSED = "CLOSED", "Closed"
+
+
+
+ICON_CLASSES = {
+    "apartment": "icon-apartment1",
+    "villa": "icon-villa",
+    "studio": "icon-studio",
+    "office": "icon-office1",
+    "townhouse": "icon-townhouse",
+    "commercial": "icon-commercial",
+}

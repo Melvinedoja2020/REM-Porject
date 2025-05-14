@@ -1,338 +1,37 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
+{% load custom_tags %}
 {% include 'partials/messages.html' %}
 <!-- .page-title -->
-<div class="page-title home03">
+<div class="page-title home03 video-banner">
+  <!-- Video Background -->
+  <video autoplay muted loop playsinline class="bg-video">
+    <source src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Optional Overlay -->
+  <div class="video-overlay"></div>
+
+  <!-- Content Container -->
   <div class="tf-container">
     <div class="row">
       <div class="col-12">
-        <div class="content-inner">
-          <div class="heading-title">
-            <h1 class="title">Your Way Home Starts Here</h1>
-            <p class="h6 fw-4">Thousands of luxury homess just like you trust us to find their next home.</p>
-
-          </div>
-          {% comment %} <div class="widget-tabs style-1 ">
-            <ul class="widget-menu-tab ">
-              <li class="item-title active ">
-                For Rent
-              </li>
-              <li class="item-title">
-                For Sale
-              </li>
-            </ul>
-            <div class="wg-filter">
-              <div class="form-title">
-                <form class="w-full">
-                  <fieldset>
-                    <input type="text" placeholder="Address, City, ZIP...">
-                  </fieldset>
-                </form>
-                <div class="nice-select" tabindex="0">
-                  <span class="current">Location</span>
-                  <ul class="list">
-                    <li data-value="1" class="option">Location</li>
-                    <li data-value="2" class="option selected">Texas</li>
-                    <li data-value="3" class="option">Florida </li>
-                    <li data-value="4" class="option">New York
-                    </li>
-                    <li data-value="5" class="option">Illinois</li>
-                    <li data-value="6" class="option">Washington</li>
-                    <li data-value="7" class="option">Pennsylvania</li>
-                    <li data-value="8" class="option">Ohio</li>
-                    <li data-value="9" class="option">Georgia</li>
-                    <li data-value="10" class="option">North Carolina
-                    </li>
-                  </ul>
-                </div>
-                <div class="nice-select" tabindex="0">
-                  <span class="current">Province / States</span>
-                  <ul class="list">
-                    <li data-value="1" class="option">California</li>
-                    <li data-value="2" class="option selected">Texas</li>
-                    <li data-value="3" class="option">Florida </li>
-                    <li data-value="4" class="option">New York
-                    </li>
-                    <li data-value="5" class="option">Illinois</li>
-                    <li data-value="6" class="option">Washington</li>
-                    <li data-value="7" class="option">Pennsylvania</li>
-                    <li data-value="8" class="option">Ohio</li>
-                    <li data-value="9" class="option">Georgia</li>
-                    <li data-value="10" class="option">North Carolina
-                    </li>
-                  </ul>
-                </div>
-                <div class="wrap-btn">
-                  <div class="btn-filter show-form">
-                    <div class="icons">
-                      <svg width="24" height="24" viewbox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 4H14" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M10 4H3" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M21 12H12" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M8 12H3" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M21 20H16" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M12 20H3" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M14 2V6" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M8 10V14" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                        <path d="M16 18V22" stroke="#F1913D" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                      </svg>
-                    </div>
-                  </div>
-                  <a href="#" class="tf-btn bg-color-primary pd-3">
-                    Search <i class="icon-MagnifyingGlass fw-6"></i>
-                  </a>
-                </div>
-              </div>
-              <div class="wd-search-form">
-                <div class="group-price">
-                  <div class="widget-price">
-                    <div class="box-title-price">
-                      <span class="title-price">Price range</span>
-                      <div class="caption-price">
-                        <span>from</span>
-                        <span class="value fw-6" id="slider-range-value1"></span>
-                        <span>to</span>
-                        <span class="value fw-6" id="slider-range-value2"></span>
-                      </div>
-                    </div>
-                    <div id="slider-range"></div>
-                    <div class="slider-labels">
-                      <div>
-                        <input type="hidden" name="min-value" value="">
-                        <input type="hidden" name="max-value" value="">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="widget-price">
-                    <div class="box-title-price">
-                      <span class="title-price">Size range</span>
-                      <div class="caption-price">
-                        <span>from</span>
-                        <span class="value fw-6" id="slider-range-value01"></span>
-                        <span>to</span>
-                        <span class="value fw-6" id="slider-range-value02"></span>
-                      </div>
-                    </div>
-                    <div id="slider-range2"></div>
-                    <div class="slider-labels">
-                      <div>
-                        <input type="hidden" name="min-value2" value="">
-                        <input type="hidden" name="max-value2" value="">
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class=" group-select">
-                  <div class="box-select">
-                    <div class="nice-select" tabindex="0">
-                      <span class="current">Province / States</span>
-                      <ul class="list">
-                        <li data-value="1" class="option">California</li>
-                        <li data-value="2" class="option selected">Texas</li>
-                        <li data-value="3" class="option">Florida </li>
-                        <li data-value="4" class="option">New York
-                        </li>
-                        <li data-value="5" class="option">Illinois</li>
-                        <li data-value="6" class="option">Washington</li>
-                        <li data-value="7" class="option">Pennsylvania</li>
-                        <li data-value="8" class="option">Ohio</li>
-                        <li data-value="9" class="option">Georgia</li>
-                        <li data-value="10" class="option">North Carolina
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="box-select">
-
-                    <div class="nice-select" tabindex="0">
-                      <span class="current">Rooms</span>
-                      <ul class="list">
-                        <li data-value="1" class="option">1</li>
-                        <li data-value="2" class="option selected">2</li>
-                        <li data-value="3" class="option">3</li>
-                        <li data-value="4" class="option">4</li>
-                        <li data-value="5" class="option">5</li>
-                        <li data-value="6" class="option">6</li>
-                        <li data-value="7" class="option">7</li>
-                        <li data-value="8" class="option">8</li>
-                        <li data-value="9" class="option">9</li>
-                        <li data-value="10" class="option">10</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="box-select">
-
-                    <div class="nice-select" tabindex="0">
-                      <span class="current">Bath: Any</span>
-                      <ul class="list">
-                        <li data-value="1" class="option">1</li>
-                        <li data-value="2" class="option selected">2</li>
-                        <li data-value="3" class="option">3</li>
-                        <li data-value="4" class="option">4</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="box-select">
-
-                    <div class="nice-select" tabindex="0">
-                      <span class="current">Beds: Any</span>
-                      <ul class="list">
-                        <li data-value="1" class="option">1</li>
-                        <li data-value="2" class="option selected">2</li>
-                        <li data-value="3" class="option">3</li>
-                        <li data-value="4" class="option">4</li>
-                        <li data-value="5" class="option">5</li>
-                        <li data-value="6" class="option">6</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                <div class="group-checkbox">
-                  <div class=" title text-4 fw-6">Amenities:</div>
-                  <div class="group-amenities ">
-                    <fieldset class="checkbox-item style-1  ">
-                      <label>
-                        <span class="text-4">Bed linens</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4"> Carbon alarm</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4">Check-in lockbox </span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4">Coffee maker </span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-
-
-                    <fieldset class="checkbox-item style-1  ">
-                      <label>
-                        <span class="text-4"> Dishwasher</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4"> Fireplace</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4">Extra pillows </span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4">First aid kit </span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-
-                    <fieldset class="checkbox-item style-1  ">
-                      <label>
-                        <span class="text-4">Hangers </span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4">Iron</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4"> Microwave</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4">Fireplace</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-
-                    <fieldset class="checkbox-item style-1  ">
-                      <label>
-                        <span class="text-4"> Refrigerator</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4">Security cameras </span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4"> Smoke alarm</span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                    <fieldset class="checkbox-item style-1   mt-12">
-                      <label>
-                        <span class="text-4">Fireplace </span>
-                        <input type="checkbox">
-                        <span class="btn-checkbox"></span>
-                      </label>
-                    </fieldset>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> {% endcomment %}
+        <div class="content-inner overlay-content text-center">
+          <h1 class="title">Your Way Home Starts Here</h1>
+          <p class="h6 fw-4">Thousands of luxury homes just like you trust us to find their next home.</p>
         </div>
       </div>
     </div>
   </div>
-</div><!-- .page-title -->
+</div>
 
 <!-- .main-content -->
 <div class="main-content">
 
   <!-- section-help -->
-  <section class="section-help style-2 tf-spacing-1">
+  {% comment %} <section class="section-help style-2 tf-spacing-1">
     <div class="tf-container">
       <div class="row">
         <div class="col-12">
@@ -408,11 +107,11 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> {% endcomment %}
   <!-- section-help -->
 
   <!-- section-appraisal -->
-  <section class="section-appraisal style-2">
+  {% comment %} <section class="section-appraisal style-2">
     <div class="wg-appraisal style-3">
       <div class="tf-container">
         <div class="row">
@@ -438,7 +137,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> {% endcomment %}
   <!-- /section-appraisal -->
 
   <!-- Categories -->
@@ -455,84 +154,30 @@
         <div class="swiper sw-layout style-pagination" data-preview="6" data-tablet="4" data-mobile-sm="3"
           data-mobile="2" data-space="15" data-space-md="30" data-space-lg="30">
           <div class="swiper-wrapper">
+
+            {% for item in property_listing_types %}
             <div class="swiper-slide">
-              <a href="#" class="categories-item">
+              <a href="{% url 'home:property_type_list' item.value %}" class="categories-item">
                 <div class="icon-box">
-                  <i class="icon icon-apartment1">
-                  </i>
+                  <i class="icon {{ item.icon_class }}"></i>
                 </div>
                 <div class="content text-center">
-                  <h5>Apartment</h5>
-                  <p class="mt-4 text-1">234 Property</p>
+                  <h5>{{ item.label }}</h5>
+                  {% comment %} <p class="mt-4 text-1">
+                    {{ property_listing_type_counts|get_item:item.value|default:0 }} Property
+                  </p> {% endcomment %}
                 </div>
               </a>
             </div>
-            <div class="swiper-slide">
-              <a href="#" class="categories-item">
-                <div class="icon-box">
-                  <i class="icon icon-villa">
-                  </i>
-                </div>
-                <div class="content text-center">
-                  <h5>Villa</h5>
-                  <p class="mt-4 text-1">234 Property</p>
-                </div>
-              </a>
-            </div>
-            <div class="swiper-slide">
-              <a href="#" class="categories-item active">
-                <div class="icon-box">
-                  <i class="icon icon-studio">
-                  </i>
-                </div>
-                <div class="content text-center">
-                  <h5>Studio</h5>
-                  <p class="mt-4 text-1">234 Property</p>
-                </div>
-              </a>
-            </div>
-            <div class="swiper-slide">
-              <a href="#" class="categories-item">
-                <div class="icon-box">
-                  <i class="icon icon-office1">
-                  </i>
-                </div>
-                <div class="content text-center">
-                  <h5>Office</h5>
-                  <p class="mt-4 text-1">234 Property</p>
-                </div>
-              </a>
-            </div>
-            <div class="swiper-slide">
-              <a href="#" class="categories-item">
-                <div class="icon-box">
-                  <i class="icon icon-townhouse">
-                  </i>
-                </div>
-                <div class="content text-center">
-                  <h5>Townhouse</h5>
-                  <p class="mt-4 text-1">234 Property</p>
-                </div>
-              </a>
-            </div>
-            <div class="swiper-slide">
-              <a href="#" class="categories-item">
-                <div class="icon-box">
-                  <i class="icon icon-commercial">
-                  </i>
-                </div>
-                <div class="content text-center">
-                  <h5>Commercial</h5>
-                  <p class="mt-4 text-1">234 Property</p>
-                </div>
-              </a>
-            </div>
+            {% endfor %}
+
           </div>
           <div class="sw-pagination sw-pagination-layout text-center d-lg-none mt-20 d-block"></div>
         </div>
       </div>
     </div>
   </section>
+
   <!-- End Categories -->
 
   <!-- section-popular-searches -->
@@ -558,12 +203,11 @@
                       <img class="lazyload" data-src="{{ property.main_image_url }}" src="{{ property.main_image_url }}"
                         alt="{{ property.title }}">
                     </a>
-                    {% comment %} <ul class="box-tag flex gap-8 ">
-                      <li class="flat-tag text-4 bg-main fw-6 text_white">
-                        Featured</li>
-                      <li class="flat-tag text-4 bg-3 fw-6 text_white">For
-                        Sale</li>
-                    </ul> {% endcomment %}
+                    <ul class="box-tag flex gap-8 ">
+                      {% comment %} <li class="flat-tag text-4 bg-main fw-6 text_white">
+                        Featured</li> {% endcomment %}
+                      <li class="flat-tag text-4 bg-3 fw-6 text_white">{{ property.property_listing }}</li>
+                    </ul>
                     {% include 'partials/_favorite_button.html' %}
                   </div>
                   <div class="content">
@@ -660,12 +304,12 @@
             </div>
             <div class="sw-pagination sw-pagination-mb-1 text-center d-md-none d-block mb-20"></div>
           </div>
-          <p class="text-center text-1 mb-46">Explore Property agents are here to help with all your
+          {% comment %} <p class="text-center text-1 mb-46">Explore Property agents are here to help with all your
             buying, renting and selling goals. <br>
             Find the home of your dreams with an expert you can trust. <a href="#">Let’s chat</a>
           </p>
           <a href="#" class="tf-btn bg-color-primary pd-3 fw-6 mx-auto">Find your location agent <i
-              class="icon-MagnifyingGlass"></i></a>
+              class="icon-MagnifyingGlass"></i></a> {% endcomment %}
         </div>
       </div>
     </div>
@@ -750,10 +394,8 @@
         <div class="col-12">
           <div class="heading-section mb-48 text-center">
             <h2 class="title split-text effect-right">Why Choose Us?</h2>
-            <p class="text-1 split-text split-lines-transform">Here’s just a few reasons why
-              homeowners are choosing
-              Realty to sell
-              their property.
+            <p class="text-1 split-text split-lines-transform">Discover why thousands of homeowners trust REM to sell
+              faster, for more money, and with less stress.
             </p>
           </div>
           <div class="tf-grid-layout lg-col-4 sm-col-2 mb-46">
@@ -805,10 +447,9 @@
                 </svg>
 
               </div>
-              <h5 class="title "><a href="#">30+ Years of Local Property Experience</a></h5>
-              <p class=" text-1">We are not loud, noisy and full of our own self-importance. As
-                your agent we know we work for you.
-              </p>
+              <h5 class="title"><a href="#">Decades Serving Our Community</a></h5>
+              <p class="text-1">With decades of experience in the local market, we provide discreet, client-focused
+                service tailored to your unique needs.</p>
             </div>
             <div class="icons-box effec-icon style-2 ">
               <div class="tf-icon ">
@@ -850,9 +491,9 @@
 
 
               </div>
-              <h5 class="title "><a href="#">We Are not Like Other Agents You Know</a></h5>
-              <p class=" text-1">We are not loud, noisy and full of our own self-importance. As
-                your agent we know we work for you.</p>
+              <h5 class="title"><a href="#">A Different Kind of Real Estate Experience</a></h5>
+              <p class="text-1">Professional service without the ego - we listen first and always put your interests
+                ahead of our own.</p>
             </div>
             <div class="icons-box effec-icon style-2 ">
               <div class="tf-icon ">
@@ -867,23 +508,31 @@
 
 
               </div>
-              <h5 class="title "><a href="#">Intimate Local Knowledge</a></h5>
-              <p class=" text-1">Not all agents have the skills or experience to ensure you get
-                the highest price for your property. Our experience is your guarantee of best
-                price.</p>
+              <h5 class="title"><a href="#">More Than an Agent - A Neighborhood Advocate</a></h5>
+              <p class="text-1">We don't just sell houses; we leverage our community relationships to showcase your
+                property's true worth.</p>
             </div>
           </div>
           {% if request.user.is_authenticated and user.role == "Prospective Buyer/Tenant" and not request.user.property_subscriptions.exists %}
-          <section class="subscribe-section text-center py-5">
-            <p class="text-1 mb-4">
-              You can obtain more information and get notified about matching properties by
-              <a href="{% url 'property:create-subscription' %}" class="text-decoration-underline fw-bold">
-                clicking this link
-              </a> now.
-            </p>
-            <a href="{% url 'property:create-subscription' %}" class="tf-btn bg-color-primary pd-3 fw-6 mx-auto">
-              Get Started Now
-            </a>
+          <section class="subscribe-section text-center py-5 bg-light rounded-3">
+            <div class="container py-3">
+              <h3 class="h4 mb-3 fw-semibold text-dark">
+                Need Something Specific? We'll Help You Find It
+              </h3>
+              <p class="text-muted mb-4">
+                Don't see what you're looking for? Let us know your requirements and we'll notify you when matching
+                properties become available.
+              </p>
+              <div class="d-flex flex-column flex-md-row justify-content-center gap-3">
+                <a href="{% url 'property:create-subscription' %}" class="tf-btn bg-color-primary pd-3 fw-6 mx-auto">
+                  <i class="bi bi-bell-fill me-2"></i>Notify Me About New Properties
+                </a>
+
+              </div>
+              <p class="small text-muted mt-3">
+                You can unsubscribe anytime. We respect your privacy.
+              </p>
+            </div>
           </section>
           {% endif %}
 

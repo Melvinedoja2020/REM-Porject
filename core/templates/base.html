@@ -87,53 +87,6 @@
       </div>
     </div><!-- /.preload -->
 
-    <!-- .tf-top-bar -->
-    <div class="tf-top-bar">
-      <div class="tf-container xl">
-        <div class="row">
-          <div class="col-12">
-            <div class="top-bar-inner">
-              <ul class="top-bar-info">
-                <li>
-                  <i class="icon-phone-1"></i>
-                  <p>Phone: <span class="fw-7">(234) 8165194182</span></p>
-                </li>
-                {% comment %} <li>
-                  <i class="icon-mail"></i>
-                  <p>Email: <a href="#">{{ request.user.name }}@gmail.com</a></p>
-                </li> {% endcomment %}
-              </ul>
-              <div class="wrap-social">
-                <p>Follow us</p>
-                <ul class="tf-social  style-2">
-                  <li>
-                    <a href="#">
-                      <i class="icon-fb"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="icon-X"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="icon-linked"></i>
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                      <i class="icon-ins"></i>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> <!-- /.tf-top-bar -->
-
     <!-- .header -->
     <header id="header-main" class="header style-4 header-sticky">
       <div class="header-inner">
@@ -297,7 +250,7 @@
                       </svg>
 
                     </div>
-                    <p>(234) 8165194182</p>
+                    {% comment %} <p>(234) 8165194182</p> {% endcomment %}
                   </div>
                   <div class="box-user tf-action-btns">
                     <div class="user ">
@@ -308,7 +261,7 @@
                       </svg>
                     </div>
                     <div class="name">
-                      {{ request.user.name }}
+                      {% comment %} {{ request.user.name }} {% endcomment %}
                       <i class="icon-CaretDown"></i>
                     </div>
 
@@ -348,8 +301,9 @@
                     {% if not user_has_favorites %}style="display: none;" {% endif %}>
                     <a class="tf-btn style-border pd-23" href="{% url 'property:customers_favorite_list' %}"
                       id="favorites-button">
-                      My Favorites 
-                      {% comment %} (<span id="favorites-count">{{ request.user.favorites.count }}</span>) {% endcomment %}
+                      My Favorites
+                      {% comment %} (<span id="favorites-count">{{ request.user.favorites.count }}</span>)
+                      {% endcomment %}
                     </a>
                   </div>
                   {% endif %}
@@ -532,7 +486,7 @@
                       </svg>
 
                     </div>
-                    <p>(234) 8165194182</p>
+                    {% comment %} <p>(234) 8165194182</p> {% endcomment %}
                   </div>
                   {% if request.user.is_authenticated %}
                   <div class="box-user tf-action-btns">
@@ -544,7 +498,7 @@
                       </svg>
                     </div>
                     <div class="name">
-                      {{ request.user.email }}
+
                       <i class="icon-CaretDown"></i>
                     </div>
                     <div class=" menu-user">
@@ -712,6 +666,28 @@
           </div>
         </div>
       </div>
+
+      {% if has_announcements %}
+
+      <div class="announcement-marquee-container">
+        <div class="announcement-marquee">
+          {% for announcement in active_announcements %}
+          <div
+            class="announcement-item {% if announcement.priority == 3 %}priority-high{% elif announcement.priority == 2 %}priority-medium{% else %}priority-low{% endif %}">
+            <span class="announcement-title">{{ announcement.title }}:</span>
+            <span class="announcement-message">{{ announcement.message }}</span>
+            {% if announcement.priority == 3 %}
+            <span class="badge bg-outline-secondary ms-2">High Priority</span>
+            {% elif announcement.priority == 2 %}
+            <span class="badge bg-outline-secondary ms-2">Medium</span>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% endif %}
+
     </header><!-- /header -->
 
 

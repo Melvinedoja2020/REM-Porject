@@ -184,6 +184,7 @@ TEMPLATES = [
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors favorites_context
             "context_processors": [
                 "core.applications.home.context_processors.user_context",
+                "core.applications.home.context_processors.announcements",
                 # "core.applications.home.context_processors.favorite_property_ids",
                 # "core.applications.home.context_processors.favorites_context",
                 "django.template.context_processors.debug",
