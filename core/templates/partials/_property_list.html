@@ -1,0 +1,35 @@
+{% for rents in properties %}
+                  <div class="box-house style-list hover-img">
+                    <div class="image-wrap">
+                      <a href="{% url 'home:rent_property_detail' rents.slug %}">
+                        <img class="lazyload" data-src="{{ rents.main_image_url }}" src="{{ rents.main_image_url }}"
+                          alt="">
+                      </a>
+                      {% include 'partials/_favorite_button.html' with property=rents %}
+                    </div>
+                    <div class="content">
+                      <h5 class="title">
+                        <a href="{% url 'home:rent_property_detail' rents.slug %}">{{ rents.title}}</a>
+
+                      </h5>
+                      <p class="location text-1 flex items-center gap-6">
+                        <i class="icon-location"></i> {{ rents.location}}
+                      </p>
+                      <ul class="meta-list flex">
+                        <li class="text-1 flex"><span>{{rents.bedrooms}}</span>Beds</li>
+                        <li class="text-1 flex"><span>{{ rents.bathrooms}}</span>Baths</li>
+                        <li class="text-1 flex"><span>{{ rents.sqft }}</span>Sqft</li>
+                      </ul>
+                      <div class="bot flex justify-between items-center">
+                        <h5 class="price">
+                          ${{ rents.price}}
+                        </h5>
+                        <div class="wrap-btn flex">
+
+                          <a href="{% url 'home:rent_property_detail' rents.slug %}"
+                            class="tf-btn style-border pd-4">Details</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}

@@ -19,6 +19,9 @@ from django.conf import settings
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
+from core.helper.mixins import PropertySearchMixin
 # Create your views here.
 
 
@@ -61,65 +64,86 @@ class ContactUsView(FormView):
 
         messages.success(self.request, 'Your message has been sent successfully.')
         return super().form_valid(form)
-    
 
-class RentPropertyListView(ListView):
+class PropertyListView(PropertySearchMixin, ListView):
     model = Property
     template_name = "pages/property/property_list.html"
     context_object_name = "properties"
     paginate_by = 6
 
     def get_queryset(self):
-        """
-        Returns a queryset of available properties for rent.
-        Filters the properties based on the search criteria provided in the GET request.
-        """
-        queryset = Property.objects.filter(
+        base_queryset = Property.objects.filter(
+            is_available=True,
+        ).select_related("agent").prefetch_related("images", "amenities")
+
+        return self.get_filtered_queryset(base_queryset)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["page_title"] = "Rent Properties"
+        return context
+    
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            html = render_to_string(
+                "partials/_property_list.html", context, request=self.request
+            )
+            return JsonResponse({"html": html})
+        return super().render_to_response(context, **response_kwargs)    
+
+class RentPropertyListView(PropertySearchMixin, ListView):
+    model = Property
+    template_name = "pages/property/property_list.html"
+    context_object_name = "properties"
+    paginate_by = 6
+
+    def get_queryset(self):
+        base_queryset = Property.objects.filter(
             is_available=True,
             property_listing=PropertyListingType.RENT,
         ).select_related("agent").prefetch_related("images", "amenities")
 
-        form = PropertySearchForm(self.request.GET)
-
-        if form.is_valid():
-            cd = form.cleaned_data
-
-            q = cd.get("q")
-            if q:
-                queryset = queryset.filter(
-                    Q(title__icontains=q) | Q(description__icontains=q)
-                )
-
-            if cd.get("location"):
-                queryset = queryset.filter(location__icontains=cd["location"])
-
-            if cd.get("property_type"):
-                queryset = queryset.filter(property_type=cd["property_type"])
-
-            if cd.get("min_price"):
-                queryset = queryset.filter(price__gte=cd["min_price"])
-
-            if cd.get("max_price"):
-                queryset = queryset.filter(price__lte=cd["max_price"])
-
-            if cd.get("min_bedrooms"):
-                queryset = queryset.filter(bedrooms__gte=cd["min_bedrooms"])
-
-            if cd.get("min_bathrooms"):
-                queryset = queryset.filter(bathrooms__gte=cd["min_bathrooms"])
-
-            if cd.get("amenities"):
-                for amenity in cd["amenities"]:
-                    queryset = queryset.filter(amenities=amenity)
-
-        return queryset.order_by("-created_at").distinct()
+        return self.get_filtered_queryset(base_queryset)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form"] = PropertySearchForm(self.request.GET)
+        context["page_title"] = "Rent Properties"
+        return context
+    
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            html = render_to_string(
+                "partials/_property_list.html", context, request=self.request
+            )
+            return JsonResponse({"html": html})
+        return super().render_to_response(context, **response_kwargs)
+
+class BuyPropertyListView(PropertySearchMixin, ListView):
+    model = Property
+    template_name = "pages/property/property_list.html"
+    context_object_name = "properties"
+    paginate_by = 6
+
+    def get_queryset(self):
+        base_queryset = Property.objects.filter(
+            is_available=True,
+            property_listing=PropertyListingType.FOR_SALE,
+        ).select_related("agent").prefetch_related("images", "amenities")
+
+        return self.get_filtered_queryset(base_queryset)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         context["page_title"] = "Rent Properties"
         return context
 
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            html = render_to_string(
+                "partials/_property_list.html", context, request=self.request
+            )
+            return JsonResponse({"html": html})
+        return super().render_to_response(context, **response_kwargs)
 
 class PropertyDetailView(DetailView):
     model = Property
@@ -190,11 +214,11 @@ class PropertyGalleryView(ListView):
         context["page_title"] = f"Photo Gallery - {self.property.title}"
         return context
 
-class PropertyTypeListView(ListView):
+class PropertyTypeListView(PropertySearchMixin, ListView):
     model = Property
-    template_name = "pages/property/property_type_list.html"
+    template_name = "pages/property/property_list.html"
     context_object_name = "properties"
-    paginate_by = 12  
+    paginate_by = 12
 
     def get_queryset(self):
         type_value = self.kwargs.get("type")
@@ -203,15 +227,26 @@ class PropertyTypeListView(ListView):
         except ValueError:
             raise Http404("Invalid property type")
 
-        return Property.objects.filter(property_type=type_value, is_available=True)
+        base_queryset = Property.objects.filter(
+            property_type=type_value, is_available=True
+        ).select_related("agent").prefetch_related("images", "amenities")
+
+        return self.get_filtered_queryset(base_queryset)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         type_value = self.kwargs.get("type")
         context["property_type_label"] = PropertyTypeChoices(type_value).label
         return context
-
     
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
+            html = render_to_string(
+                "partials/_property_list.html", context, request=self.request
+            )
+            return JsonResponse({"html": html})
+        return super().render_to_response(context, **response_kwargs)
+
 
 class AgentListView(LoginRequiredMixin, ListView):
     model = AgentProfile

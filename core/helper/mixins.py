@@ -1,6 +1,9 @@
 from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.db.models import Q
+
+from core.applications.property.forms import PropertySearchForm
 
 
 class RoleRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
@@ -40,3 +43,52 @@ class AgentRequiredMixin(LoginRequiredMixin):
             messages.error(request, "This section is for agents only")
             return redirect('home:home')
         return super().dispatch(request, *args, **kwargs)
+
+
+class PropertySearchMixin:
+    def get_filtered_queryset(self, base_queryset):
+        """
+        Filter the queryset based on the search form data.
+        This method is called in the get_queryset method of the view.
+        """
+        form = PropertySearchForm(self.request.GET)
+
+        self.search_form = form  # Store the form for access in context
+
+        if form.is_valid():
+            cd = form.cleaned_data
+
+            q = cd.get("q")
+            if q:
+                base_queryset = base_queryset.filter(
+                    Q(title__icontains=q) | Q(description__icontains=q)
+                )
+
+            if cd.get("location"):
+                base_queryset = base_queryset.filter(location__icontains=cd["location"])
+
+            if cd.get("property_type"):
+                base_queryset = base_queryset.filter(property_type=cd["property_type"])
+
+            if cd.get("min_price"):
+                base_queryset = base_queryset.filter(price__gte=cd["min_price"])
+
+            if cd.get("max_price"):
+                base_queryset = base_queryset.filter(price__lte=cd["max_price"])
+
+            if cd.get("min_bedrooms"):
+                base_queryset = base_queryset.filter(bedrooms__gte=cd["min_bedrooms"])
+
+            if cd.get("min_bathrooms"):
+                base_queryset = base_queryset.filter(bathrooms__gte=cd["min_bathrooms"])
+
+            if cd.get("amenities"):
+                for amenity in cd["amenities"]:
+                    base_queryset = base_queryset.filter(amenities=amenity)
+
+        return base_queryset.order_by("-created_at").distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = getattr(self, "search_form", PropertySearchForm(self.request.GET))
+        return context

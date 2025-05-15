@@ -2,7 +2,8 @@ from django.urls import path
 
 from core.applications.home.views import (
     FavoriteCountAPI, HomeView, PropertyDetailView, PropertyGalleryView, RentPropertyListView, 
-    AgentListView, AgentDetailView, ToggleFavoriteView, PropertyTypeListView
+    AgentListView, AgentDetailView, ToggleFavoriteView, PropertyTypeListView, BuyPropertyListView,
+    PropertyListView
 )
 
 
@@ -11,7 +12,9 @@ app_name = "home"
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"), 
+    path("properties", PropertyListView.as_view(), name="property_lists"),
     path("rents", RentPropertyListView.as_view(), name="property_rent_list"),
+    path("buys", BuyPropertyListView.as_view(), name="property_buy_list"),
     path(
         "rent/property/<slug:slug>/", PropertyDetailView.as_view(), 
         name="rent_property_detail"
