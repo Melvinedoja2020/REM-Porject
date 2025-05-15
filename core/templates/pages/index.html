@@ -1416,5 +1416,16 @@
 </div>
 <!-- /main-content -->
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const video = document.querySelector('.bg-video');
+    if (video) {
+      video.onerror = function () {
+        document.querySelector('.video-banner').classList.add('no-video');
+      };
+    }
+  });
+</script>
+
 
 {% endblock content %}

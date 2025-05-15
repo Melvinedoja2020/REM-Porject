@@ -13703,7 +13703,7 @@ tr {
   max-width: calc(100vw - 30px);
 }
 
-/* banner video */
+
 
 /* banner video */
 .video-banner {
@@ -13750,6 +13750,7 @@ tr {
   margin: 0 auto;
 }
 
+
 @media (max-width: 768px) {
   .video-banner {
     height: 80vh;
@@ -13768,25 +13769,12 @@ tr {
     font-size: 1rem;
   }
 
-  /* Optional: Fallback for videos that won't play */
-  .bg-video {
-    display: none;
-  }
-
-  .video-banner {
+  /* Optional fallback background ONLY if the video doesn't load */
+  .video-banner.no-video {
     background: url('../images/section/page-title-3.jpg') center/cover no-repeat;
   }
 }
 
-@media (max-width: 768px) {
-  .overlay-content h1 {
-    font-size: 2rem;
-  }
-
-  .overlay-content p {
-    font-size: 1rem;
-  }
-}
 
 
 .heading-title {
