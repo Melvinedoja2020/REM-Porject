@@ -10,12 +10,16 @@
     <source src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
     Your browser does not support the video tag.
   </video> {% endcomment %}
-  <video _ngcontent-c15="" autoplay loop muted playsinline preload="auto" poster="https://picsum.photos/360/240?image=990" class="bg-video">
-  <source _ngcontent-c15="" media="screen and (min-device-width: 721px)" src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
-  <source _ngcontent-c15="" media="screen and (max-device-width: 720px)" src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
-  <source _ngcontent-c15="" media="screen and (max-device-width: 640px)" src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
-  <source _ngcontent-c15="" media="screen" src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
-</video>
+  <video _ngcontent-c15="" autoplay loop muted playsinline preload="auto"
+    poster="{% static 'images/section/real estate.jpg' %}" class="bg-video">
+    <source _ngcontent-c15="" media="screen and (min-device-width: 721px)" src="{% static 'videos/real_estate.mp4' %}"
+      type="video/mp4">
+    <source _ngcontent-c15="" media="screen and (max-device-width: 720px)" src="{% static 'videos/real_estate.mp4' %}"
+      type="video/mp4">
+    <source _ngcontent-c15="" media="screen and (max-device-width: 640px)" src="{% static 'videos/real_estate.mp4' %}"
+      type="video/mp4">
+    <source _ngcontent-c15="" media="screen" src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
+  </video>
 
   <!-- Optional Overlay -->
   <div class="video-overlay"></div>
@@ -1431,6 +1435,7 @@
       };
     }
   });
+
 </script>
 
 
