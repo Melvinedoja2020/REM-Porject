@@ -18132,3 +18132,53 @@ tr {
 .announcement-message {
   margin-right: 8px;
 }
+
+/* === WHITE BORDER (STROKE) EFFECT === */
+.title {
+  color: #000; /* Text color (black for contrast) */
+  text-shadow: 
+    -1px -1px 0 #fff,  
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff; /* Creates a white outline */
+  font-weight: 700;
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  color: #fff; /* White text for contrast */
+  font-size: 1.25rem;
+  opacity: 0; /* Start hidden for animation */
+}
+
+/* === ANIMATIONS === */
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-pop-in {
+  animation: popIn 0.8s cubic-bezier(0.26, 0.53, 0.74, 1.48) forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s 0.4s ease-out forwards;
+}
