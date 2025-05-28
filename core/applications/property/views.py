@@ -5,6 +5,7 @@ from django.views.generic import (
     CreateView, UpdateView, ListView, DetailView, DeleteView,
     FormView
 )
+from django.views import View
 from django.shortcuts import get_object_or_404
 # from core.applications.notifications.utils.notifications import notify_new_property_listing, notify_price_change
 from core.applications.property.forms import LeadCreateForm, LeadStatusForm, PropertyForm, PropertyImageForm, PropertySubscriptionForm, ViewingScheduleForm
@@ -444,11 +445,15 @@ class FavoriteLeadCreateView(LoginRequiredMixin, CreateView):
         return self.form_invalid(form)
 
 
-class FavoriteDeleteView(LoginRequiredMixin, DeleteView):
-    model = FavoriteProperty
-    template_name = "pages/dashboard/favorite_delete.html"
-    success_url = reverse_lazy("property:customers_favorite_list")
 
+class FavoriteDeleteView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        favorite = get_object_or_404(
+            FavoriteProperty, pk=kwargs['pk'], 
+            user=request.user
+        )
+        favorite.delete()
+        return redirect("property:customers_favorite_list")
 
 class PropertySubscriptionListView(LoginRequiredMixin, ListView):
     model = PropertySubscription
