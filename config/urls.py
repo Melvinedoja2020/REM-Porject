@@ -17,7 +17,8 @@ urlpatterns = [
     path("property/", include("core.applications.property.urls", namespace="property")),
     # User management
     path("users/", include("core.applications.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
+    # path("accounts/", include("allauth.urls")),
+    path("accounts/", include("allauth.account.urls")),
     # Your stuff: custom urls includes go here
     # ...
     # Media files
