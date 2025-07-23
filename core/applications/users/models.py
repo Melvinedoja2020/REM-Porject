@@ -1,22 +1,29 @@
-
 from typing import ClassVar
 
+import auto_prefetch
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.db.models import CASCADE
+from django.db.models import BooleanField
 from django.db.models import CharField
+from django.db.models import DecimalField
 from django.db.models import EmailField
-from django.db.models import BooleanField, DecimalField,  IntegerField, URLField, FileField, JSONField
-from django.db.models import ImageField, TextField, CASCADE
+from django.db.models import FileField
+from django.db.models import ImageField
+from django.db.models import JSONField
+from django.db.models import TextField
+from django.db.models import URLField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from core.helper.enums import AgentTypeChoices, UserRoleChoice, VerificationStatusChoices
+from core.helper.enums import AgentTypeChoices
+from core.helper.enums import UserRoleChoice
+from core.helper.enums import VerificationStatusChoices
 from core.helper.media import MediaHelper
 from core.helper.models import UIDTimeBasedModel
-from django.conf import settings
-from django.core.exceptions import ValidationError
 
 from .managers import UserManager
-import auto_prefetch
 
 
 class User(AbstractUser):
@@ -33,8 +40,11 @@ class User(AbstractUser):
     email = EmailField(_("email address"), unique=True)
     username = None  # type: ignore[assignment]
     role = CharField(
-        _("Role"), max_length=50, blank=True, null=True,
-        choices=UserRoleChoice.choices
+        _("Role"),
+        max_length=50,
+        blank=True,
+        null=True,
+        choices=UserRoleChoice.choices,
     )
 
     USERNAME_FIELD = "email"
@@ -58,7 +68,7 @@ class User(AbstractUser):
         # elif self.role == UserRoleChoice.REAL_ESTATE_OWNER.value:
         #     return reverse("users:real_estate_owner_profile", kwargs={"pk": self.id})
         return reverse("users:user_profile", kwargs={"pk": self.id})
-    
+
     @property
     def is_customer(self) -> bool:
         return self.role == UserRoleChoice.CUSTOMER.value
@@ -67,13 +77,12 @@ class User(AbstractUser):
     def is_agent(self) -> bool:
         return self.role == UserRoleChoice.AGENT.value
 
-    
-
 
 class BaseProfile(UIDTimeBasedModel):
     profile_picture = ImageField(
-        upload_to=MediaHelper.get_image_upload_path, 
-        blank=True, null=True
+        upload_to=MediaHelper.get_image_upload_path,
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -84,16 +93,19 @@ class BaseProfile(UIDTimeBasedModel):
         """Return profile picture if exists, else default"""
         if self.profile_picture:
             return self.profile_picture.url
-        return f'{settings.STATIC_URL}images/avatar.png'
-    
+        return f"{settings.STATIC_URL}images/avatar.png"
+
     @property
     def full_name(self):
         """Return full name of user associated with the profile"""
         return self.user.name if self.user else "Unknown User"
 
+
 class UserProfile(BaseProfile):
     user = auto_prefetch.OneToOneField(
-        "users.User", on_delete=CASCADE, related_name="profile"
+        "users.User",
+        on_delete=CASCADE,
+        related_name="profile",
     )
     phone_number = CharField(max_length=15, blank=True, null=True)
     # Saved search preferences
@@ -106,20 +118,19 @@ class UserProfile(BaseProfile):
     is_premium = BooleanField(default=False)
 
     class Meta(auto_prefetch.Model.Meta):
-        
         verbose_name = "User Profile"
         verbose_name_plural = "User Profiles"
         ordering = ["-id"]
 
     def __str__(self) -> str:
         return f"{self.user.name}'s Profile"
-    
-
 
 
 class SocialMediaLinks(UIDTimeBasedModel):
     user = auto_prefetch.OneToOneField(
-        "users.User", on_delete=CASCADE, related_name="social_media_links"
+        "users.User",
+        on_delete=CASCADE,
+        related_name="social_media_links",
     )
     facebook = URLField(max_length=255, blank=True, null=True)
     twitter = URLField(max_length=255, blank=True, null=True)
@@ -132,11 +143,11 @@ class SocialMediaLinks(UIDTimeBasedModel):
         ordering = ["-id"]
 
 
-
-
 class AgentProfile(BaseProfile):
     user = auto_prefetch.OneToOneField(
-        "users.User", on_delete=CASCADE, related_name='agent_profile'
+        "users.User",
+        on_delete=CASCADE,
+        related_name="agent_profile",
     )
     agent_type = CharField(max_length=50, choices=AgentTypeChoices.choices)
     company_name = CharField(max_length=255, blank=True, null=True)
@@ -146,20 +157,32 @@ class AgentProfile(BaseProfile):
     office_address = CharField(max_length=255, blank=True, null=True)
     description = TextField(null=True, blank=True)
     rating = DecimalField(
-        max_digits=3, decimal_places=2, default=0.0, blank=True, null=True
+        max_digits=3,
+        decimal_places=2,
+        default=0.0,
+        blank=True,
+        null=True,
     )
     license_document = FileField(
-        upload_to=MediaHelper.get_image_upload_path, null=True, blank=True
+        upload_to=MediaHelper.get_image_upload_path,
+        null=True,
+        blank=True,
     )
     company_registration_document = FileField(
-        upload_to=MediaHelper.get_image_upload_path, null=True, blank=True
+        upload_to=MediaHelper.get_image_upload_path,
+        null=True,
+        blank=True,
     )
     company_registration_number = CharField(
-        max_length=50, unique=True, blank=True, null=True
+        max_length=50,
+        unique=True,
+        blank=True,
+        null=True,
     )
     verification_status = CharField(
-        max_length=20, choices=VerificationStatusChoices.choices, 
-        default=VerificationStatusChoices.PENDING
+        max_length=20,
+        choices=VerificationStatusChoices.choices,
+        default=VerificationStatusChoices.PENDING,
     )
     verified = BooleanField(default=False)
 
@@ -172,14 +195,20 @@ class AgentProfile(BaseProfile):
         """Validate agent-specific fields"""
         if self.agent_type == AgentTypeChoices.REAL_ESTATE_AGENT:
             if not self.company_name:
-                raise ValidationError({"company_name": "Company name is required for real estate agents."})
+                raise ValidationError(
+                    {
+                        "company_name": "Company name is required for real estate agents.",
+                    },
+                )
             if not self.license_number:
-                raise ValidationError({"license_number": "License number is required for real estate agents."})
+                raise ValidationError(
+                    {
+                        "license_number": "License number is required for real estate agents.",
+                    },
+                )
 
     def __str__(self):
         return self.user.name
-    
-
 
 
 # class RealEstateOwnerProfile(UIDTimeBasedModel):

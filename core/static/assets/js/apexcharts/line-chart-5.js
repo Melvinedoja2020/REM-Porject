@@ -1,9 +1,9 @@
 (function ($) {
-    
+
     var tfLineChart = (function () {
-  
+
       var chartBar = function () {
-      
+
         var options = {
             chart: {
               height: 291,
@@ -68,20 +68,20 @@
           chart.render();
         }
       };
-  
+
       /* Function ============ */
       return {
         init: function () {},
-  
+
         load: function () {
           chartBar();
         },
         resize: function () {},
       };
     })();
-  
+
     jQuery(document).ready(function () {});
-  
+
     jQuery(window).on("load", function () {
       tfLineChart.load();
     });

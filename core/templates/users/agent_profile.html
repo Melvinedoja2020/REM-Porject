@@ -254,9 +254,9 @@
               <input type="text" id="email" value="{{ request.user.email }}" class="form-control" readonly>
             </div>
 
-            
+
             <div class="box-fieldset">
-              
+
               <label for="{{ form.agent_type.label}}">{{ form.agent_type.label}}:<span>*</span></label>
               {% if form.fields.agent_type.disabled %}
               <input type="text" class="form-control" value="{{ form.instance.get_agent_type_display }}" disabled>
@@ -301,7 +301,7 @@
         <script>
           document.addEventListener("DOMContentLoaded", function () {
             const agentTypeField = document.getElementById("id_agent_type");
-        
+
             // Mapping agent types to the field IDs they require
             const agentFieldMap = {
               "Real Estate Agent": [
@@ -319,7 +319,7 @@
                 "id_office_phone_no"
               ]
             };
-        
+
             // All potential field IDs that might need toggling
             const allFieldIds = [
               "id_license_number",
@@ -331,7 +331,7 @@
               "id_company_registration_document",
               "id_license_document"
             ];
-        
+
             // Utility to hide all optional fields
             function hideAllFields() {
               allFieldIds.forEach(fieldId => {
@@ -342,7 +342,7 @@
                 }
               });
             }
-        
+
             // Show only fields relevant to the selected agent type
             function showFieldsForAgentType(agentType) {
               const requiredFields = agentFieldMap[agentType] || [];
@@ -354,24 +354,24 @@
                 }
               });
             }
-        
+
             // Main function to update fields based on selection
             function handleAgentTypeChange(selectedType) {
               hideAllFields();
               showFieldsForAgentType(selectedType);
             }
-        
+
             // Initial state and listener
             if (agentTypeField) {
               handleAgentTypeChange(agentTypeField.value);
-        
+
               agentTypeField.addEventListener("change", function () {
                 handleAgentTypeChange(this.value);
               });
             }
           });
         </script>
-        
+
 
       </div>
       {% endblock content %}

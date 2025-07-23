@@ -11,7 +11,7 @@
     <div class="main-content-wrap">
       <div class="flex items-center flex-wrap justify-between gap20 mb-27">
         <h3>Create Rented House</h3>
-        <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
+        {% comment %} <ul class="breadcrumbs flex items-center flex-wrap justify-start gap10">
           <li>
             <a href="index.html">
               <div class="text-tiny">Dashboard</div>
@@ -31,13 +31,13 @@
           <li>
             <div class="text-tiny">Add Rent</div>
           </li>
-        </ul>
+        </ul> {% endcomment %}
       </div>
       <!-- form-add-product -->
       <form method="post" enctype="multipart/form-data" class="tf-section-2 form-add-product">
         {% csrf_token %}
         {{ form.errors }}
-        
+
         <!-- First Section -->
         <div class="wg-box">
           <fieldset class="name">
@@ -45,7 +45,7 @@
             {{ form.title }}
             <div class="text-tiny">Do not exceed 20 characters when entering the property name.</div>
           </fieldset>
-      
+
           <!-- Enhanced Property Type Selection -->
           <div class="gap22 cols">
             <fieldset class="category">
@@ -53,12 +53,12 @@
               <div class="select">
                 {{ form.property_type }}
                 {% comment %} <div class="property-type-hint text-tiny mt-5">
-                  Can't find your type? 
+                  Can't find your type?
                   <a href="#" class="tf-color js-show-new-type">Add custom type</a>
                 </div> {% endcomment %}
               </div>
             </fieldset>
-            
+
             <fieldset class="male">
               <div class="body-title mb-10">{{ form.price.label }} <span class="tf-color-1">*</span></div>
               <div class="select">
@@ -66,7 +66,7 @@
               </div>
             </fieldset>
           </div>
-      
+
           <!-- New Property Type Field -->
           <fieldset class="brand js-new-property-type" style="display: none;">
             <div class="body-title mb-10">{{ form.new_property_type.label }}</div>
@@ -76,23 +76,28 @@
             </div>
             <div class="text-tiny">Example: "Vacation Home", "Co-working Space"</div>
           </fieldset>
-      
+
           <fieldset class="brand">
             <div class="body-title mb-10">{{ form.location.label }} <span class="tf-color-1">*</span></div>
             <div class="select">
               {{ form.location }}
             </div>
           </fieldset>
-      
+
           <fieldset class="description">
             <div class="body-title mb-10">{{ form.description.label }} <span class="tf-color-1">*</span></div>
             {{ form.description }}
             <div class="text-tiny">Do not exceed 100 characters when entering the product description.</div>
           </fieldset>
         </div>
-      
+
         <!-- Second Section -->
         <div class="wg-box">
+          <fieldset class="name">
+            <div class="body-title mb-10">{{ form.cover_image.label }} <span class="tf-color-1">*</span></div>
+            {{ form.cover_image }}
+            <div class="text-tiny">This will be the main image users will see.</div>
+          </fieldset>
           <fieldset>
             <div class="body-title mb-10">Upload images</div>
             <div class="upload-image mb-16">
@@ -113,7 +118,7 @@
               background color standards. Pictures must be in certain dimensions.
             </div>
           </fieldset>
-      
+
           <div class="cols gap22">
             <fieldset class="name">
               <div class="body-title mb-10">{{ form.bedrooms.label }}</div>
@@ -121,7 +126,7 @@
                 {{ form.bedrooms }}
               </div>
             </fieldset>
-      
+
             <fieldset class="name">
               <div class="body-title mb-10">{{ form.bathrooms.label }}</div>
               <div class="select">
@@ -129,7 +134,7 @@
               </div>
             </fieldset>
           </div>
-      
+
           <div class="cols gap22">
             <fieldset class="name">
               <div class="body-title mb-10">{{ form.sqft.label }}</div>
@@ -137,7 +142,7 @@
                 {{ form.sqft }}
               </div>
             </fieldset>
-      
+
             <fieldset class="name">
               <div class="body-title mb-10">{{ form.is_available.label }}</div>
               <div class="select">
@@ -145,7 +150,7 @@
               </div>
             </fieldset>
           </div>
-      
+
           <div class="cols gap22">
             <fieldset class="name">
               <div class="body-title mb-10">{{ form.amenities.label }}</div>
@@ -154,31 +159,31 @@
               </div>
             </fieldset>
           </div>
-      
+
           <div class="cols gap10">
             <button class="tf-button w-full" type="submit">Submit</button>
           </div>
         </div>
       </form>
-      
+
       <style>
         /* Small additions to your existing styles */
         .property-type-hint {
           display: block;
           color: #666;
         }
-        
+
         .flex-items {
           display: flex;
         }
-        
+
         .flex-items input {
           flex-grow: 1;
           padding: 8px 12px;
           border: 1px solid #ddd;
           border-radius: 4px;
         }
-        
+
         /* Make select boxes match your design better */
         .select select {
           width: 100%;
@@ -186,44 +191,46 @@
           border: 1px solid #ddd;
           border-radius: 4px;
         }
+
       </style>
-      
+
       <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Get elements
-        const showBtn = document.querySelector('.js-show-new-type');
-        const cancelBtn = document.querySelector('.js-cancel-new-type');
-        const newTypeField = document.querySelector('.js-new-property-type');
-        const propertyTypeSelect = document.querySelector('[name="property_type"]');
-        
-        // Show new property type field
-        if (showBtn) {
-          showBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function () {
+          // Get elements
+          const showBtn = document.querySelector('.js-show-new-type');
+          const cancelBtn = document.querySelector('.js-cancel-new-type');
+          const newTypeField = document.querySelector('.js-new-property-type');
+          const propertyTypeSelect = document.querySelector('[name="property_type"]');
+
+          // Show new property type field
+          if (showBtn) {
+            showBtn.addEventListener('click', function (e) {
+              e.preventDefault();
+              newTypeField.style.display = 'block';
+              propertyTypeSelect.disabled = true;
+              document.querySelector('[name="new_property_type"]').focus();
+            });
+          }
+
+          // Hide new property type field
+          if (cancelBtn) {
+            cancelBtn.addEventListener('click', function () {
+              newTypeField.style.display = 'none';
+              propertyTypeSelect.disabled = false;
+              document.querySelector('[name="new_property_type"]').value = '';
+            });
+          }
+
+          // If form was submitted with errors and new_property_type has value
+          if (document.querySelector('[name="new_property_type"]').value) {
             newTypeField.style.display = 'block';
             propertyTypeSelect.disabled = true;
-            document.querySelector('[name="new_property_type"]').focus();
-          });
-        }
-        
-        // Hide new property type field
-        if (cancelBtn) {
-          cancelBtn.addEventListener('click', function() {
-            newTypeField.style.display = 'none';
-            propertyTypeSelect.disabled = false;
-            document.querySelector('[name="new_property_type"]').value = '';
-          });
-        }
-        
-        // If form was submitted with errors and new_property_type has value
-        if (document.querySelector('[name="new_property_type"]').value) {
-          newTypeField.style.display = 'block';
-          propertyTypeSelect.disabled = true;
-        }
-      });
+          }
+        });
+
       </script>
 
-      
 
-      
-{% endblock content %}
+
+
+      {% endblock content %}

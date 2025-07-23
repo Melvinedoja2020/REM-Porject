@@ -1,6 +1,9 @@
-from core.applications.notifications.models import Announcement, Notification
-from core.helper.enums import ICON_CLASSES, PropertyTypeChoices
 from django.utils import timezone
+
+from core.applications.notifications.models import Announcement
+from core.applications.notifications.models import Notification
+from core.helper.enums import ICON_CLASSES
+from core.helper.enums import PropertyTypeChoices
 
 
 def user_context(request):
@@ -21,25 +24,35 @@ def user_context(request):
         "unmarked_notifications": 0,
         "latest_notifications": [],
         "property_listing_types": [
-        {
-            "label": choice.label,
-            "value": choice.value,
-            "icon_class": ICON_CLASSES.get(choice.value, "icon-apartment1")  # fallback
-        }
-        for choice in PropertyTypeChoices
-    ],
-    "property_listing_type_counts": {
-        choice.value: PropertyTypeChoices.choices.count(choice)
-        for choice in PropertyTypeChoices
-    }
+            {
+                "label": choice.label,
+                "value": choice.value,
+                "icon_class": ICON_CLASSES.get(
+                    choice.value,
+                    "icon-apartment1",
+                ),  # fallback
+            }
+            for choice in PropertyTypeChoices
+        ],
+        "property_listing_type_counts": {
+            choice.value: PropertyTypeChoices.choices.count(choice)
+            for choice in PropertyTypeChoices
+        },
     }
 
     if request.user.is_authenticated:
         user = request.user
-        context["favorite_property_ids"] = list(user.favorites.values_list("property_id", flat=True))
+        context["favorite_property_ids"] = list(
+            user.favorites.values_list("property_id", flat=True),
+        )
         context["user_has_favorites"] = user.favorites.exists()
-        context["latest_notifications"] = Notification.objects.filter(user=user).order_by("-created_at")[:5]
-        context["unmarked_notifications"] = Notification.objects.filter(user=user, is_read=False).count()
+        context["latest_notifications"] = Notification.objects.filter(
+            user=user,
+        ).order_by("-created_at")[:5]
+        context["unmarked_notifications"] = Notification.objects.filter(
+            user=user,
+            is_read=False,
+        ).count()
 
     return context
 
@@ -49,10 +62,10 @@ def announcements(request):
     active_announcements = Announcement.objects.filter(
         visible=True,
         start_date__lte=now,
-        end_date__gte=now
+        end_date__gte=now,
     ).order_by("-priority", "-created_at")[:5]  # Limit to 5 most important
-    
+
     return {
         "active_announcements": active_announcements,
-        "has_announcements": active_announcements.exists()
+        "has_announcements": active_announcements.exists(),
     }

@@ -46,4 +46,3 @@ reportlab==4.0.9  # https://github.com/reportlab/reportlab
 django-auto-prefetch==1.9.0
 PyJWT==2.10.1
 django-model-utils==5.0.0
-

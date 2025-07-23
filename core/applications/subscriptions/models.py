@@ -1,5 +1,6 @@
-from django.db import models
 import auto_prefetch
+from django.db import models
+
 from core.helper.models import UIDTimeBasedModel
 
 
@@ -7,24 +8,32 @@ class RentalTransaction(UIDTimeBasedModel):
     """
     Represents a rental transaction between an agent and a buyer.
     """
+
     property = auto_prefetch.ForeignKey(
-        "property.Property", on_delete=models.CASCADE,
-        related_name="rental_transactions"
+        "property.Property",
+        on_delete=models.CASCADE,
+        related_name="rental_transactions",
     )
     agent = auto_prefetch.ForeignKey(
-        "users.User", on_delete=models.SET_NULL,
-        null=True, blank=True,
-        related_name="agent_rentals"
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="agent_rentals",
     )
     buyer = auto_prefetch.ForeignKey(
-        "users.User", on_delete=models.SET_NULL,
-        null=True, blank=True,
-        related_name="buyer_rentals"
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="buyer_rentals",
     )
     referred_by = auto_prefetch.ForeignKey(
-        "users.User", on_delete=models.SET_NULL,
-        null=True, blank=True,
-        related_name="referral_rentals"
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="referral_rentals",
     )
 
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -35,7 +44,7 @@ class RentalTransaction(UIDTimeBasedModel):
             ("paid", "Paid"),
             ("failed", "Failed"),
         ],
-        default="pending"
+        default="pending",
     )
     completed = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
@@ -53,22 +62,29 @@ class AgentCommission(UIDTimeBasedModel):
     """
     Tracks commission owed or paid to an agent for a rental transaction.
     """
+
     agent = auto_prefetch.ForeignKey(
-        "users.AgentProfile", on_delete=models.CASCADE,
-        related_name="commissions"
+        "users.AgentProfile",
+        on_delete=models.CASCADE,
+        related_name="commissions",
     )
     rental = auto_prefetch.ForeignKey(
-        "subscriptions.RentalTransaction", on_delete=models.CASCADE,
-        related_name="commissions"
+        "subscriptions.RentalTransaction",
+        on_delete=models.CASCADE,
+        related_name="commissions",
     )
     amount = models.DecimalField(
-        max_digits=12, decimal_places=2,
-        null=True, blank=True
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
     )
     percentage = models.DecimalField(
-        max_digits=5, decimal_places=2,
+        max_digits=5,
+        decimal_places=2,
         help_text="Commission percentage",
-        null=True, blank=True
+        null=True,
+        blank=True,
     )
     status = models.CharField(
         max_length=20,
@@ -76,7 +92,7 @@ class AgentCommission(UIDTimeBasedModel):
             ("pending", "Pending"),
             ("paid", "Paid"),
         ],
-        default="pending"
+        default="pending",
     )
     paid_on = models.DateTimeField(null=True, blank=True)
 
@@ -106,29 +122,37 @@ class PremiumServiceSubscription(UIDTimeBasedModel):
     """
     Tracks the premium service subscriptions of agents for enhanced visibility and additional features.
     """
+
     agent = auto_prefetch.ForeignKey(
-        "users.AgentProfile", on_delete=models.CASCADE, related_name="premium_subscriptions"
+        "users.AgentProfile",
+        on_delete=models.CASCADE,
+        related_name="premium_subscriptions",
     )
     service_type = models.CharField(
-        max_length=50, choices=[
+        max_length=50,
+        choices=[
             ("standard", "Standard"),
             ("premium", "Premium"),
             ("enterprise", "Enterprise"),
         ],
-        default="standard"
+        default="standard",
     )
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
-        max_length=20, choices=[
+        max_length=20,
+        choices=[
             ("active", "Active"),
             ("expired", "Expired"),
             ("pending", "Pending"),
         ],
-        default="pending"
+        default="pending",
     )
     amount_paid = models.DecimalField(
-        max_digits=12, decimal_places=2, null=True, blank=True
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
     )
     transaction_id = models.CharField(max_length=255, null=True, blank=True)
 
@@ -144,4 +168,6 @@ class PremiumServiceSubscription(UIDTimeBasedModel):
         """
         Returns whether the subscription is currently active based on the current date and the end date.
         """
-        return self.status == "active" and (self.end_date is None or self.end_date >= timezone.now())
+        return self.status == "active" and (
+            self.end_date is None or self.end_date >= timezone.now()
+        )

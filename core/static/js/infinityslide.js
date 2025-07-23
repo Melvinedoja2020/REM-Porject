@@ -6,11 +6,11 @@
    infiniteslide.js v2
    version: 2.0.1
    Author: T.Morimoto
-   
+
    Copyright 2017, T.Morimoto
    * Free to use and abuse under the MIT license.
    * http://www.opensource.org/licenses/mit-license.php
-   
+
    https://github.com/woodroots/infiniteslidev2
    */
 

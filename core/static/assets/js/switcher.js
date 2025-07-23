@@ -203,7 +203,7 @@ $(document).ready(function () {
             '</div>' +
         '</div>' +
     '</div>';
-    
+
   $("#wrapper").append(e);
 });
 
@@ -234,6 +234,6 @@ $(document).ready(function () {
     '<div class="setting cursor-pointer" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight">' +
         '<i class="icon-settings"></i>' +
     '</div>' ;
-    
+
   $(".header-grid").append(x);
 });

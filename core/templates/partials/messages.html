@@ -6,10 +6,10 @@
 <div class="container mt-4">
   {% for message in messages %}
   <div class="alert alert-{{ message.tags }} shadow border-0 rounded-4 px-4 py-3 mb-4 animate__animated animate__fadeInDown position-relative
-                  {% if message.tags == 'success' %}bg-success bg-opacity-10 text-success{% 
-                     elif message.tags == 'error' %}bg-danger bg-opacity-10 text-danger{% 
-                     elif message.tags == 'warning' %}bg-warning bg-opacity-10 text-warning{% 
-                     elif message.tags == 'info' %}bg-info bg-opacity-10 text-info{% 
+                  {% if message.tags == 'success' %}bg-success bg-opacity-10 text-success{%
+                     elif message.tags == 'error' %}bg-danger bg-opacity-10 text-danger{%
+                     elif message.tags == 'warning' %}bg-warning bg-opacity-10 text-warning{%
+                     elif message.tags == 'info' %}bg-info bg-opacity-10 text-info{%
                      else %}bg-light text-dark{% endif %}" role="alert"
     style="font-size: 1rem; backdrop-filter: blur(3px);"
     data-delay="{% if message.tags == 'success' %}5000{% elif message.tags == 'error' %}7000{% elif message.tags == 'warning' %}6000{% else %}5500{% endif %}">

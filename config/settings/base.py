@@ -1,7 +1,6 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
-
 from pathlib import Path
 
 import environ
@@ -88,7 +87,6 @@ LOCAL_APPS = [
     "core.applications.property",
     "core.applications.subscriptions",
     "core.applications.notifications",
-    
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -300,7 +298,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 # SOCIALACCOUNT_PROVIDERS = {
 #     "google": {
 #         "APP": {
-#             "client_id": 
+#             "client_id":
 #         }
 #     }
 # }
@@ -308,3 +306,6 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+# Default property image URL
+DEFAULT_PROPERTY_IMAGE_URL = "/static/images/placeholder.jpg"

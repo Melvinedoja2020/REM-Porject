@@ -23,7 +23,7 @@ function toggleFullscreen(elem) {
       }
     }
 }
-  
+
 document.querySelector('.button-zoom-maximize').addEventListener('click', function() {
     toggleFullscreen();
 });

@@ -1,11 +1,8 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
-
-from core.utils.utils import create_notification, send_favorite_notifications
 from core.applications.property.models import FavoriteProperty
-
+from core.utils.utils import send_favorite_notifications
 
 
 @receiver(post_save, sender=FavoriteProperty)

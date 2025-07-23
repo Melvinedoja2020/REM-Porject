@@ -1,8 +1,8 @@
 /* ---------------------------------------------------------
-    * Name: 
+    * Name:
     * Version: 1.0.1
     * Author: REM
-    * Author URI: http://REM.com 
+    * Author URI: http://REM.com
 
 	* Abstracts variable
 
@@ -13783,7 +13783,7 @@ tr {
 }
 
 
-/* title-inner 
+/* title-inner
 ===============================================================================*/
 .flat-title {
   margin-bottom: 62px;
@@ -13824,7 +13824,7 @@ tr {
   right: 8px;
 }
 
-/* breadcrumb 
+/* breadcrumb
 ===============================================================================*/
 .breadcrumb {
   display: -webkit-box;
@@ -14180,7 +14180,7 @@ tr {
   margin-bottom: 47px;
 }
 
-/*section-help 
+/*section-help
 ===============================================================================*/
 .section-help {
   background-color: var(--Sub-primary-1);
@@ -14694,7 +14694,7 @@ tr {
   margin-bottom: 33px;
 }
 
-/*section-property-map 
+/*section-property-map
 ===============================================================================*/
 .section-property-map {
   display: -webkit-box;
@@ -15037,7 +15037,7 @@ tr {
   margin-top: 41px;
 }
 
-/*section-agency-grid 
+/*section-agency-grid
 ===============================================================================*/
 .section-agency-layout .box-title {
   margin-bottom: 30px;
@@ -18136,8 +18136,8 @@ tr {
 /* === WHITE BORDER (STROKE) EFFECT === */
 .title {
   color: #000; /* Text color (black for contrast) */
-  text-shadow: 
-    -1px -1px 0 #fff,  
+  text-shadow:
+    -1px -1px 0 #fff,
     1px -1px 0 #fff,
     -1px 1px 0 #fff,
     1px 1px 0 #fff; /* Creates a white outline */

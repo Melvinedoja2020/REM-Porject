@@ -1,9 +1,9 @@
 (function ($) {
-  
+
   var tfLineChart = (function () {
 
     var chartBar = function () {
-    
+
       var options = {
           series: [{
           name: '',

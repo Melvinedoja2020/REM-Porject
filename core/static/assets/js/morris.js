@@ -1,4 +1,4 @@
- 
+
 !function($) {
   "use strict";
 
@@ -10,12 +10,12 @@
       data: data,
       resize: true,
       colors: colors,
-      formatter : function (y, data) { 
-        return '$' + y 
+      formatter : function (y, data) {
+        return '$' + y
       }
     });
   },
-  
+
   MorrisCharts.prototype.init = function() {
 
     var $donutData = [
@@ -23,7 +23,7 @@
         {label: "Women’s", value: 30},
         {label: "For kid", value: 20},
         {label: "Accessory", value: 20},
-        {label: "Sport shoes", value: 20}, 
+        {label: "Sport shoes", value: 20},
         {label: "Underwear", value: 20},
     ];
     this.createDonutChart('morris-donut-1', $donutData, ['#22C55E', '#2377FC', '#8F77F3', '#FFBA93', '#FFE99A', '#B0E7FF']);

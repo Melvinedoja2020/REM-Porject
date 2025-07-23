@@ -1,9 +1,9 @@
 (function ($) {
-  
+
     var tfLineChart = (function () {
-  
+
       var chartBar = function () {
-      
+
         var options = {
             series: [
               {
@@ -19,7 +19,7 @@
             },
             plotOptions: { bar: { columnWidth: "50%" } },
             xaxis: { crosshairs: { width: 1 } },
-  
+
             stroke: {
               show: true,
               curve: "smooth",
@@ -58,23 +58,23 @@
           chart.render();
         }
       };
-  
+
       /* Function ============ */
       return {
         init: function () {},
-  
+
         load: function () {
           chartBar();
         },
         resize: function () {},
       };
     })();
-  
+
     jQuery(document).ready(function () {});
-  
+
     jQuery(window).on("load", function () {
       tfLineChart.load();
     });
-  
+
     jQuery(window).on("resize", function () {});
 })(jQuery);

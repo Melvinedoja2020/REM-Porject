@@ -1,30 +1,36 @@
+import auto_prefetch
 from django.db import models
+from django.utils import timezone
+
 from core.helper.enums import NotificationType
 from core.helper.models import TitleTimeBasedModel
-from django.utils import timezone
-import auto_prefetch
+
 
 # Messaging between users (agent <-> user)
 class Message(TitleTimeBasedModel):
     sender = auto_prefetch.ForeignKey(
-        "users.User", related_name="sent_messages", on_delete=models.CASCADE
+        "users.User",
+        related_name="sent_messages",
+        on_delete=models.CASCADE,
     )
     receiver = auto_prefetch.ForeignKey(
-        "users.User", related_name="received_messages", on_delete=models.CASCADE
+        "users.User",
+        related_name="received_messages",
+        on_delete=models.CASCADE,
     )
     property = auto_prefetch.ForeignKey(
-        "property.Property", 
-        null=True, 
-        blank=True, 
+        "property.Property",
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
-        related_name="property_messages"
+        related_name="property_messages",
     )
     parent_message = auto_prefetch.ForeignKey(
-        "self", 
-        null=True, 
-        blank=True, 
-        related_name="replies", 
-        on_delete=models.CASCADE
+        "self",
+        null=True,
+        blank=True,
+        related_name="replies",
+        on_delete=models.CASCADE,
     )
     subject = models.CharField(max_length=255, blank=True)
     message = models.TextField()
@@ -40,7 +46,7 @@ class Message(TitleTimeBasedModel):
         self.save()
 
     def __str__(self):
-        return self.title  or "Untitled Message"
+        return self.title or "Untitled Message"
 
 
 # Scheduling a property viewing
@@ -52,10 +58,10 @@ class ViewingSchedule(TitleTimeBasedModel):
     status = models.CharField(
         max_length=50,
         choices=[
-            ("pending", "Pending"), 
-            ("completed", "Completed")
+            ("pending", "Pending"),
+            ("completed", "Completed"),
         ],
-        default="pending"
+        default="pending",
     )
 
     class Meta(auto_prefetch.Model.Meta):
@@ -66,13 +72,17 @@ class ViewingSchedule(TitleTimeBasedModel):
 class Notification(TitleTimeBasedModel):
     user = auto_prefetch.ForeignKey("users.User", on_delete=models.CASCADE)
     notification_type = models.CharField(
-        max_length=20, choices=NotificationType.choices, 
-        default=NotificationType.NEW_LISTING
+        max_length=20,
+        choices=NotificationType.choices,
+        default=NotificationType.NEW_LISTING,
     )
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     property = auto_prefetch.ForeignKey(  # optional link to a property
-        "property.Property", null=True, blank=True, on_delete=models.SET_NULL
+        "property.Property",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
     link = models.URLField(blank=True, null=True)  # optional link to view more
     extra_data = models.JSONField(blank=True, null=True)
@@ -84,6 +94,7 @@ class Notification(TitleTimeBasedModel):
 
     def __str__(self):
         return f"{self.title} for {self.user}"
+
 
 # User notification preferences
 class NotificationPreference(TitleTimeBasedModel):
@@ -105,9 +116,8 @@ class Announcement(TitleTimeBasedModel):
     end_date = models.DateTimeField()
     priority = models.PositiveSmallIntegerField(
         choices=[(1, "Low"), (2, "Medium"), (3, "High")],
-        default=2
+        default=2,
     )
-    
 
     class Meta(auto_prefetch.Model.Meta):
         verbose_name = "Announcement"
@@ -116,7 +126,7 @@ class Announcement(TitleTimeBasedModel):
 
     def __str__(self):
         return self.title
-    
+
     @property
     def is_current(self):
         now = timezone.now()

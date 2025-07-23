@@ -1,12 +1,13 @@
 import logging
 
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
 from django.conf import settings
-from django.urls import reverse
+from django.core.mail import send_mail
 from django.db import models
+from django.template.loader import render_to_string
+from django.urls import reverse
 
-from core.applications.notifications.models import Notification, NotificationPreference
+from core.applications.notifications.models import Notification
+from core.applications.notifications.models import NotificationPreference
 from core.applications.property.models import PropertySubscription
 from core.helper.enums import NotificationType
 
@@ -18,9 +19,10 @@ def is_user_subscribed_for_property(user, property_obj):
     Check if a user is subscribed to a property based on location containment and property type.
     """
     subscriptions = PropertySubscription.objects.filter(
-        user=user
+        user=user,
     ).filter(
-        models.Q(property_type=property_obj.property_type) | models.Q(property_type__isnull=True)
+        models.Q(property_type=property_obj.property_type)
+        | models.Q(property_type__isnull=True),
     )
 
     property_location = (property_obj.location or "").lower()
@@ -45,7 +47,7 @@ def create_notification(user, notification_type, title, message, **kwargs):
         title=title,
         message=message,
         property=kwargs.get("property"),
-        extra_data=kwargs.get("metadata", {})
+        extra_data=kwargs.get("metadata", {}),
     )
 
     if pref.email_notifications:
@@ -63,19 +65,29 @@ def send_notification_email(notification):
     """
     site_name = getattr(settings, "SITE_NAME", "Real Estate Market Place")
     site_url = settings.SITE_URL + reverse("notification:message_list")
-    default_from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "Real Estate <noreply@example.com>")
+    default_from_email = getattr(
+        settings,
+        "DEFAULT_FROM_EMAIL",
+        "Real Estate <noreply@example.com>",
+    )
     subject_prefix = getattr(settings, "EMAIL_SUBJECT_PREFIX", f"[{site_name}] ")
 
     subject = f"{subject_prefix}{notification.title or 'Notification'}"
 
     context = {
-        'notification': notification,
-        'site_name': site_name,
-        'site_url': site_url,
+        "notification": notification,
+        "site_name": site_name,
+        "site_url": site_url,
     }
 
-    html_message = render_to_string('pages/notifications/email_notification.html', context)
-    text_message = render_to_string('pages/notifications/email_notification.txt', context)
+    html_message = render_to_string(
+        "pages/notifications/email_notification.html",
+        context,
+    )
+    text_message = render_to_string(
+        "pages/notifications/email_notification.txt",
+        context,
+    )
 
     send_mail(
         subject=subject,
@@ -83,12 +95,14 @@ def send_notification_email(notification):
         from_email=default_from_email,
         recipient_list=[notification.user.email],
         html_message=html_message,
-        fail_silently=True
+        fail_silently=True,
     )
 
 
 def send_favorite_notifications(agent, user_email, property):
-    message = f"user with email {user_email} has favorited your listing: {property.title}"
+    message = (
+        f"user with email {user_email} has favorited your listing: {property.title}"
+    )
     # Add it to a notification system
     create_notification(
         user=agent.user,
@@ -96,7 +110,7 @@ def send_favorite_notifications(agent, user_email, property):
         title="Property Favorited",
         message=message,
         property=property,
-        metadata={'property_id': str(property.id)}  # Convert UUID to string
+        metadata={"property_id": str(property.id)},  # Convert UUID to string
     )
 
     # You can also email the agent
@@ -107,12 +121,12 @@ def send_favorite_notifications(agent, user_email, property):
         from_email=settings.DEFAULT_FROM_EMAIL,
     )
 
+
 def send_push_notification(notification):
     """
     Placeholder for push notification logic.
     Implement based on your provider (e.g., Firebase, OneSignal).
     """
-    pass
 
 
 def process_new_lead(lead):
@@ -121,7 +135,7 @@ def process_new_lead(lead):
     try:
         if not hasattr(lead.agent.user, "agent_profile"):
             raise ValueError("Associated agent has no profile")
-        
+
         if not hasattr(lead.user, "profile"):
             raise ValueError("Lead user has no profile")
 
@@ -130,27 +144,43 @@ def process_new_lead(lead):
             "agent": lead.agent.user.agent_profile,
             "user": lead.user.profile,
             "property": lead.property_link,
-            "dashboard_url":getattr(settings, "FRONTEND_DASHBOARD_URL", "http://localhost:8000")
+            "dashboard_url": getattr(
+                settings,
+                "FRONTEND_DASHBOARD_URL",
+                "http://localhost:8000",
+            ),
         }
 
         # Email agent
         send_mail(
             subject=f"New Lead: {lead.property_link.title}",
-            message=render_to_string("pages/notifications/lead_notification.txt", context),
-            html_message=render_to_string("pages/notifications/lead_notification.html", context),
+            message=render_to_string(
+                "pages/notifications/lead_notification.txt",
+                context,
+            ),
+            html_message=render_to_string(
+                "pages/notifications/lead_notification.html",
+                context,
+            ),
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[lead.agent.user.email],
-            fail_silently=False
+            fail_silently=False,
         )
 
         # Email user
         send_mail(
             subject=f"Your inquiry about {lead.property_link.title}",
-            message=render_to_string("pages/notifications/lead_confirmation.txt", context),
-            html_message=render_to_string("pages/notifications/lead_confirmation.html", context),
+            message=render_to_string(
+                "pages/notifications/lead_confirmation.txt",
+                context,
+            ),
+            html_message=render_to_string(
+                "pages/notifications/lead_confirmation.html",
+                context,
+            ),
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[lead.user.email],
-            fail_silently=False
+            fail_silently=False,
         )
 
         # Notification
@@ -161,12 +191,12 @@ def process_new_lead(lead):
             message=f"Interested in {lead.property_link.title}",
             metadata={
                 "lead_id": str(lead.id),
-                "property_id": str(lead.property_link.id)
-            }
+                "property_id": str(lead.property_link.id),
+            },
         )
 
     except Exception as e:
-        logger.error(f"Failed to process new lead: {str(e)}", exc_info=True)
+        logger.error(f"Failed to process new lead: {e!s}", exc_info=True)
 
 
 def process_viewing_scheduled(viewing):
@@ -187,14 +217,24 @@ def process_viewing_scheduled(viewing):
             "property": lead.property_link,
             "agent": agent.agent_profile,
             "user": user.profile,
-            "dashboard_url": getattr(settings, "FRONTEND_DASHBOARD_URL", "http://localhost:8000"),
+            "dashboard_url": getattr(
+                settings,
+                "FRONTEND_DASHBOARD_URL",
+                "http://localhost:8000",
+            ),
         }
 
         # Email user
         send_mail(
             subject=f"Viewing Scheduled: {lead.property_link.title}",
-            message=render_to_string("pages/notifications/viewing_schedule_user.txt", context),
-            html_message=render_to_string("pages/notifications/viewing_schedule_user.html", context),
+            message=render_to_string(
+                "pages/notifications/viewing_schedule_user.txt",
+                context,
+            ),
+            html_message=render_to_string(
+                "pages/notifications/viewing_schedule_user.html",
+                context,
+            ),
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
             fail_silently=False,
@@ -203,8 +243,14 @@ def process_viewing_scheduled(viewing):
         # Email agent
         send_mail(
             subject=f"Viewing Scheduled for Lead: {user.profile.full_name}",
-            message=render_to_string("pages/notifications/viewing_schedule_agent.txt", context),
-            html_message=render_to_string("pages/notifications/viewing_schedule_agent.html", context),
+            message=render_to_string(
+                "pages/notifications/viewing_schedule_agent.txt",
+                context,
+            ),
+            html_message=render_to_string(
+                "pages/notifications/viewing_schedule_agent.html",
+                context,
+            ),
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[agent.email],
             fail_silently=False,
@@ -220,8 +266,11 @@ def process_viewing_scheduled(viewing):
                 "viewing_id": str(viewing.id),
                 "lead_id": str(lead.id),
                 "property_id": str(lead.property_link.id),
-            }
+            },
         )
 
     except Exception as e:
-        logger.error(f"Failed to process viewing scheduled notification: {str(e)}", exc_info=True)
+        logger.error(
+            f"Failed to process viewing scheduled notification: {e!s}",
+            exc_info=True,
+        )

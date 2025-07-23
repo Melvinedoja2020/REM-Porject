@@ -1,9 +1,9 @@
 (function ($) {
-  
+
     var tfLineChart = (function () {
-  
+
       var chartBar = function () {
-      
+
         var options = {
             series: [90, 35, 41],
             chart: {
@@ -43,23 +43,23 @@
           chart.render();
         }
       };
-  
+
       /* Function ============ */
       return {
         init: function () {},
-  
+
         load: function () {
           chartBar();
         },
         resize: function () {},
       };
     })();
-  
+
     jQuery(document).ready(function () {});
-  
+
     jQuery(window).on("load", function () {
       tfLineChart.load();
     });
-  
+
     jQuery(window).on("resize", function () {});
 })(jQuery);

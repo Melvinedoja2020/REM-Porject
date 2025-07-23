@@ -163,7 +163,7 @@
   }
 
   var box_search=function(){
-        
+
     $(document).on('click',function(e){
       var clickID=e.target.id;if((clickID!=='s')){
           $('.box-content-search').removeClass('active');
@@ -172,7 +172,7 @@
         var clickID=e.target.class;if((clickID!=='a111')){
             $('.show-search').removeClass('active');
     }});
-        
+
     $('.show-search').on('click',function(event){
       event.stopPropagation();}
     );
@@ -187,7 +187,7 @@
         $('.box-content-search').removeClass('active');
       }
     });
-   
+
   }
 
   var retinaLogos = function() {
@@ -199,7 +199,7 @@
           $('#logo_header').attr({src:'images/logo/logo@2x.png',width:'154px',height:'52px'});
         }
       }
-  };  
+  };
 
   var preloader = function () {
     setTimeout(function () {
@@ -226,7 +226,7 @@
     box_search();
     retinaLogos();
     preloader();
-    
+
   });
 
 })(jQuery);

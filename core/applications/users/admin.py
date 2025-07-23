@@ -6,10 +6,10 @@ from django.utils.translation import gettext_lazy as _
 
 from .forms import UserAdminChangeForm
 from .forms import UserAdminCreationForm
-from .models import (
-    User, UserProfile, AgentProfile, 
-    SocialMediaLinks
-)
+from .models import AgentProfile
+from .models import SocialMediaLinks
+from .models import User
+from .models import UserProfile
 
 if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
     # Force the `admin` sign in process to go through the `django-allauth` workflow:
@@ -59,6 +59,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ["user__name"]
     ordering = ["id"]
 
+
 @admin.register(AgentProfile)
 class AgentProfileAdmin(admin.ModelAdmin):
     list_display = ["user", "office_phone_no", "office_address"]
@@ -67,10 +68,13 @@ class AgentProfileAdmin(admin.ModelAdmin):
     actions = ["approve_agents"]
     ordering = ["id"]
 
+    @admin.action(
+        description="Approve selected agents",
+    )
     def approve_agents(self, request, queryset):
         queryset.update(verified=True)
         self.message_user(request, "Selected agents have been approved.")
-    approve_agents.short_description = "Approve selected agents"
+
 
 # @admin.register(RealEstateOwnerProfile)
 # class RealEstateOwnerProfileAdmin(admin.ModelAdmin):

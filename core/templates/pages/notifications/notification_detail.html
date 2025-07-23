@@ -22,7 +22,7 @@
                 </span>
             </div>
         </div>
-        
+
         <!-- Main Content -->
         <div class="px-6 py-6">
             <!-- Notification Content -->
@@ -38,17 +38,17 @@
                 </div>
             </div>
 
-            
+
         </div>
 
         <!-- Footer Actions -->
         <div class="px-6 py-4 bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4">
             <a href="{% url 'notification:notification_list' %}" class="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-                
+
                 Back to notifications
             </a>
             {% if notification.link %}
-            <a href="{{ notification.link }}" 
+            <a href="{{ notification.link }}"
                class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#E8960F] hover:bg-[#D4870E] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E8960F] transition-colors">
                 Take action
                 <svg class="ml-2 -mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

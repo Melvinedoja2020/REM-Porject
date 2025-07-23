@@ -64,7 +64,7 @@
         style: "mapbox://styles/mapbox/light-v11",
         center: [-74.003099, 40.709295],
         zoom: 13,
-        cooperativeGestures: true 
+        cooperativeGestures: true
     });
 
     // Add navigation controls
@@ -166,7 +166,7 @@
                  closeButton.addEventListener("click", () => {
                      markerContainer.classList.remove("clicked");
                      popup.remove();
-                 });      
+                 });
             }
 
         });

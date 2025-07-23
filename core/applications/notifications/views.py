@@ -1,17 +1,24 @@
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, ListView, View, DetailView
-
-from core.applications.notifications.forms import MessageForm, ReplyForm
-from core.applications.notifications.models import Message, Notification
-from django.contrib import messages as django_messages
-from django.db.models import Q
-
-from core.utils.utils import create_notification
-from core.helper.enums import NotificationType
 from django.contrib import messages
+from django.contrib import messages as django_messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.shortcuts import render
+from django.urls import reverse
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import View
+
+from core.applications.notifications.forms import MessageForm
+from core.applications.notifications.forms import ReplyForm
+from core.applications.notifications.models import Message
+from core.applications.notifications.models import Notification
+from core.helper.enums import NotificationType
+from core.utils.utils import create_notification
 
 # Create your views here.
 
@@ -19,22 +26,23 @@ from django.contrib import messages
 # views.py
 
 
-
 class MessageListView(LoginRequiredMixin, ListView):
     model = Message
-    template_name = 'pages/notifications/message_list.html'
-    context_object_name = 'messages'
-    ordering = ['-created_at']
+    template_name = "pages/notifications/message_list.html"
+    context_object_name = "messages"
+    ordering = ["-created_at"]
 
     def get_queryset(self):
         # Only messages sent or received by the user
         queryset = Message.objects.filter(
-            Q(sender=self.request.user) | Q(receiver=self.request.user)
-        ).order_by('-created_at')
+            Q(sender=self.request.user) | Q(receiver=self.request.user),
+        ).order_by("-created_at")
 
         # Mark unread received messages as read
-        Message.objects.filter(receiver=self.request.user, is_read=False).update(is_read=True)
-        
+        Message.objects.filter(receiver=self.request.user, is_read=False).update(
+            is_read=True,
+        )
+
         return queryset
 
 
@@ -43,30 +51,43 @@ class MessageDetailView(LoginRequiredMixin, View):
         message = get_object_or_404(Message, pk=pk)
 
         if request.user not in [message.sender, message.receiver]:
-            django_messages.error(request, "You don't have permission to view this message.")
-            return redirect('notification:message_list')
+            django_messages.error(
+                request,
+                "You don't have permission to view this message.",
+            )
+            return redirect("notification:message_list")
 
         if message.receiver == request.user:
             message.mark_as_read()
 
         form = ReplyForm()
-        return render(request, 'pages/notifications/message_detail.html', {
-            'message': message,
-            'form': form,
-            'replies': message.replies.all().order_by('created_at')
-        })
+        return render(
+            request,
+            "pages/notifications/message_detail.html",
+            {
+                "message": message,
+                "form": form,
+                "replies": message.replies.all().order_by("created_at"),
+            },
+        )
 
     def post(self, request, pk, *args, **kwargs):
         message = get_object_or_404(Message, pk=pk)
 
         if request.user not in [message.sender, message.receiver]:
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'success': False,
-                    'error': "You don't have permission to view this message."
-                }, status=403)
-            django_messages.error(request, "You don't have permission to view this message.")
-            return redirect('notification:message_list')
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "error": "You don't have permission to view this message.",
+                    },
+                    status=403,
+                )
+            django_messages.error(
+                request,
+                "You don't have permission to view this message.",
+            )
+            return redirect("notification:message_list")
 
         form = ReplyForm(request.POST)
         if form.is_valid():
@@ -86,77 +107,91 @@ class MessageDetailView(LoginRequiredMixin, View):
                 title=f"New message from {getattr(reply.sender, 'get_full_name', lambda: reply.sender.username)()}",
                 message=reply.message,
                 property=reply.property,
-                extra_data={'message_id': str(reply.id)},
+                extra_data={"message_id": str(reply.id)},
                 link=request.build_absolute_uri(
-                    reverse('notification:message_detail', kwargs={'pk': message.pk})
-                )
+                    reverse("notification:message_detail", kwargs={"pk": message.pk}),
+                ),
             )
 
-            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 # Get profile picture URL
-                profile_picture = ''
-                if hasattr(request.user, 'profile'):
+                profile_picture = ""
+                if hasattr(request.user, "profile"):
                     profile_picture = request.user.profile.get_profile_picture()
-                elif hasattr(request.user, 'agent_profile'):
+                elif hasattr(request.user, "agent_profile"):
                     profile_picture = request.user.agent_profile.get_profile_picture()
-                
-                return JsonResponse({
-                    'success': True,
-                    'sender_name': getattr(reply.sender, 'get_full_name', lambda: reply.sender.username)(),
-                    'sender_avatar': profile_picture,
-                    'message_content': reply.message,
-                    'created_at': reply.created_at.strftime("%b %d, %Y %H:%M")
-                })
+
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "sender_name": getattr(
+                            reply.sender,
+                            "get_full_name",
+                            lambda: reply.sender.username,
+                        )(),
+                        "sender_avatar": profile_picture,
+                        "message_content": reply.message,
+                        "created_at": reply.created_at.strftime("%b %d, %Y %H:%M"),
+                    },
+                )
 
             django_messages.success(request, "Your reply has been sent.")
-            return redirect('notification:message_detail', pk=message.pk)
+            return redirect("notification:message_detail", pk=message.pk)
 
         # Form is invalid
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({
-                'success': False,
-                'error': 'Invalid form data',
-                'errors': form.errors.get_json_data()
-            }, status=400)
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Invalid form data",
+                    "errors": form.errors.get_json_data(),
+                },
+                status=400,
+            )
 
-        return render(request, 'pages/notifications/message_detail.html', {
-            'message': message,
-            'form': form,
-            'replies': message.replies.all().order_by('created_at')
-        })
+        return render(
+            request,
+            "pages/notifications/message_detail.html",
+            {
+                "message": message,
+                "form": form,
+                "replies": message.replies.all().order_by("created_at"),
+            },
+        )
 
 
 class MessageCreateView(LoginRequiredMixin, CreateView):
     model = Message
     form_class = MessageForm
-    template_name = 'pages/notifications/message_form.html'
-    success_url = reverse_lazy('notification:message_list')
+    template_name = "pages/notifications/message_form.html"
+    success_url = reverse_lazy("notification:message_list")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['sender'] = self.request.user
-        
+        kwargs["sender"] = self.request.user
+
         # If this is a GET request and receiver_id is in kwargs
-        if self.request.method == 'GET' and 'receiver_id' in self.kwargs:
-            initial = kwargs.get('initial', {})
-            initial['receiver'] = self.kwargs['receiver_id']
-            kwargs['initial'] = initial
-            
+        if self.request.method == "GET" and "receiver_id" in self.kwargs:
+            initial = kwargs.get("initial", {})
+            initial["receiver"] = self.kwargs["receiver_id"]
+            kwargs["initial"] = initial
+
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         # If receiver_id is provided, get the agent's profile
-        if 'receiver_id' in self.kwargs:
+        if "receiver_id" in self.kwargs:
             from core.applications.users.models import AgentProfile
+
             try:
-                agent = AgentProfile.objects.get(user_id=self.kwargs['receiver_id'])
-                context['recipient'] = agent
-                context['title'] = f"Message {agent.user.name}"
+                agent = AgentProfile.objects.get(user_id=self.kwargs["receiver_id"])
+                context["recipient"] = agent
+                context["title"] = f"Message {agent.user.name}"
             except AgentProfile.DoesNotExist:
                 pass
-                
+
         return context
 
     def form_valid(self, form):
@@ -173,7 +208,7 @@ class NotificationListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Notification.objects.filter(
-            user=self.request.user
+            user=self.request.user,
         )
 
 
@@ -184,7 +219,7 @@ class NotificationDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return Notification.objects.filter(
-            user=self.request.user
+            user=self.request.user,
         )
 
     def get(self, request, *args, **kwargs):
@@ -200,10 +235,12 @@ class NotificationDetailView(LoginRequiredMixin, DetailView):
 
         return super().get(request, *args, **kwargs)
 
+
 class MarkAllNotificationsReadView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         notifications = Notification.objects.filter(
-            user=request.user, is_read=False
+            user=request.user,
+            is_read=False,
         )
         notifications.update(is_read=True)
         messages.success(request, "All notifications marked as read.")

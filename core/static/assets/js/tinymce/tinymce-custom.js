@@ -20,10 +20,7 @@ $(document).ready(function () {
                 {title: 'Table styles'},
                 {title: 'Table row 1', selector: 'tr', classes: 'tablerow1'}
             ],
-            
+
         });
     }
 });
-
-
-  

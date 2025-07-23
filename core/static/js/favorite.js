@@ -8,15 +8,15 @@ async function handleFavoriteToggle(e) {
   if (!btn) return;
 
   e.preventDefault();
-  
+
   // Visual feedback: Disable button during processing
   btn.disabled = true;
   const icon = btn.querySelector('i');
   const tooltip = btn.querySelector('.tooltip');
-  
+
   // Add loading state
   icon.classList.add('opacity-75');
-  
+
   try {
     const response = await fetch("/property/favorite/", {
       method: "POST",
@@ -32,7 +32,7 @@ async function handleFavoriteToggle(e) {
 
     // Update UI based on response
     updateButtonState(btn, icon, tooltip, data.status);
-    
+
     // Visual confirmation
     if (data.status === 'added') {
       icon.classList.add('animate-pop');
@@ -50,13 +50,13 @@ async function handleFavoriteToggle(e) {
 // Helper functions
 function updateButtonState(btn, icon, tooltip, action) {
   const isAdded = action === 'added';
-  
+
   // Toggle classes more efficiently
   icon.classList.toggle('icon-save', !isAdded);
   icon.classList.toggle('icon-save-filled', isAdded);
   icon.classList.toggle('text-gray-400', !isAdded);
   icon.classList.toggle('text-red-500', isAdded);
-  
+
   // Update accessibility attributes
   btn.setAttribute('aria-pressed', isAdded);
   btn.title = isAdded ? 'Remove from Favorites (click to undo)' : 'Add to Favorites';

@@ -1,9 +1,15 @@
-from django.utils import timezone
 from django import forms
-from core.applications.property.models import Amenity, Lead, Property, PropertyImage, PropertySubscription, PropertyType, PropertyViewing
-from core.helper.enums import PropertyListingType, PropertyTypeChoices
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
+from core.applications.property.models import Amenity
+from core.applications.property.models import Lead
+from core.applications.property.models import Property
+from core.applications.property.models import PropertyImage
+from core.applications.property.models import PropertySubscription
+from core.applications.property.models import PropertyType
+from core.applications.property.models import PropertyViewing
+from core.helper.enums import PropertyTypeChoices
 
 
 class PropertyForm(forms.ModelForm):
@@ -22,70 +28,105 @@ class PropertyForm(forms.ModelForm):
     # )
     property_type = forms.ChoiceField(
         choices=PropertyTypeChoices.choices,
-        widget=forms.Select(attrs={
-            "class": "mb-10",
-            "id": "property_type_select"
-        }),
-        label="Property Type"
+        widget=forms.Select(
+            attrs={
+                "class": "mb-10",
+                "id": "property_type_select",
+            },
+        ),
+        label="Property Type",
     )
     new_property_type = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={
-            "class": "mb-10", "id": "new_property_type_input", 
-            "placeholder": "Enter new property type"
-        }),
-        label="New Property Type (optional)"
+        widget=forms.TextInput(
+            attrs={
+                "class": "mb-10",
+                "id": "new_property_type_input",
+                "placeholder": "Enter new property type",
+            },
+        ),
+        label="New Property Type (optional)",
     )
+
     class Meta:
         model = Property
         fields = [
-            "title", "description", "property_type", 
-            "price", "location", "bedrooms", "bathrooms", 
-            "sqft", "is_available", "amenities", 
-            "new_property_type"
+            "title",
+            "description",
+            "property_type",
+            "price",
+            "location",
+            "bedrooms",
+            "bathrooms",
+            "sqft",
+            "is_available",
+            "amenities",
+            "new_property_type",
+            "cover_image",
         ]
         widgets = {
-            "title": forms.TextInput(attrs={
-                "placeholder": "Enter property title",
-                "class": "mb-10",
-            }),
-            "description": forms.Textarea(attrs={
-                "placeholder": "Enter property description",
-                "class": "mb-10",
-                "rows": 4,
-            }),
+            "title": forms.TextInput(
+                attrs={
+                    "placeholder": "Enter property title",
+                    "class": "mb-10",
+                },
+            ),
+            "cover_image": forms.ClearableFileInput(
+                attrs={
+                    "class": "mb-10",
+                    "accept": "image/*",
+                },
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "placeholder": "Enter property description",
+                    "class": "mb-10 form-control",
+                    "rows": 4,
+                },
+            ),
             # "property_type": forms.Select(attrs={
-                  
             # }),
-            "price": forms.NumberInput(attrs={
-                "placeholder": "Enter price",
-                "class": "mb-10",
-                "min": "0",
-                "step": "0.01",  
-            }),
-            "location": forms.TextInput(attrs={
-                "placeholder": "Enter location",
-                "class": "mb-10",
-            }),
-            "bedrooms": forms.NumberInput(attrs={
-                "class": "mb-10",
-                "min": "0",
-                "step": "1",
-            }),
-            "bathrooms": forms.NumberInput(attrs={
-                "class": "mb-10",
-                "min": "0",
-                "step": "1",
-            }),
-            "sqft": forms.NumberInput(attrs={
-                "placeholder": "Enter size in sqft",
-                "class": "mb-10",
-                "min": "0",
-                "step": "1",
-            }),
-            "is_available": forms.CheckboxInput(attrs={
-                "class": "mb-10",
-            }),
+            "price": forms.NumberInput(
+                attrs={
+                    "placeholder": "Enter price",
+                    "class": "mb-10",
+                    "min": "0",
+                    "step": "0.01",
+                },
+            ),
+            "location": forms.TextInput(
+                attrs={
+                    "placeholder": "Enter location",
+                    "class": "mb-10",
+                },
+            ),
+            "bedrooms": forms.NumberInput(
+                attrs={
+                    "class": "mb-10",
+                    "min": "0",
+                    "step": "1",
+                },
+            ),
+            "bathrooms": forms.NumberInput(
+                attrs={
+                    "class": "mb-10",
+                    "min": "0",
+                    "step": "1",
+                },
+            ),
+            "sqft": forms.NumberInput(
+                attrs={
+                    "placeholder": "Enter size in sqft",
+                    "class": "mb-10",
+                    "min": "0",
+                    "step": "1",
+                },
+            ),
+            "is_available": forms.CheckboxInput(
+                attrs={
+                    "class": "mb-10",
+                },
+            ),
         }
 
     def clean_price(self):
@@ -111,7 +152,7 @@ class PropertyForm(forms.ModelForm):
         if not property_type and not new_property_type:
             raise forms.ValidationError(
                 "Please select a property type or enter a new one.",
-                code="missing_property_type"
+                code="missing_property_type",
             )
 
         # If new property type is entered
@@ -120,12 +161,12 @@ class PropertyForm(forms.ModelForm):
             if len(new_property_type) < 3:
                 raise forms.ValidationError(
                     "Property type must be at least 3 characters.",
-                    code="invalid_property_type_length"
+                    code="invalid_property_type_length",
                 )
 
             # Check for existing type (case insensitive)
             existing_type = PropertyType.objects.filter(
-                title__iexact=new_property_type
+                title__iexact=new_property_type,
             ).first()
 
             if existing_type:
@@ -150,21 +191,27 @@ class PropertyForm(forms.ModelForm):
         instance = super().save(commit=False)
         if not instance.property_type and hasattr(self, "cleaned_data"):
             instance.property_type = self.cleaned_data.get("property_type")
-        
+
         if commit:
             instance.save()
             self.save_m2m()  # Don"t forget this for ManyToMany fields
-            
+
         return instance
-    
+
 
 class PropertyImageForm(forms.ModelForm):
-    image = forms.FileField(widget = forms.TextInput(attrs={
-            "name": "images",
-            "type": "File",
-            "class": "form-control",
-            "multiple": "True",
-        }), label = "")
+    image = forms.FileField(
+        widget=forms.TextInput(
+            attrs={
+                "name": "images",
+                "type": "File",
+                "class": "form-control",
+                "multiple": "True",
+            },
+        ),
+        label="",
+    )
+
     class Meta:
         model = PropertyImage
         fields = ["property", "image"]
@@ -179,19 +226,22 @@ class PropertySearchForm(forms.Form):
     property_type = forms.ChoiceField(
         choices=[("", "Any")] + list(PropertyTypeChoices.choices),
         required=False,
-        label="Listing Type"
+        label="Listing Type",
     )
     min_price = forms.DecimalField(label="Min Price", required=False, min_value=0)
     max_price = forms.DecimalField(label="Max Price", required=False, min_value=0)
     min_bedrooms = forms.IntegerField(label="Min Bedrooms", required=False, min_value=0)
-    min_bathrooms = forms.IntegerField(label="Min Bathrooms", required=False, min_value=0)
-    amenities = forms.ModelMultipleChoiceField(
-        queryset=Amenity.objects.all(), 
-        required=False, 
-        widget=forms.CheckboxSelectMultiple,
-        label="Amenities"
+    min_bathrooms = forms.IntegerField(
+        label="Min Bathrooms",
+        required=False,
+        min_value=0,
     )
-
+    amenities = forms.ModelMultipleChoiceField(
+        queryset=Amenity.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="Amenities",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -203,18 +253,23 @@ class PropertySearchForm(forms.Form):
             else:
                 field.widget.attrs.update({"class": "form-control"})
 
+
 class PropertySubscriptionForm(forms.ModelForm):
     class Meta:
         model = PropertySubscription
         fields = ["location", "property_type"]
         widgets = {
-            "location": forms.TextInput(attrs={
-                "placeholder": "Enter location",
-                "class": "flex-grow",
-            }),
-            "property_type": forms.Select(attrs={
-                "class": "flex-grow",
-            }),
+            "location": forms.TextInput(
+                attrs={
+                    "placeholder": "Enter location",
+                    "class": "flex-grow",
+                },
+            ),
+            "property_type": forms.Select(
+                attrs={
+                    "class": "flex-grow",
+                },
+            ),
         }
 
 
@@ -234,15 +289,15 @@ class LeadCreateForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         property_link = cleaned_data.get("property_link")
-        
+
         if self.user and property_link:
             if Lead.objects.filter(
                 user=self.user,
-                property_link=property_link
+                property_link=property_link,
             ).exists():
                 raise ValidationError(
                     "You already have an existing lead for this property. "
-                    "Please check your leads list or contact the agent."
+                    "Please check your leads list or contact the agent.",
                 )
         return cleaned_data
 
@@ -253,12 +308,15 @@ class LeadStatusForm(forms.ModelForm):
         fields = ["status", "notes"]
         widgets = {
             "status": forms.Select(attrs={"class": "form-select"}),
-            "notes": forms.Textarea(attrs={
-                "rows": 3,
-                "class": "form-control",
-                "placeholder": "Add private notes..."
-            })
+            "notes": forms.Textarea(
+                attrs={
+                    "rows": 3,
+                    "class": "form-control",
+                    "placeholder": "Add private notes...",
+                },
+            ),
         }
+
 
 class ViewingScheduleForm(forms.ModelForm):
     class Meta:
@@ -269,9 +327,9 @@ class ViewingScheduleForm(forms.ModelForm):
                 attrs={
                     "type": "datetime-local",
                     "class": "form-control",
-                    "min": timezone.now().strftime("%Y-%m-%dT%H:%M")
-                }
-            )
+                    "min": timezone.now().strftime("%Y-%m-%dT%H:%M"),
+                },
+            ),
         }
 
     def clean_scheduled_time(self):
@@ -279,4 +337,3 @@ class ViewingScheduleForm(forms.ModelForm):
         if scheduled_time < timezone.now():
             raise ValidationError("Viewing time cannot be in the past")
         return scheduled_time
-

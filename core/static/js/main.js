@@ -242,7 +242,7 @@
         }
     };
 
-    /* Delete image 
+    /* Delete image
   -------------------------------------------------------------------------------------*/
     var deleteImg = function (e) {
         if ($(".remove-file").length > 0) {
@@ -254,7 +254,7 @@
         }
     };
 
-    /* parallaxImage 
+    /* parallaxImage
   -------------------------------------------------------------------------------------*/
     var parallaxImage = function () {
         if ($(".parallax-img").length > 0) {
@@ -780,7 +780,7 @@
         });
     };
 
-    /* Parallaxie js 
+    /* Parallaxie js
     -------------------------------------------------------------------------------------*/
 
     var parallaxie = function () {
@@ -839,7 +839,7 @@
             });
         }
     };
-    
+
     var fadeLeft = function () {
         if ($(".fadeLeft").length) {
             gsap.set(".fadeLeft", { x: -20, opacity: 0 });

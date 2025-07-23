@@ -1,19 +1,42 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
-from core.applications.property.models import (
-    Property, PropertyImage, Amenity, 
-    PropertyType, FavoriteProperty, PropertySubscription, Lead
-)
+from core.applications.property.models import Amenity
+from core.applications.property.models import FavoriteProperty
+from core.applications.property.models import Lead
+from core.applications.property.models import Property
+from core.applications.property.models import PropertyImage
+from core.applications.property.models import PropertySubscription
+from core.applications.property.models import PropertyType
 
 # Register your models here.
 
+
+class PropertyImageInline(admin.TabularInline):
+    model = PropertyImage
+    extra = 1
+
+
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
+    inlines = [PropertyImageInline]
     list_display = ["title", "price", "location", "is_available"]
     search_fields = ["title", "location"]
     list_filter = ["is_available", "property_type"]
     ordering = ["-created_at"]
     filter_horizontal = ["amenities"]
+
+    def cover_image_preview(self, obj):
+        """
+        Returns a preview of the cover image for the property.
+        If no cover image is set, returns a placeholder.
+        """
+        if obj.cover:
+            return format_html(
+                '<img src="{}" width="100" />',
+                obj.cover.image.url,
+            )
+        return "-"
 
 
 @admin.register(PropertyImage)
@@ -36,6 +59,7 @@ class PropertyTypeAdmin(admin.ModelAdmin):
     search_fields = ["title"]
     ordering = ["-created_at"]
 
+
 @admin.register(FavoriteProperty)
 class FavoritePropertyAdmin(admin.ModelAdmin):
     list_display = ["user", "property"]
@@ -51,11 +75,10 @@ class PropertySubscriptionAdmin(admin.ModelAdmin):
     ordering = ["-created_at"]
     list_filter = ["user", "property_type"]
 
+
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
     list_display = ["property_link", "user", "status"]
     search_fields = ["property_link", "user__username"]
     ordering = ["-created_at"]
     list_filter = ["status", "property_link"]
-
-    

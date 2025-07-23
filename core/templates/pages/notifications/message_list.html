@@ -74,12 +74,12 @@
           <div class="d-flex align-items-start">
             <div class="position-relative me-3">
               {% if message.sender.agent_profile %}
-                <img src="{{ message.sender.agent_profile.get_profile_picture }}" 
-                     alt="{{ message.sender.name }}" 
+                <img src="{{ message.sender.agent_profile.get_profile_picture }}"
+                     alt="{{ message.sender.name }}"
                      class="rounded-circle message-avatar">
               {% else %}
-                <img src="{{ message.sender.profile.get_profile_picture }}" 
-                     alt="{{ message.sender.name }}" 
+                <img src="{{ message.sender.profile.get_profile_picture }}"
+                     alt="{{ message.sender.name }}"
                      class="rounded-circle message-avatar">
               {% endif %}
               {% if not message.is_read and message.receiver == request.user %}

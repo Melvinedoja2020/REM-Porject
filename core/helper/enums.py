@@ -25,7 +25,6 @@ class PropertyTypeChoices(TextChoices):
     OTHER = ("other", "Other")
 
 
-
 class Lead_Status_Choices(TextChoices):
     NEW = ("New", "New")
     CONTRACTED = ("Contacted", "Contacted")
@@ -59,7 +58,6 @@ class VerificationStatusChoices(TextChoices):
     PENDING = "pending", "Pending"
     VERIFIED = "verified", "Verified"
     REJECTED = "rejected", "Rejected"
-    
 
 
 class NotificationType(TextChoices):
@@ -72,10 +70,12 @@ class NotificationType(TextChoices):
     VIEWING_UPDATE = ("Viewing Update", "Viewing Update")
     NEW_LEAD = ("New Lead", "New Lead")
 
+
 class PropertyViewingChoices(TextChoices):
     PENDING = ("Pending", "Pending")
     CONFIRMED = ("Confirmed", "Confirmed")
     CANCELLED = ("Cancelled", "Cancelled")
+
 
 class LeadStatus(TextChoices):
     NEW = "NEW", "New Lead"
@@ -83,7 +83,6 @@ class LeadStatus(TextChoices):
     VIEWING_SCHEDULED = "VIEWING_SCHEDULED", "Viewing Scheduled"
     FOLLOW_UP = "FOLLOW_UP", "Follow Up Required"
     CLOSED = "CLOSED", "Closed"
-
 
 
 ICON_CLASSES = {

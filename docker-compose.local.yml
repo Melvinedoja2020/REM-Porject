@@ -1,7 +1,7 @@
 volumes:
   real_estate_market_place_local_postgres_data: {}
   real_estate_market_place_local_postgres_data_backups: {}
-  
+
 
 services:
   django:

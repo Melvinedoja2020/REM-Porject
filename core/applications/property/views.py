@@ -1,40 +1,60 @@
-import uuid
-from django.http import Http404, JsonResponse
-from django.shortcuts import get_object_or_404, render
-from django.views.generic import (
-    CreateView, UpdateView, ListView, DetailView, DeleteView,
-    FormView
-)
-from django.views import View
-from django.shortcuts import get_object_or_404
-# from core.applications.notifications.utils.notifications import notify_new_property_listing, notify_price_change
-from core.applications.property.forms import LeadCreateForm, LeadStatusForm, PropertyForm, PropertyImageForm, PropertySubscriptionForm, ViewingScheduleForm
-from core.applications.property.models import FavoriteProperty, Lead, Property, PropertyImage, PropertySubscription, PropertyType, PropertyViewing
-from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib import messages
-from django.shortcuts import redirect
-
-from core.helper.enums import Lead_Status_Choices, LeadStatus, PropertyListingType, UserRoleChoice
-from core.helper.mixins import AgentApprovalRequiredMixin, AgentRequiredMixin
-from django.db import IntegrityError, transaction
-from django.db.models import Q
-from django.core.exceptions import ValidationError
-
-from core.utils.notifications import notify_new_property_listing, notify_price_change
-from django.core.exceptions import PermissionDenied
-
-from core.utils.utils import process_new_lead, process_viewing_scheduled
 # Create your views here.
-
-
 import logging
+import uuid
+
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.db import transaction
+from django.db.models import Q
+from django.http import Http404
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import DetailView
+from django.views.generic import FormView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
+
+# from core.applications.notifications.utils.notifications import notify_new_property_listing, notify_price_change
+from core.applications.property.forms import LeadCreateForm
+from core.applications.property.forms import LeadStatusForm
+from core.applications.property.forms import PropertyForm
+from core.applications.property.forms import PropertyImageForm
+from core.applications.property.forms import PropertySubscriptionForm
+from core.applications.property.forms import ViewingScheduleForm
+from core.applications.property.models import FavoriteProperty
+from core.applications.property.models import Lead
+from core.applications.property.models import Property
+from core.applications.property.models import PropertyImage
+from core.applications.property.models import PropertySubscription
+from core.applications.property.models import PropertyType
+from core.applications.property.models import PropertyViewing
+from core.helper.enums import Lead_Status_Choices
+from core.helper.enums import LeadStatus
+from core.helper.enums import PropertyListingType
+from core.helper.enums import UserRoleChoice
+from core.helper.mixins import AgentApprovalRequiredMixin
+from core.utils.notifications import notify_new_property_listing
+from core.utils.notifications import notify_price_change
+from core.utils.utils import process_new_lead
+from core.utils.utils import process_viewing_scheduled
+
 logger = logging.getLogger(__name__)
 
 
 class PropertyCreateView(
-    LoginRequiredMixin, UserPassesTestMixin,
-    AgentApprovalRequiredMixin, CreateView
+    LoginRequiredMixin,
+    UserPassesTestMixin,
+    AgentApprovalRequiredMixin,
+    CreateView,
 ):
     model = Property
     form_class = PropertyForm
@@ -67,7 +87,7 @@ class PropertyCreateView(
         # Notify subscribers if property is available
         if self.object.is_available:
             notify_new_property_listing(self.object)
-            
+
         # Handle multiple image uploads
         images = self.request.FILES.getlist("images")
         for image in images:
@@ -75,15 +95,19 @@ class PropertyCreateView(
 
         messages.success(self.request, "Property created successfully!")
         return response
-    
 
     def form_invalid(self, form):
         print("❌ Form invalid. Errors:", form.errors)
         messages.error(self.request, "Error creating property. Please check the form.")
         return super().form_invalid(form)
-    
 
-class PropertyUpdateView(LoginRequiredMixin, AgentApprovalRequiredMixin, UserPassesTestMixin, UpdateView):
+
+class PropertyUpdateView(
+    LoginRequiredMixin,
+    AgentApprovalRequiredMixin,
+    UserPassesTestMixin,
+    UpdateView,
+):
     model = Property
     form_class = PropertyForm
     template_name = "pages/dashboard/create_property.html"
@@ -91,7 +115,9 @@ class PropertyUpdateView(LoginRequiredMixin, AgentApprovalRequiredMixin, UserPas
 
     def test_func(self):
         # Ensure user is an agent and owns the property
-        is_agent = getattr(self.request.user, "role", None) == UserRoleChoice.AGENT.value
+        is_agent = (
+            getattr(self.request.user, "role", None) == UserRoleChoice.AGENT.value
+        )
         is_owner = self.get_object().agent == self.request.user.agent_profile
         return is_agent and is_owner
 
@@ -103,9 +129,11 @@ class PropertyUpdateView(LoginRequiredMixin, AgentApprovalRequiredMixin, UserPas
         property_instance = self.get_object()
         old_price = property_instance.price
 
-        new_property_type = form.cleaned_data.get('new_property_type')
+        new_property_type = form.cleaned_data.get("new_property_type")
         if new_property_type:
-            property_type = PropertyType.objects.filter(title__iexact=new_property_type).first()
+            property_type = PropertyType.objects.filter(
+                title__iexact=new_property_type,
+            ).first()
             if not property_type:
                 property_type = PropertyType.objects.create(title=new_property_type)
             form.instance.property_type = property_type
@@ -136,7 +164,6 @@ class PropertyDetailView(DetailView):
     model = Property
     template_name = "pages/dashboard/property_detail.html"
     context_object_name = "property"
-    
 
 
 class PropertyListView(LoginRequiredMixin, ListView):
@@ -151,7 +178,7 @@ class PropertyListView(LoginRequiredMixin, ListView):
         if hasattr(user, "agent_profile"):
             return Property.objects.filter(
                 is_available=True,
-                agent=user.agent_profile
+                agent=user.agent_profile,
             ).order_by("-id")
         return Property.objects.none()
 
@@ -173,7 +200,6 @@ class PropertyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, "Property deleted successfully!")
         return super().delete(request, *args, **kwargs)
-    
 
 
 class PropertyImageCreateView(LoginRequiredMixin, CreateView):
@@ -212,7 +238,7 @@ class PropertyImageDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteVie
 def upload_property_images(request, property_id):
     if request.method == "POST" and request.FILES:
         property_obj = get_object_or_404(Property, id=property_id)
-        
+
         images = request.FILES.getlist("images")
         for image in images:
             PropertyImage.objects.create(property=property_obj, image=image)
@@ -220,9 +246,6 @@ def upload_property_images(request, property_id):
         return JsonResponse({"message": "Images uploaded successfully!"}, status=200)
 
     return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-
 
 
 class FavoriteListView(LoginRequiredMixin, ListView):
@@ -236,6 +259,7 @@ class FavoriteListView(LoginRequiredMixin, ListView):
             .select_related("property")
             .prefetch_related("property__images", "property__amenities")
         )
+
 
 # class FavoriteDetailView(LoginRequiredMixin, DetailView):
 #     model = FavoriteProperty
@@ -355,6 +379,7 @@ class FavoriteListView(LoginRequiredMixin, ListView):
 #         )
 #         return self.render_to_response(self.get_context_data(form=form))
 
+
 # views.py
 class FavoriteLeadCreateView(LoginRequiredMixin, CreateView):
     model = Lead
@@ -370,7 +395,7 @@ class FavoriteLeadCreateView(LoginRequiredMixin, CreateView):
         return get_object_or_404(
             FavoriteProperty.objects.select_related("property"),
             pk=self.kwargs["pk"],
-            user=self.request.user
+            user=self.request.user,
         )
 
     def get_form_kwargs(self):
@@ -387,16 +412,20 @@ class FavoriteLeadCreateView(LoginRequiredMixin, CreateView):
         try:
             property_link = form.cleaned_data["property_link"]
 
-            existing_lead = Lead.objects.select_for_update().filter(
-                user=self.request.user,
-                property_link=property_link
-            ).first()
+            existing_lead = (
+                Lead.objects.select_for_update()
+                .filter(
+                    user=self.request.user,
+                    property_link=property_link,
+                )
+                .first()
+            )
 
             if existing_lead:
                 messages.info(
                     self.request,
                     self.get_existing_lead_message(existing_lead),
-                    extra_tags='alert-info'
+                    extra_tags="alert-info",
                 )
                 return redirect(existing_lead.get_absolute_url())
 
@@ -405,13 +434,15 @@ class FavoriteLeadCreateView(LoginRequiredMixin, CreateView):
 
             response = super().form_valid(form)
 
-            logger.debug(f"Calling process_new_lead for lead ID <<<>>> {self.object.id}")
+            logger.debug(
+                f"Calling process_new_lead for lead ID <<<>>> {self.object.id}",
+            )
             process_new_lead(self.object)
 
             messages.success(
                 self.request,
                 self.get_success_message(),
-                extra_tags='alert-success'
+                extra_tags="alert-success",
             )
             return response
 
@@ -439,27 +470,27 @@ class FavoriteLeadCreateView(LoginRequiredMixin, CreateView):
             self.request,
             "This lead could not be created due to a system error. "
             "Our team has been notified.",
-            extra_tags='alert-danger'
+            extra_tags="alert-danger",
         )
-        logger.error(f"Lead creation integrity error: {str(error)}", exc_info=True)
+        logger.error(f"Lead creation integrity error: {error!s}", exc_info=True)
         return self.form_invalid(form)
-
 
 
 class FavoriteDeleteView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         favorite = get_object_or_404(
-            FavoriteProperty, pk=kwargs['pk'], 
-            user=request.user
+            FavoriteProperty,
+            pk=kwargs["pk"],
+            user=request.user,
         )
         favorite.delete()
         return redirect("property:customers_favorite_list")
+
 
 class PropertySubscriptionListView(LoginRequiredMixin, ListView):
     model = PropertySubscription
     template_name = "subscriptions/list.html"
     context_object_name = "subscriptions"
-    
 
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user)
@@ -469,7 +500,7 @@ class CreatePropertySubscriptionView(LoginRequiredMixin, FormView):
     form_class = PropertySubscriptionForm
     template_name = "pages/dashboard/subscription_form.html"
     success_url = reverse_lazy("users:user_dashboard")
-    
+
     def form_valid(self, form):
         subscription, created = PropertySubscription.objects.get_or_create(
             user=self.request.user,
@@ -477,13 +508,22 @@ class CreatePropertySubscriptionView(LoginRequiredMixin, FormView):
             property_type=form.cleaned_data["property_type"],
         )
         if created:
-            messages.success(self.request, "✅ Subscribed successfully to property alerts.")
+            messages.success(
+                self.request,
+                "✅ Subscribed successfully to property alerts.",
+            )
         else:
-            messages.info(self.request, "ℹ️ You’re already subscribed to this preference.")
+            messages.info(
+                self.request,
+                "ℹ️ You’re already subscribed to this preference.",
+            )
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        messages.error(self.request, "❌ There was an error with your subscription. Please try again.")
+        messages.error(
+            self.request,
+            "❌ There was an error with your subscription. Please try again.",
+        )
         return super().form_invalid(form)
 
 
@@ -504,7 +544,7 @@ class PropertySubscriptionDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user)
-    
+
 
 class LeadListView(LoginRequiredMixin, ListView):
     model = Lead
@@ -523,9 +563,12 @@ class LeadListView(LoginRequiredMixin, ListView):
 
         # Filter leads by properties that belong to this agent
         queryset = Lead.objects.filter(
-            property_link__agent=agent_profile
+            property_link__agent=agent_profile,
         ).select_related(
-            "user", "property_link", "property_link__agent__user", "scheduled_viewing"
+            "user",
+            "property_link",
+            "property_link__agent__user",
+            "scheduled_viewing",
         )
 
         # Optional: Filter by status
@@ -537,13 +580,13 @@ class LeadListView(LoginRequiredMixin, ListView):
         search = self.request.GET.get("search")
         if search:
             queryset = queryset.filter(
-                Q(user__email__icontains=search) |
-                Q(property_link__title__icontains=search)
+                Q(user__email__icontains=search)
+                | Q(property_link__title__icontains=search),
             )
 
         return queryset.order_by("-created_at")
-   
-  
+
+
 class LeadDetailView(AgentApprovalRequiredMixin, DetailView):
     model = Lead
     template_name = "pages/property/lead_detail.html"
@@ -565,7 +608,7 @@ class LeadDetailView(AgentApprovalRequiredMixin, DetailView):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        if hasattr(self.request.user, 'agent_profile'):
+        if hasattr(self.request.user, "agent_profile"):
             return qs.filter(property_link__agent=self.request.user.agent_profile)
         return qs.none()
 
@@ -574,6 +617,7 @@ class LeadDetailView(AgentApprovalRequiredMixin, DetailView):
         context["status_choices"] = Lead_Status_Choices.choices
         return context
 
+
 class LeadUpdateView(LoginRequiredMixin, UpdateView):
     model = Lead
     form_class = LeadCreateForm
@@ -581,9 +625,14 @@ class LeadUpdateView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = "pk"
 
     def get_queryset(self):
-        return super().get_queryset().filter(
-            agent=self.request.user.agent_profile
-        ).select_related("property_link", "user")
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                agent=self.request.user.agent_profile,
+            )
+            .select_related("property_link", "user")
+        )
 
     def form_valid(self, form):
         messages.success(self.request, "Lead updated successfully")
@@ -591,11 +640,12 @@ class LeadUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy("property:lead_detail", kwargs={"pk": self.object.pk})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["property"] = self.object.property_link
         return context
-    
+
 
 class ViewingScheduleView(AgentApprovalRequiredMixin, CreateView):
     model = PropertyViewing
@@ -607,14 +657,14 @@ class ViewingScheduleView(AgentApprovalRequiredMixin, CreateView):
         self.lead = get_object_or_404(
             Lead,
             pk=kwargs["pk"],
-            agent=request.user.agent_profile
+            agent=request.user.agent_profile,
         )
         # Store the lead ID in the view instance
         self.lead_id = kwargs["pk"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['lead'] = self.lead
+        context["lead"] = self.lead
         return context
 
     def form_valid(self, form):
@@ -633,11 +683,11 @@ class ViewingScheduleView(AgentApprovalRequiredMixin, CreateView):
         messages.success(self.request, "Viewing scheduled successfully")
         return redirect(self.get_success_url())
 
-
     def get_success_url(self):
         # Use the stored lead_id to generate the URL
         return reverse_lazy("property:lead_detail", kwargs={"pk": self.lead_id})
-    
+
+
 class LeadStatusUpdateView(LoginRequiredMixin, UpdateView):
     model = Lead
     form_class = LeadStatusForm

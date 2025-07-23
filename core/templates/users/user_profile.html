@@ -190,7 +190,7 @@
           <div class="box-agent-account">
             <h6>My Profile</h6>
             <p class="note">Dear {{ request.user.name }}, <br>
-              You are welcome please do well to fill up your profile 
+              You are welcome please do well to fill up your profile
 
             </p>
 
@@ -198,11 +198,11 @@
         </div>
         <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
-        
+
           <!-- === Section 1: Basic Info === -->
           <div class="box">
             <h4 class="title">Basic Information <small class="text-muted">(Required)</small></h4>
-        
+
             <!-- Profile Picture Upload -->
             <div class="box-agent-avt">
               <div class="img-poster">
@@ -216,33 +216,33 @@
                 <span class="text-muted">JPEG, recommended size 100x100</span>
               </div>
             </div>
-        
+
             <!-- Name (readonly) -->
             <fieldset class="box box-fieldset">
               <label for="name">Full Name:<span>*</span></label>
               <input type="text" id="name" value="{{ request.user.name }}" class="form-control" readonly>
             </fieldset>
-        
+
             <!-- Phone -->
             <fieldset class="box box-fieldset">
               <label>{{ form.phone_number.label }}:<span>*</span></label>
               {{ form.phone_number }}
             </fieldset>
-        
+
             <!-- Address -->
             <fieldset class="box box-fieldset">
               <label>{{ form.address.label }}:<span>*</span></label>
               {{ form.address }}
             </fieldset>
           </div>
-        
+
           <!-- === Section 2: Preferences (Optional) === -->
           <div class="box mt-5">
             <h4 class="title">Preferences <small class="text-muted">(Optional)</small></h4>
             <p class="text-muted small">
               These preferences help us personalize your experience. You can update them anytime.
             </p>
-        
+
             <div class="grid-layout-2 gap-30">
               <div class="box-fieldset">
                 <label>{{ form.preferred_location.label }}</label>
@@ -253,7 +253,7 @@
                 {{ form.preferred_property_type }}
               </div>
             </div>
-        
+
             <div class="grid-layout-2 gap-30">
               <div class="box-fieldset">
                 <label>{{ form.min_budget.label }}</label>
@@ -264,18 +264,18 @@
                 {{ form.max_budget }}
               </div>
             </div>
-        
+
             <div class="box-fieldset">
               <label>{{ form.preferred_features.label }}</label>
               {{ form.preferred_features }}
             </div>
           </div>
-        
+
           <!-- === Section 3: Social Media (Optional) === -->
           <div class="box mt-5">
             <h4 class="title">Social Media <small class="text-muted">(Optional)</small></h4>
             <p class="text-muted small">Optional — Add links to personalize your profile even more.</p>
-        
+
             <div class="grid-layout-3 gap-30">
               <div class="box-fieldset">
                 <label>{{ social_media_form.facebook.label }}</label>
@@ -291,13 +291,13 @@
               </div>
             </div>
           </div>
-        
+
           <!-- === Submit Button === -->
           <div class="box mt-4">
             <button type="submit" class="tf-btn bg-color-primary pd-10">Save & Update</button>
           </div>
         </form>
-        
-        
+
+
       </div>
       {% endblock content %}

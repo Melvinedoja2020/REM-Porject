@@ -1,14 +1,9 @@
 from django.db.models import Q
 
-from core.applications.notifications.models import Notification, NotificationPreference
 from core.applications.property.models import PropertySubscription
 from core.helper.enums import NotificationType
-from core.utils.utils import (
-    is_user_subscribed_for_property,
-    send_notification_email,
-    send_push_notification,
-    create_notification,
-)
+from core.utils.utils import create_notification
+from core.utils.utils import is_user_subscribed_for_property
 
 
 def notify_new_property_listing(property_instance):
@@ -16,7 +11,8 @@ def notify_new_property_listing(property_instance):
     Notify users who are subscribed to the location or type of a new property.
     """
     subscriptions = PropertySubscription.objects.filter(
-        Q(property_type=property_instance.property_type) | Q(property_type__isnull=True)
+        Q(property_type=property_instance.property_type)
+        | Q(property_type__isnull=True),
     )
 
     property_location = (property_instance.location or "").lower()
@@ -30,7 +26,7 @@ def notify_new_property_listing(property_instance):
                 title="New Property Listing",
                 message=f"A new {property_instance.property_type} is available in {property_instance.location}.",
                 property=property_instance,
-                metadata={'property_id': property_instance.id}
+                metadata={"property_id": property_instance.id},
             )
 
 
@@ -46,5 +42,5 @@ def notify_price_change(property_instance, old_price):
                 title=f"Price Update: {property_instance.title}",
                 message=f"Price changed from ${old_price} to ${property_instance.price}.",
                 property=property_instance,
-                metadata={'old_price': old_price}
+                metadata={"old_price": old_price},
             )

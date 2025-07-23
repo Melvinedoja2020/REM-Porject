@@ -47,11 +47,11 @@
                     </a>
                 </div>
             </div>
-            
+
             <div class="card-body pt-0">
                 <form method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
-                    
+
                     <!-- Recipient Section -->
                     <div class="mb-4">
                         {% if not recipient %}
@@ -74,10 +74,10 @@
                         <div class="card recipient-card mb-3">
                             <div class="card-body py-3">
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ recipient.get_profile_picture }}" 
-                                         alt="{{ recipient.user.name }}" 
-                                         class="rounded-circle me-3" 
-                                         width="48" 
+                                    <img src="{{ recipient.get_profile_picture }}"
+                                         alt="{{ recipient.user.name }}"
+                                         class="rounded-circle me-3"
+                                         width="48"
                                          height="48">
                                     <div>
                                         <h5 class="mb-1">{{ recipient.user.name }}</h5>
@@ -94,7 +94,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    
+
                     <!-- Subject Field -->
                     <div class="mb-4">
                         <label for="{{ form.subject.id_for_label }}" class="form-label fw-semibold">
@@ -110,7 +110,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    
+
                     <!-- Message Field -->
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
@@ -126,7 +126,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    
+
                     <!-- Form Actions -->
                     <div class="d-flex justify-content-between align-items-center border-top pt-4">
                         <button type="reset" class="btn btn-outline-secondary">
@@ -149,26 +149,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Character counter for message
     const messageField = document.getElementById('{{ form.message.id_for_label }}');
     const charCount = document.querySelector('.character-count');
-    
+
     if (messageField && charCount) {
         messageField.classList.add('message-textarea');
         messageField.setAttribute('maxlength', '1000');
-        
+
         messageField.addEventListener('input', function() {
             const currentLength = this.value.length;
             charCount.textContent = `${currentLength}/1000`;
-            
+
             if (currentLength > 800) {
                 charCount.style.color = '#dc3545';
             } else {
                 charCount.style.color = '#6c757d';
             }
         });
-        
+
         // Initialize count
         charCount.textContent = `${messageField.value.length}/1000`;
     }
-    
+
     // Add Bootstrap validation
     const forms = document.querySelectorAll('.needs-validation');
     Array.from(forms).forEach(form => {

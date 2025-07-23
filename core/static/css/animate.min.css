@@ -2086,7 +2086,7 @@ print {
         -webkit-transform: translate3d(100px, 0, 0);
                 transform: translate3d(100px, 0, 0);
       }
-    
+
       100% {
         opacity: 1;
         -webkit-transform: none;
@@ -2100,7 +2100,7 @@ print {
         -webkit-transform: translate3d(100px, 0, 0);
                 transform: translate3d(100px, 0, 0);
       }
-    
+
       100% {
         opacity: 1;
         -webkit-transform: none;

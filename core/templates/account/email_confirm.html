@@ -11,7 +11,7 @@
 {% block content %}
 <div class="container d-flex justify-content-center align-items-center vh-100">
   <div class="card shadow-lg border-0" style="max-width: 650px; width: 100%; border-radius: 12px;">
-    <div class="card-header text-white text-center py-4" 
+    <div class="card-header text-white text-center py-4"
          style="background: linear-gradient(135deg, #E8960F, #d17c0a); border-radius: 12px 12px 0 0;">
       <h3 class="fw-bold mb-0">{% trans "Confirm Email Address" %}</h3>
     </div>
@@ -22,7 +22,7 @@
         {% if can_confirm %}
           <p class="lead text-dark">
             {% blocktrans with confirmation.email_address.email as email %}
-              Please confirm that <a href="mailto:{{ email }}" class="fw-bold">{{ email }}</a> 
+              Please confirm that <a href="mailto:{{ email }}" class="fw-bold">{{ email }}</a>
               is an email address for user <span class="fw-bold">{{ user_display }}</span>.
             {% endblocktrans %}
           </p>
@@ -30,7 +30,7 @@
           <form method="post" action="{{ action_url }}">
             {% csrf_token %}
             {{ redirect_field }}
-            <button type="submit" class="btn btn-lg text-white shadow-sm mt-4" 
+            <button type="submit" class="btn btn-lg text-white shadow-sm mt-4"
                     style="background-color: #E8960F; border-radius: 8px; padding: 12px 24px;">
               {% trans 'Confirm' %}
             </button>
@@ -43,7 +43,7 @@
       {% else %}
         {% url 'account_email' as email_url %}
         <p class="text-danger fw-bold">
-          {% blocktrans %}This email confirmation link expired or is invalid. 
+          {% blocktrans %}This email confirmation link expired or is invalid.
           Please <a href="{{ email_url }}" class="text-decoration-none fw-bold" style="color: #E8960F;">issue a new email confirmation request</a>.{% endblocktrans %}
         </p>
       {% endif %}
