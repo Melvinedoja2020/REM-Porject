@@ -297,81 +297,80 @@
 
 
         </form>
+      </div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const agentTypeField = document.getElementById("id_agent_type");
 
-        <script>
-          document.addEventListener("DOMContentLoaded", function () {
-            const agentTypeField = document.getElementById("id_agent_type");
+        // Mapping agent types to the field IDs they require
+        const agentFieldMap = {
+          "Real Estate Agent": [
+            "id_license_number",
+            "id_company_name",
+            "id_office_phone_no",
+            "id_office_location",
+            "id_company_registration_number",
+            "id_company_registration_document",
+            "id_license_document"
+          ],
+          "Property Manager": [
+            "id_company_name",
+            "id_office_address",
+            "id_office_phone_no"
+          ]
+        };
 
-            // Mapping agent types to the field IDs they require
-            const agentFieldMap = {
-              "Real Estate Agent": [
-                "id_license_number",
-                "id_company_name",
-                "id_office_phone_no",
-                "id_office_location",
-                "id_company_registration_number",
-                "id_company_registration_document",
-                "id_license_document"
-              ],
-              "Property Manager": [
-                "id_company_name",
-                "id_office_address",
-                "id_office_phone_no"
-              ]
-            };
+        // All potential field IDs that might need toggling
+        const allFieldIds = [
+          "id_license_number",
+          "id_company_name",
+          "id_office_location",
+          "id_office_address",
+          "id_office_phone_no",
+          "id_company_registration_number",
+          "id_company_registration_document",
+          "id_license_document"
+        ];
 
-            // All potential field IDs that might need toggling
-            const allFieldIds = [
-              "id_license_number",
-              "id_company_name",
-              "id_office_location",
-              "id_office_address",
-              "id_office_phone_no",
-              "id_company_registration_number",
-              "id_company_registration_document",
-              "id_license_document"
-            ];
-
-            // Utility to hide all optional fields
-            function hideAllFields() {
-              allFieldIds.forEach(fieldId => {
-                const fieldElement = document.getElementById(fieldId);
-                if (fieldElement) {
-                  const wrapper = fieldElement.closest(".box-fieldset") || fieldElement.closest(".box");
-                  if (wrapper) wrapper.style.display = "none";
-                }
-              });
-            }
-
-            // Show only fields relevant to the selected agent type
-            function showFieldsForAgentType(agentType) {
-              const requiredFields = agentFieldMap[agentType] || [];
-              requiredFields.forEach(fieldId => {
-                const fieldElement = document.getElementById(fieldId);
-                if (fieldElement) {
-                  const wrapper = fieldElement.closest(".box-fieldset") || fieldElement.closest(".box");
-                  if (wrapper) wrapper.style.display = "block";
-                }
-              });
-            }
-
-            // Main function to update fields based on selection
-            function handleAgentTypeChange(selectedType) {
-              hideAllFields();
-              showFieldsForAgentType(selectedType);
-            }
-
-            // Initial state and listener
-            if (agentTypeField) {
-              handleAgentTypeChange(agentTypeField.value);
-
-              agentTypeField.addEventListener("change", function () {
-                handleAgentTypeChange(this.value);
-              });
+        // Utility to hide all optional fields
+        function hideAllFields() {
+          allFieldIds.forEach(fieldId => {
+            const fieldElement = document.getElementById(fieldId);
+            if (fieldElement) {
+              const wrapper = fieldElement.closest(".box-fieldset") || fieldElement.closest(".box");
+              if (wrapper) wrapper.style.display = "none";
             }
           });
-        </script>
+        }
 
+        // Show only fields relevant to the selected agent type
+        function showFieldsForAgentType(agentType) {
+          const requiredFields = agentFieldMap[agentType] || [];
+          requiredFields.forEach(fieldId => {
+            const fieldElement = document.getElementById(fieldId);
+            if (fieldElement) {
+              const wrapper = fieldElement.closest(".box-fieldset") || fieldElement.closest(".box");
+              if (wrapper) wrapper.style.display = "block";
+            }
+          });
+        }
 
-      </div>
-      {% endblock content %}
+        // Main function to update fields based on selection
+        function handleAgentTypeChange(selectedType) {
+          hideAllFields();
+          showFieldsForAgentType(selectedType);
+        }
+
+        // Initial state and listener
+        if (agentTypeField) {
+          handleAgentTypeChange(agentTypeField.value);
+
+          agentTypeField.addEventListener("change", function () {
+            handleAgentTypeChange(this.value);
+          });
+        }
+      });
+
+    </script>
+    {% endblock content %}
