@@ -4,6 +4,7 @@
 python manage.py collectstatic --noinput --clear
 # python manage.py spectacular --color --file schema.yml
 python manage.py migrate
+pip install --upgrade fido2
 exec /usr/local/bin/gunicorn config.asgi --bind 0.0.0.0:5000 --chdir=/app -k uvicorn.workers.UvicornWorker
 # exec python manage.py startpublishing
 # exec python manage.py runserver 0.0.0.0:5000
