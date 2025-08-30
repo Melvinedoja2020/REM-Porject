@@ -69,3 +69,9 @@ def announcements(request):
         "active_announcements": active_announcements,
         "has_announcements": active_announcements.exists(),
     }
+
+
+def property_types(request):
+    return {
+        "property_types": PropertyTypeChoices.choices
+    }

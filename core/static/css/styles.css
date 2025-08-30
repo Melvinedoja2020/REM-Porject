@@ -13264,11 +13264,82 @@ tr {
 }
 
 .page-title.home02 {
-  background-image: url(../images/section/page-title-2.jpg);
+  /* background-image: url(../images/section/page-title-2.jpg); */
   padding: 232px 0 294px;
   background-size: cover;
   background-attachment: fixed;
 }
+
+.search-btn {
+  background-color: #E8960F;   /* main color */
+  color: #fff;                /* white text for contrast */
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.search-btn:hover {
+  background-color: #cc7d0c;   /* slightly darker shade on hover */
+  transform: translateY(-2px); /* small lift effect */
+}
+
+.btn-accent {
+  @apply bg-[#E8960F] text-white px-4 py-2 rounded-lg hover:bg-[#d9840d] transition;
+}
+
+/* Inputs & dropdowns */
+.form-control,
+.form-select {
+  background-color: rgba(255, 255, 255, 0.15); /* translucent background */
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.form-select option {
+  color: #000; /* make dropdown options visible */
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #E8960F;
+  box-shadow: 0 0 0 0.25rem rgba(232, 150, 15, 0.4);
+}
+
+/* Buttons */
+.btn-brand {
+  background-color: #E8960F;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  transition: background 0.3s ease;
+}
+
+.btn-brand:hover {
+  background-color: #d07f0a;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #E8960F !important;
+  color: #fff !important;
+}
+
+.nav-pills .nav-link {
+  background-color: rgba(255,255,255,0.2);
+  color: #fff;
+  border-radius: 0.5rem;
+}
+
 
 .page-title.home02 .heading-title {
   margin-bottom: 80px;

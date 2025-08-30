@@ -41,6 +41,7 @@ class HomeView(TemplateView):
         context["agents_profile"] = AgentProfile.objects.filter(
             verified=True,
         )
+        context["property_types"] = PropertyTypeChoices.choices
         return context
 
 
@@ -161,6 +162,9 @@ class BuyPropertyListView(PropertySearchMixin, ListView):
         return context
 
     def render_to_response(self, context, **response_kwargs):
+        """
+        Render the response, returning JSON for AJAX requests.
+        """
         if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
             html = render_to_string(
                 "partials/_property_list.html",

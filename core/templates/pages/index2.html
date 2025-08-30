@@ -3,159 +3,41 @@
 {% block content %}
 {% load custom_tags %}
 {% include 'partials/messages.html' %}
-
-<!-- .page-title  -->
-<div class="page-title home02 video-banner position-relative text-white">
-  <!-- Background Video -->
-  <video autoplay loop muted playsinline preload="auto"
-    class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover">
+<!-- .page-title -->
+<div class="page-title home03 video-banner">
+  <!-- Video Background -->
+  {% comment %} <video autoplay muted loop playsinline class="bg-video">
     <source src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
+    Your browser does not support the video tag.
+  </video> {% endcomment %}
+  <video _ngcontent-c15="" autoplay loop muted playsinline preload="auto"
+    poster="{% static 'images/section/realestate.jpg' %}" class="bg-video">
+    <source _ngcontent-c15="" media="screen and (min-device-width: 721px)" src="{% static 'videos/real_estate.mp4' %}"
+      type="video/mp4">
+    <source _ngcontent-c15="" media="screen and (max-device-width: 720px)" src="{% static 'videos/real_estate.mp4' %}"
+      type="video/mp4">
+    <source _ngcontent-c15="" media="screen and (max-device-width: 640px)" src="{% static 'videos/real_estate.mp4' %}"
+      type="video/mp4">
+    <source _ngcontent-c15="" media="screen" src="{% static 'videos/real_estate.mp4' %}" type="video/mp4">
   </video>
 
-  <!-- Overlay (optional: light darkening for readability) -->
-  <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-25"></div>
+  <!-- Optional Overlay -->
+  <div class="video-overlay"></div>
 
-  <!-- Content -->
-  <div class="container position-relative py-5">
-    <div class="row justify-content-center">
-      <div class="col-lg-10 text-center">
-        <!-- Heading -->
-        <div class="mb-5">
-          <h1 class="display-5 fw-bold">Your Way Home Starts Here</h1>
-          <p class="lead">Thousands of luxury home enthusiasts just like you visit our website.</p>
+  <!-- Content Container -->
+  <div class="tf-container">
+    <div class="row">
+      <div class="col-12">
+        <div class="content-inner overlay-content text-center hero-text">
+          <h1 class="title animate-pop-in">Your Way Home Starts Here</h1>
+          <p class="h6 fw-4 subtitle animate-fade-in">Thousands of luxury homes just like you trust us to find their next home.</p>
         </div>
-
-        <!-- Tabs -->
-        <ul class="nav nav-pills justify-content-center mb-3" id="searchTabs" role="tablist">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active px-4 py-2 rounded-2 fw-semibold" id="rent-tab" data-bs-toggle="pill"
-              data-bs-target="#rent" type="button" role="tab" aria-controls="rent" aria-selected="true">
-              For Rent
-            </button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link px-4 py-2 rounded-2 fw-semibold" id="sale-tab" data-bs-toggle="pill"
-              data-bs-target="#sale" type="button" role="tab" aria-controls="sale" aria-selected="false">
-              For Sale
-            </button>
-          </li>
-        </ul>
-
-        <!-- Tab Content -->
-        <div class="tab-content" id="searchTabsContent">
-
-          <!-- For Rent -->
-          <div class="tab-pane fade show active" id="rent" role="tabpanel" aria-labelledby="rent-tab">
-            <div class="card bg-transparent border-0 shadow-none p-4">
-              <form method="GET" action="{% url 'home:property_rent_list' %}" class="row g-3">
-                <!-- City -->
-                <div class="col-md-6">
-                  <input type="text" name="city"
-                    class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="City">
-                </div>
-
-                <!-- Property Type -->
-                <div class="col-md-6">
-                  <select name="property_type"
-                    class="form-select bg-transparent text-white border border-white rounded-2 p-2">
-                    <option value="">Property Type</option>
-                    {% for value, label in property_types %}
-                    <option value="{{ value }}">{{ label }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-
-                <!-- Bedrooms -->
-                <div class="col-md-6">
-                  <input type="number" name="bedrooms"
-                    class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Bedrooms">
-                </div>
-
-                <!-- Price Range -->
-                <div class="col-md-3">
-                  <input type="number" name="price_min"
-                    class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Min Price">
-                </div>
-                <div class="col-md-3">
-                  <input type="number" name="price_max"
-                    class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Max Price">
-                </div>
-
-                <!-- Submit -->
-                <div class="col-12 text-center mt-3">
-                  <button type="submit" class="btn text-white px-5 py-2 rounded-2"
-                    style="background-color:#E8960F; border-color:#E8960F;">
-                    <i class="bi bi-search me-2"></i>Search
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- For Sale -->
-          <div class="tab-pane fade" id="sale" role="tabpanel" aria-labelledby="sale-tab">
-            <div class="card bg-transparent border-0 shadow-none p-4">
-              <form method="GET" action="{% url 'home:property_buy_list' %}" class="row g-3">
-                <!-- City -->
-                <div class="col-md-6">
-                  <input type="text" name="city"
-                    class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="City">
-                </div>
-
-                <!-- Property Type -->
-                <div class="col-md-6">
-                  <select name="property_type"
-                    class="form-select bg-transparent text-white border border-white rounded-2 p-2">
-                    <option value="">Property Type</option>
-                    {% for value, label in property_types %}
-                    <option value="{{ value }}">{{ label }}</option>
-                    {% endfor %}
-                  </select>
-                </div>
-
-                <!-- Bedrooms -->
-                <div class="col-md-6">
-                  <input type="number" name="bedrooms"
-                    class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Bedrooms">
-                </div>
-
-                <!-- Price Range -->
-                <div class="col-md-3">
-                  <input type="number" name="price_min"
-                    class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Min Price">
-                </div>
-                <div class="col-md-3">
-                  <input type="number" name="price_max"
-                    class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Max Price">
-                </div>
-
-                <!-- Submit -->
-                <div class="col-12 text-center mt-3">
-                  <button type="submit" class="btn text-white px-5 py-2 rounded-2"
-                    style="background-color:#E8960F; border-color:#E8960F;">
-                    <i class="bi bi-search me-2"></i>Search
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-        </div><!-- /tab-content -->
       </div>
-
     </div>
   </div>
-
 </div>
 
+<!-- .main-content -->
 <div class="main-content">
 
   <!-- section-help -->
@@ -1551,14 +1433,6 @@
       video.onerror = function () {
         document.querySelector('.video-banner').classList.add('no-video');
       };
-    }
-  });
-  document.addEventListener("DOMContentLoaded", function () {
-    let currentUrl = window.location.href;
-    if (currentUrl.includes("buy")) {
-      let saleTab = document.getElementById("sale-tab");
-      let salePane = document.getElementById("sale");
-      new bootstrap.Tab(saleTab).show();
     }
   });
 

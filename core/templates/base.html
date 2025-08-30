@@ -237,6 +237,7 @@
                       </ul>
                     </li> {% endcomment %}
                     <li><a href="{% url 'home:property_rent_list' %}">Rents</a></li>
+                    <li><a href="{% url 'home:property_buy_list' %}">Buy</a></li>
                     {% comment %} <li><a href="#">Buy</a></li> {% endcomment %}
                     <li><a href="{% url 'home:agent_list' %}">Agents</a></li>
                     <li><a href="#">Contact</a></li>
@@ -345,136 +346,9 @@
                       class="{% if request.resolver_match.namespace == 'home' and request.resolver_match.url_name == 'home' %} current-menu {% endif %}">
                       <a href="{% url 'home:home' %}">Home</a>
                     </li>
-                    {% comment %} <li class="has-child style-2"><a href="#">Listing</a>
-                      <ul class="submenu">
-                        <li>
-                          <a href="#">Layout</a>
-                          <ul class="submenu2">
-                            <li>
-                              <a href="property-grid-full-width.html">Grid Style -
-                                Full Width </a>
-                            </li>
-                            <li>
-                              <a href="property-gird-top-search.html">Grid Style - Top
-                                Search </a>
-                            </li>
-                            <li>
-                              <a href="property-gird-left-sidebar.html">Grid Style -
-                                Sidebar Left </a>
-                            </li>
-                            <li>
-                              <a href="property-gird-right-sidebar.html">Grid Style -
-                                Sidebar Right </a>
-                            </li>
-                            <li>
-                              <a href="property-list-full-width.html">List Style -
-                                Full
-                                Width </a>
-                            </li>
-                            <li>
-                              <a href="property-list-top-search.html">List Style -
-                                Top
-                                Search
-                              </a>
-                            </li>
-                            <li>
-                              <a href="property-list-left-sidebar.html">List Style -
-                                Sidebar
-                                Left </a>
-                            </li>
-                            <li>
-                              <a href="property-list-right-sidebar.html">List Style -
-                                Sidebar
-                                Right </a>
-                            </li>
-                          </ul>
-                        </li>
-                        <li>
-                          <a href="#">Feature</a>
-                          <ul class="submenu2">
-                            <li>
-                              <a href="property-half-map-grid.html">Property Half Map Grid
-                              </a>
-                            <li>
-                              <a href="property-half-map-list.html">Property Half Map List
-                              </a>
-                            </li>
-                            <li>
-                              <a href="property-half-top-map.html">Property Half Map Top
-                              </a>
-                            </li>
-                            <li>
-                              <a href="property-filter-popup.html">Property Filter Popup
-                              </a>
-                            </li>
-                            <li>
-                              <a href="property-filter-popup-left.html">Property Filter
-                                Popup Left </a>
-                            </li>
-                            <li>
-                              <a href="property-filter-popup-right.html">Property Filter
-                                Popup Right </a>
-                            </li>
 
-                          </ul>
-                        </li>
-                        <li>
-                          <a href="#">Listing Details</a>
-                          <ul class="submenu2">
-                            <li><a href="property-detail-v1.html">Property Details 1</a>
-                            </li>
-                            <li><a href="property-detail-v2.html">Property Details 2</a>
-                            </li>
-                            <li><a href="property-detail-v3.html">Property Details 3</a>
-                            </li>
-                            <li><a href="property-detail-v4.html">Property Details 4</a>
-                            </li>
-                            <li><a href="property-detail-v5.html">Property Details 5</a>
-                            </li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li> {% endcomment %}
-                    {% comment %} <li class="has-child"><a href="#">Pages</a>
-                      <ul class="submenu">
-                        <li class="has-child"><a href="#">Agents</a>
-                          <ul class="submenu">
-                            <li>
-                              <a href="agents.html">Agents</a>
-                            </li>
-                            <li>
-                              <a href="agents-details.html">Agents Details</a>
-                            </li>
-                          </ul>
-                        </li>
-                        <li class="has-child"><a href="#">Agencies</a>
-                          <ul class="submenu">
-                            <li><a href="agency-grid.html">Agencies
-                                Grid</a></li>
-                            <li><a href="agency-list.html">Agencies
-                                List</a></li>
-                            <li><a href="agency-details.html">Agencies
-                                Detail</a></li>
-                          </ul>
-                        </li>
-                        <li><a href="home-loan-process.html">Home Loan Process</a></li>
-                        <li><a href="career.html">Career</a></li>
-                        <li><a href="faq.html">Faq's</a></li>
-                        <li><a href="compare.html">Compare</a></li>
-                        <li><a href="project-list.html">Project List</a></li>
-                        <li><a href="project-details.html">Project Details</a></li>
-                        <li><a href="404.html">Page 404</a></li>
-                        <li><a href="dashboard.html">Dashboard</a></li>
-                      </ul>
-                    </li> {% endcomment %}
-                    {% comment %} <li class="has-child "><a href="#">Blog</a>
-                      <ul class="submenu">
-                        <li><a href="blog-list.html">Blog List</a></li>
-                        <li><a href="blog-grid.html">Blog Grid</a></li>
-                        <li><a href="blog-details.html">Blog Detail</a></li>
-                      </ul>
-                    </li> {% endcomment %}
                     <li><a href="{% url 'home:property_rent_list' %}">Rents</a></li>
+                    <li><a href="{% url 'home:property_buy_list' %}">Buy</a></li>
                     {% comment %} <li><a href="#">Buy</a></li> {% endcomment %}
                     <li><a href="{% url 'home:agent_list' %}">Agents</a></li>
                     <li><a href="#">Contact</a></li>
