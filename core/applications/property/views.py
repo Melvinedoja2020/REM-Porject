@@ -1,5 +1,7 @@
 # Create your views here.
+from django.utils import timezone
 import logging
+
 import uuid
 
 from django.contrib import messages
@@ -37,7 +39,9 @@ from core.applications.property.models import PropertyImage
 from core.applications.property.models import PropertySubscription
 from core.applications.property.models import PropertyType
 from core.applications.property.models import PropertyViewing
-from core.helper.enums import Lead_Status_Choices
+from core.applications.subscriptions.features import FEATURE_LIMITS
+from core.applications.subscriptions.models import FeaturedListing
+from core.helper.enums import Lead_Status_Choices, SubscriptionPlan
 from core.helper.enums import LeadStatus
 from core.helper.enums import PropertyListingType
 from core.helper.enums import UserRoleChoice
@@ -56,6 +60,13 @@ class PropertyCreateView(
     AgentApprovalRequiredMixin,
     CreateView,
 ):
+    """
+    Handles property creation for agents with plan-based restrictions.
+    - Enforces property limit based on agent’s subscription.
+    - Assigns agent and listing type automatically.
+    - Handles property images.
+    """
+
     model = Property
     form_class = PropertyForm
     template_name = "pages/dashboard/create_property.html"
@@ -69,36 +80,59 @@ class PropertyCreateView(
         return redirect("home:home")
 
     def form_valid(self, form):
-        """Set the agent and listing type before saving the property."""
-        new_property_type = form.cleaned_data.get("new_property_type")
-        if new_property_type:
-            property_type = PropertyType.objects.get(name__iexact=new_property_type)
-            form.instance.property_type = property_type
-
         agent_profile = self.request.user.agent_profile
         form.instance.agent = agent_profile
 
-        # Set listing type to FOR_SALE if agent is a REAL_ESTATE_AGENT
+        # ✅ Verify subscription limit at view level (failsafe)
+        subscription = getattr(agent_profile, "current_subscription", None)
+        plan = subscription.plan if subscription else SubscriptionPlan.FREE
+        property_count = agent_profile.properties.count()
+        limit = FEATURE_LIMITS.get(plan, {}).get("properties")
+
+        if limit is not None and property_count >= limit:
+            messages.error(
+                self.request,
+                f"You have reached your property limit ({limit}) for the {plan} plan. "
+                f"Please upgrade your subscription to add more properties.",
+            )
+            return redirect("subscriptions:start")  # adjust this URL as needed
+
+        # ✅ Handle dynamic property type creation
+        new_property_type = form.cleaned_data.get("new_property_type")
+        if new_property_type:
+            property_type = PropertyType.objects.filter(
+                title__iexact=new_property_type
+            ).first()
+            if not property_type:
+                property_type = PropertyType.objects.create(title=new_property_type)
+            form.instance.property_type = property_type
+
+        # ✅ Set default listing type
         if agent_profile.agent_type == "Real Estate Agent":
             form.instance.property_listing = PropertyListingType.FOR_SALE
 
-        response = super().form_valid(form)
+        # ✅ Try saving safely
+        try:
+            response = super().form_valid(form)
+        except ValidationError as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
 
-        # Notify subscribers if property is available
+        # ✅ Send notifications if property is available
         if self.object.is_available:
             notify_new_property_listing(self.object)
 
-        # Handle multiple image uploads
-        images = self.request.FILES.getlist("images")
-        for image in images:
+        # ✅ Handle image uploads
+        for image in self.request.FILES.getlist("images"):
             PropertyImage.objects.create(property=self.object, image=image)
 
-        messages.success(self.request, "Property created successfully!")
+        messages.success(self.request, "✅ Property created successfully!")
         return response
 
     def form_invalid(self, form):
-        print("❌ Form invalid. Errors:", form.errors)
-        messages.error(self.request, "Error creating property. Please check the form.")
+        messages.error(
+            self.request, "⚠️ Error creating property. Please check the form."
+        )
         return super().form_invalid(form)
 
 
@@ -108,18 +142,24 @@ class PropertyUpdateView(
     UserPassesTestMixin,
     UpdateView,
 ):
+    """
+    Handles property updates for agents.
+    - Ensures the agent owns the property.
+    - Updates property type dynamically.
+    - Notifies subscribers of price changes.
+    """
+
     model = Property
     form_class = PropertyForm
     template_name = "pages/dashboard/create_property.html"
     success_url = reverse_lazy("property:property_list")
 
     def test_func(self):
-        # Ensure user is an agent and owns the property
-        is_agent = (
-            getattr(self.request.user, "role", None) == UserRoleChoice.AGENT.value
+        user = self.request.user
+        return (
+            getattr(user, "role", None) == UserRoleChoice.AGENT.value
+            and self.get_object().agent == user.agent_profile
         )
-        is_owner = self.get_object().agent == self.request.user.agent_profile
-        return is_agent and is_owner
 
     def handle_no_permission(self):
         messages.error(self.request, "You are not authorized to update this property.")
@@ -129,10 +169,11 @@ class PropertyUpdateView(
         property_instance = self.get_object()
         old_price = property_instance.price
 
+        # ✅ Handle property type updates
         new_property_type = form.cleaned_data.get("new_property_type")
         if new_property_type:
             property_type = PropertyType.objects.filter(
-                title__iexact=new_property_type,
+                title__iexact=new_property_type
             ).first()
             if not property_type:
                 property_type = PropertyType.objects.create(title=new_property_type)
@@ -141,55 +182,64 @@ class PropertyUpdateView(
         if not form.instance.agent:
             form.instance.agent = self.request.user.agent_profile
 
-        response = super().form_valid(form)
+        try:
+            response = super().form_valid(form)
+        except ValidationError as e:
+            messages.error(self.request, str(e))
+            return self.form_invalid(form)
 
-        # Notify users if the price has changed and property is available
+        # ✅ Notify users if price changed
         if self.object.is_available and old_price != self.object.price:
             notify_price_change(self.object, old_price)
 
-        images = self.request.FILES.getlist("images")
-        for image in images:
+        # ✅ Handle image uploads
+        for image in self.request.FILES.getlist("images"):
             PropertyImage.objects.create(property=self.object, image=image)
 
-        messages.success(self.request, "Property updated successfully!")
+        messages.success(self.request, "✅ Property updated successfully!")
         return response
 
     def form_invalid(self, form):
-        print("❌ Form invalid. Errors:", form.errors)
-        messages.error(self.request, "Error updating property. Please check the form.")
+        messages.error(
+            self.request, "⚠️ Error updating property. Please check the form."
+        )
         return super().form_invalid(form)
 
 
 class PropertyDetailView(DetailView):
+    """Displays property details."""
+
     model = Property
     template_name = "pages/dashboard/property_detail.html"
     context_object_name = "property"
 
 
-class PropertyListView(LoginRequiredMixin, ListView):
+class PropertyListView(
+    LoginRequiredMixin,
+    ListView,
+):
+    """Lists properties belonging to the logged-in agent."""
+
     model = Property
     template_name = "pages/dashboard/property_list.html"
     context_object_name = "properties"
     paginate_by = 10
 
     def get_queryset(self):
-        """Show available properties for the logged-in agent."""
         user = self.request.user
         if hasattr(user, "agent_profile"):
-            return Property.objects.filter(
-                is_available=True,
-                agent=user.agent_profile,
-            ).order_by("-id")
+            return Property.objects.filter(agent=user.agent_profile).order_by("-id")
         return Property.objects.none()
 
 
 class PropertyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """Allows agents to delete their own properties."""
+
     model = Property
     template_name = "pages/dashboard/property_confirm_delete.html"
     success_url = reverse_lazy("property:property_list")
 
     def test_func(self):
-        """Ensure only the property owner (agent) can delete."""
         property_obj = self.get_object()
         return property_obj.agent == getattr(self.request.user, "agent_profile", None)
 
@@ -198,7 +248,7 @@ class PropertyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return redirect("property:property_list")
 
     def delete(self, request, *args, **kwargs):
-        messages.success(self.request, "Property deleted successfully!")
+        messages.success(self.request, "🗑️ Property deleted successfully!")
         return super().delete(request, *args, **kwargs)
 
 
@@ -259,6 +309,109 @@ class FavoriteListView(LoginRequiredMixin, ListView):
             .select_related("property")
             .prefetch_related("property__images", "property__amenities")
         )
+
+
+class FeaturePropertyView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """
+    Allows an agent to feature (boost) a property within their subscription limits.
+    """
+
+    def test_func(self):
+        """Only agents can feature properties."""
+        return getattr(self.request.user, "role", None) == UserRoleChoice.AGENT.value
+
+    def handle_no_permission(self):
+        """Redirect unauthorized users."""
+        messages.error(self.request, "You are not authorized to feature properties.")
+        return redirect("home:home")
+
+    def post(self, request, *args, **kwargs):
+        """Feature a property if within subscription limits."""
+        property_obj = get_object_or_404(Property, pk=kwargs["pk"])
+        agent = request.user.agent_profile
+
+        # Ownership check
+        if property_obj.agent != agent:
+            messages.error(request, "You can only feature your own properties.")
+            return redirect("property:property_list")
+
+        # Plan check
+        subscription = getattr(agent, "current_subscription", None)
+        plan = subscription.plan if subscription else SubscriptionPlan.FREE
+        limit = FEATURE_LIMITS.get(plan, {}).get("featured_listings")
+
+        active_boosts = agent.featured_properties.filter(is_active=True).count()
+
+        if limit is not None and active_boosts >= limit:
+            messages.error(
+                request,
+                f"You've reached your featured property limit ({limit}) for the {plan} plan. "
+                "Please upgrade your subscription to feature more listings.",
+            )
+            return redirect("subscriptions:start")
+
+        # ✅ Prevent duplicates (deactivate existing boosts)
+        agent.featured_properties.filter(property=property_obj, is_active=True).update(
+            is_active=False
+        )
+
+        # ✅ Create new boost
+        end_date = timezone.now() + timezone.timedelta(days=7)
+        FeaturedListing.objects.create(
+            property=property_obj,
+            agent=agent,
+            boost_duration=7,
+            end_date=end_date,
+            is_active=True,
+        )
+
+        messages.success(
+            request, f"✅ '{property_obj.title}' is now featured for 7 days!"
+        )
+        return redirect("property:property_list")
+
+
+class UnfeaturePropertyView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """
+    Allows an agent to unfeature (remove boost) from their property.
+    """
+
+    def test_func(self):
+        """Only agents can unfeature properties."""
+        return getattr(self.request.user, "role", None) == UserRoleChoice.AGENT.value
+
+    def handle_no_permission(self):
+        """Redirect unauthorized users."""
+        messages.error(self.request, "You are not authorized to unfeature properties.")
+        return redirect("home:home")
+
+    def post(self, request, *args, **kwargs):
+        """Unfeature a property."""
+        property_obj = get_object_or_404(Property, pk=kwargs["pk"])
+        agent = request.user.agent_profile
+
+        # Ownership check
+        if property_obj.agent != agent:
+            messages.error(request, "You can only unfeature your own properties.")
+            return redirect("property:property_list")
+
+        # Deactivate all active featured listings for this property
+        updated = FeaturedListing.objects.filter(
+            property=property_obj, agent=agent, is_active=True
+        ).update(is_active=False)
+
+        if updated:
+            messages.success(
+                request,
+                f"✅ '{property_obj.title}' has been unfeatured successfully.",
+            )
+        else:
+            messages.info(
+                request,
+                f"'{property_obj.title}' is not currently featured.",
+            )
+
+        return redirect("property:property_list")
 
 
 # class FavoriteDetailView(LoginRequiredMixin, DetailView):
@@ -382,16 +535,34 @@ class FavoriteListView(LoginRequiredMixin, ListView):
 
 # views.py
 class FavoriteLeadCreateView(LoginRequiredMixin, CreateView):
+    """
+    Allows a customer to create a Lead from one of their Favorite Properties.
+
+    ✅ Rules:
+    - Only authenticated customers can create leads.
+    - Prevents duplicate leads for the same property.
+    - Pre-fills property information from the FavoriteProperty.
+    - Redirects to the Lead Detail if duplicate, else Lead List after creation.
+    """
+
     model = Lead
     form_class = LeadCreateForm
     template_name = "pages/property/lead_create.html"
+    success_url = reverse_lazy("property:lead_list")
 
+    # -----------------------------------------------------
+    # Access Control
+    # -----------------------------------------------------
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_customer:
-            raise PermissionDenied("Only customers can create leads")
+        if not getattr(request.user, "is_customer", False):
+            raise PermissionDenied("Only customers can create leads.")
         return super().dispatch(request, *args, **kwargs)
 
+    # -----------------------------------------------------
+    # Helpers
+    # -----------------------------------------------------
     def get_favorite_property(self):
+        """Retrieve the FavoriteProperty entry belonging to this user."""
         return get_object_or_404(
             FavoriteProperty.objects.select_related("property"),
             pk=self.kwargs["pk"],
@@ -399,81 +570,197 @@ class FavoriteLeadCreateView(LoginRequiredMixin, CreateView):
         )
 
     def get_form_kwargs(self):
+        """Inject user and prefill property into form."""
         kwargs = super().get_form_kwargs()
-        kwargs["user"] = self.request.user
         favorite = self.get_favorite_property()
-        kwargs["initial"] = {
-            "property_link": favorite.property,
-        }
+        kwargs["user"] = self.request.user
+        kwargs["initial"] = {"property_link": favorite.property}
         return kwargs
 
+    # -----------------------------------------------------
+    # Form Logic
+    # -----------------------------------------------------
     @transaction.atomic
     def form_valid(self, form):
-        try:
-            property_link = form.cleaned_data["property_link"]
+        """Create a new Lead, ensuring no duplicates and full integrity."""
+        user = self.request.user
+        property_link = form.cleaned_data.get("property_link")
 
+        try:
+            # Lock and check for duplicate lead
             existing_lead = (
                 Lead.objects.select_for_update()
-                .filter(
-                    user=self.request.user,
-                    property_link=property_link,
-                )
+                .filter(user=user, property_link=property_link)
                 .first()
             )
-
             if existing_lead:
                 messages.info(
                     self.request,
-                    self.get_existing_lead_message(existing_lead),
+                    self._existing_lead_message(existing_lead),
                     extra_tags="alert-info",
                 )
-                return redirect(existing_lead.get_absolute_url())
+                return redirect("property:lead_detail", pk=existing_lead.pk)
 
-            form.instance.user = self.request.user
-            form.instance.agent = property_link.agent
+            # Assign relationships
+            form.instance.user = user
+            form.instance.agent = getattr(property_link, "agent", None)
+            form.instance.status = Lead_Status_Choices.NEW
 
             response = super().form_valid(form)
 
-            logger.debug(
-                f"Calling process_new_lead for lead ID <<<>>> {self.object.id}",
-            )
+            # Trigger post-creation handler (email & notifications)
             process_new_lead(self.object)
+            logger.debug(f"Processed new lead #{self.object.id}")
 
             messages.success(
                 self.request,
-                self.get_success_message(),
+                self._success_message(),
                 extra_tags="alert-success",
             )
-            return response
+            # ✅ Always redirect to Lead List
+            return redirect(self.get_success_url())
 
-        except IntegrityError as e:
-            return self.handle_integrity_error(e, form)
+        except IntegrityError as exc:
+            logger.error("Lead creation failed: %s", exc, exc_info=True)
+            messages.error(
+                self.request,
+                "A system error occurred while creating your lead. Please try again later.",
+                extra_tags="alert-danger",
+            )
+            return self.form_invalid(form)
+
+    # -----------------------------------------------------
+    # Messages
+    # -----------------------------------------------------
+    def _existing_lead_message(self, lead):
+        """Message shown when user tries to duplicate a lead."""
+        return (
+            f"You already have an active lead (#{lead.id}) for this property. "
+            f"Last updated on {lead.updated_at:%b %d, %Y}. "
+            "Redirecting you to that lead."
+        )
+
+    def _success_message(self):
+        """Success message after creation."""
+        agent_name = (
+            self.object.agent.user.get_full_name()
+            if self.object.agent and self.object.agent.user
+            else "the assigned agent"
+        )
+        return (
+            f"New lead #{self.object.id} created successfully! "
+            f"{agent_name} will reach out to you shortly."
+        )
+
+
+# ---------------------------------------------------------------------
+# Lead List View
+# ---------------------------------------------------------------------
+class LeadListView(LoginRequiredMixin, ListView):
+    """
+    Display all leads for the logged-in customer.
+
+    Features:
+    - Restricted to the customer's own leads.
+    - Prefetches related Property and Agent for performance.
+    """
+
+    model = Lead
+    template_name = "pages/property/lead_list.html"
+    context_object_name = "leads"
+    paginate_by = 10
+
+    def get_queryset(self):
+        user = self.request.user
+        if getattr(user, "is_customer", False):
+            return Lead.objects.select_related(
+                "property_link", "agent", "agent__user"
+            ).filter(user=user)
+        elif getattr(user, "is_agent", False):
+            return Lead.objects.select_related(
+                "property_link", "agent", "agent__user"
+            ).filter(property_link__agent=user.agent_profile)
+
+        else:
+            raise PermissionDenied("You do not have permission to view this lead.")
+
+
+# ----------------------------------------------------------------
+# Lead Update View
+# ----------------------------------------------------------------
+class LeadUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Allows an agent to update a Lead's status or notes.
+
+    Rules:
+    - Only the assigned agent or staff can update.
+    - Customers cannot update the lead.
+    """
+
+    model = Lead
+    form_class = LeadCreateForm  # could have a separate form for agent updates
+    template_name = "pages/property/lead_update.html"
+    pk_url_kwarg = "pk"
+
+    def get_queryset(self):
+        user = self.request.user
+        if getattr(user, "is_agent", False):
+            # Agent can update only their assigned leads
+            return super().get_queryset().filter(agent=user.agent_profile)
+        elif user.is_staff:
+            # Staff/admin can update all leads
+            return super().get_queryset()
+        else:
+            # Customers or others cannot update
+            raise PermissionDenied("You do not have permission to update this lead.")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Lead updated successfully")
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse_lazy("property:lead_detail", kwargs={"pk": self.object.pk})
 
-    def get_existing_lead_message(self, lead):
-        return (
-            f"You already have an active lead (#{lead.id}) for this property. "
-            f"Last updated {lead.updated_at.strftime('%b %d, %Y')}. "
-            "We've redirected you to the existing lead."
-        )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["property"] = self.object.property_link
+        return context
 
-    def get_success_message(self):
-        return (
-            f"New lead #{self.object.id} created successfully! "
-            f"Agent {self.object.agent.user.name} will contact you soon."
-        )
 
-    def handle_integrity_error(self, error, form):
-        messages.error(
-            self.request,
-            "This lead could not be created due to a system error. "
-            "Our team has been notified.",
-            extra_tags="alert-danger",
-        )
-        logger.error(f"Lead creation integrity error: {error!s}", exc_info=True)
-        return self.form_invalid(form)
+# ---------------------------------------------------------------------
+# Lead Detail View
+# ---------------------------------------------------------------------
+class LeadDetailView(LoginRequiredMixin, DetailView):
+    """
+    Display detailed information about a single Lead.
+
+    Features:
+    - Restricted to owner (customer).
+    - Includes related property and agent details.
+    """
+
+    model = Lead
+    template_name = "pages/property/lead_detail.html"
+    context_object_name = "lead"
+
+    def get_queryset(self):
+        user = self.request.user
+        if getattr(user, "is_customer", False):
+            return Lead.objects.select_related(
+                "property_link", "agent", "agent__user"
+            ).filter(user=user)
+        elif getattr(user, "is_agent", False):
+            return Lead.objects.select_related(
+                "property_link", "agent", "agent__user"
+            ).filter(property_link__agent=user.agent_profile)
+
+        else:
+            raise PermissionDenied("You do not have permission to view this lead.")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_choices'] = Lead_Status_Choices.choices
+        return context
 
 
 class FavoriteDeleteView(LoginRequiredMixin, View):
@@ -544,107 +831,6 @@ class PropertySubscriptionDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return self.model.objects.filter(user=self.request.user)
-
-
-class LeadListView(LoginRequiredMixin, ListView):
-    model = Lead
-    template_name = "pages/property/lead_list.html"
-    context_object_name = "leads"
-    paginate_by = 20
-
-    def get_queryset(self):
-        user = self.request.user
-
-        # Ensure the user has an agent profile
-        agent_profile = getattr(user, "agent_profile", None)
-        if not agent_profile:
-            messages.error(self.request, "No agent profile found.")
-            return Lead.objects.none()
-
-        # Filter leads by properties that belong to this agent
-        queryset = Lead.objects.filter(
-            property_link__agent=agent_profile,
-        ).select_related(
-            "user",
-            "property_link",
-            "property_link__agent__user",
-            "scheduled_viewing",
-        )
-
-        # Optional: Filter by status
-        status = self.request.GET.get("status")
-        if status:
-            queryset = queryset.filter(status=status)
-
-        # Optional: Search by email or property title
-        search = self.request.GET.get("search")
-        if search:
-            queryset = queryset.filter(
-                Q(user__email__icontains=search)
-                | Q(property_link__title__icontains=search),
-            )
-
-        return queryset.order_by("-created_at")
-
-
-class LeadDetailView(AgentApprovalRequiredMixin, DetailView):
-    model = Lead
-    template_name = "pages/property/lead_detail.html"
-    pk_url_kwarg = "pk"
-
-    def get_object(self, queryset=None):
-        pk = self.kwargs.get(self.pk_url_kwarg)
-        try:
-            uuid_obj = uuid.UUID(str(pk))
-        except (ValueError, AttributeError):
-            raise Http404("Invalid lead ID format")
-
-        queryset = self.get_queryset()
-        try:
-            obj = queryset.get(id=uuid_obj)
-        except (Lead.DoesNotExist, ValidationError):
-            raise Http404("Lead not found or access denied")
-        return obj
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        if hasattr(self.request.user, "agent_profile"):
-            return qs.filter(property_link__agent=self.request.user.agent_profile)
-        return qs.none()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["status_choices"] = Lead_Status_Choices.choices
-        return context
-
-
-class LeadUpdateView(LoginRequiredMixin, UpdateView):
-    model = Lead
-    form_class = LeadCreateForm
-    template_name = "pages/property/lead_update.html"
-    pk_url_kwarg = "pk"
-
-    def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .filter(
-                agent=self.request.user.agent_profile,
-            )
-            .select_related("property_link", "user")
-        )
-
-    def form_valid(self, form):
-        messages.success(self.request, "Lead updated successfully")
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse_lazy("property:lead_detail", kwargs={"pk": self.object.pk})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["property"] = self.object.property_link
-        return context
 
 
 class ViewingScheduleView(AgentApprovalRequiredMixin, CreateView):

@@ -2,127 +2,6 @@
 {% load static %}
 
 {% block content %}
-
-<style>
-  .btn-primary {
-    background-color: #E8960F;
-    border-color: #E8960F;
-  }
-
-  .btn-primary:hover,
-  .btn-primary:focus {
-    background-color: #cf830d;
-    border-color: #cf830d;
-  }
-
-  .btn-outline-primary {
-    color: #E8960F;
-    border-color: #E8960F;
-  }
-
-  .btn-outline-primary:hover,
-  .btn-outline-primary:focus {
-    background-color: #E8960F;
-    border-color: #E8960F;
-  }
-
-  .badge-primary {
-    background-color: #E8960F;
-  }
-
-  .text-primary {
-    color: #E8960F !important;
-  }
-
-  .border-primary {
-    border-color: #E8960F !important;
-  }
-
-  .timeline {
-    position: relative;
-    padding-left: 1.5rem;
-  }
-
-  .timeline-item {
-    position: relative;
-    padding-bottom: 1.5rem;
-    padding-left: 1.5rem;
-    border-left: 2px solid #e9ecef;
-  }
-
-  .timeline-item:last-child {
-    padding-bottom: 0;
-  }
-
-  .timeline-item-marker {
-    position: absolute;
-    left: -0.5rem;
-    width: 1rem;
-    height: 1rem;
-    border-radius: 50%;
-    background-color: #E8960F;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.5rem;
-  }
-
-  .timeline-item-content {
-    padding: 0.75rem;
-    background-color: #f8f9fa;
-    border-radius: 0.375rem;
-  }
-
-  .avatar-lg {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .card-header {
-    font-weight: 600;
-  }
-
-  .activity-feed .feed-item {
-    position: relative;
-    padding-left: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .activity-feed .feed-item-marker {
-    position: absolute;
-    left: 0;
-    top: 0.25rem;
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 50%;
-    background-color: #E8960F;
-  }
-
-  .property-thumbnail {
-    width: 100px;
-    height: 75px;
-    object-fit: cover;
-    border-radius: 0.25rem;
-  }
-
-  .status-badge {
-    font-size: 0.875rem;
-    padding: 0.35rem 0.75rem;
-  }
-
-  .lead-header {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 0.375rem;
-    margin-bottom: 1.5rem;
-  }
-
-</style>
-
 <div class="container-fluid px-4 px-lg-5">
   <!-- Header Section -->
   <div class="lead-header">
@@ -149,6 +28,7 @@
       <div class="card mb-4 border-0 shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
           <h5 class="mb-0"><i class="fas fa-info-circle text-primary me-2"></i>Lead Information</h5>
+          {% if request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
           <div class="dropdown">
             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="actionsDropdown"
               data-bs-toggle="dropdown" aria-expanded="false">
@@ -158,27 +38,21 @@
               <li><a class="dropdown-item" href="{% url 'property:lead_update' lead.pk %}">
                   <i class="fas fa-edit text-primary me-2"></i>Edit Lead
                 </a></li>
-              {% comment %} <li><a class="dropdown-item" href="#">
-                  <i class="fas fa-envelope text-primary me-2"></i>Send Email
-                </a></li>
-              <li><a class="dropdown-item" href="#">
-                  <i class="fas fa-phone text-primary me-2"></i>Call Client
-                </a></li> {% endcomment %}
-              <li>
-                <hr class="dropdown-divider">
-              </li>
-              {% comment %} <li><a class="dropdown-item text-danger" href="#">
-                  <i class="fas fa-archive me-2"></i>Archive Lead
-                </a></li> {% endcomment %}
+              <li><hr class="dropdown-divider"></li>
             </ul>
           </div>
+          {% endif %}
         </div>
         <div class="card-body">
           <div class="row mb-4">
             <!-- Client Information -->
             <div class="col-md-6">
               <div class="mb-4">
+                {% if request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
                 <h6 class="text-muted mb-3 pb-2 border-bottom"><i class="fas fa-user me-2"></i>Client Information</h6>
+                {% else %}
+                <h6 class="text-muted mb-3 pb-2 border-bottom"><i class="fas fa-user me-2"></i>My Information</h6>
+                {% endif %}
                 <div class="d-flex align-items-center mb-3">
                   <div class="avatar-lg bg-light rounded-circle me-3">
                     <i class="fas fa-user fa-2x text-primary align-middle"></i>
@@ -264,9 +138,11 @@
                     <i class="fas fa-sticky-note me-2 text-primary"></i>
                     <span>Internal Notes</span>
                   </div>
+                  {% if request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
                   <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#notesModal">
                     <i class="fas fa-edit me-1"></i> Edit
                   </button>
+                  {% endif %}
                 </div>
                 <div class="card-body">
                   {% if lead.notes %}
@@ -296,7 +172,7 @@
       <div class="card mb-4 border-0 shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
           <h5 class="mb-0"><i class="fas fa-calendar-alt text-primary me-2"></i>Viewing History</h5>
-          {% if not lead.upcoming_viewing %}
+          {% if not lead.upcoming_viewing and request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
           <a href="{% url 'property:schedule_viewing' lead.pk %}" class="btn btn-sm btn-primary">
             <i class="fas fa-calendar-plus me-1"></i>Schedule Viewing
           </a>
@@ -325,6 +201,7 @@
                   </span>
                 </div>
               </div>
+              {% if request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
               <div class="d-flex flex-column">
                 <a href="#" class="btn btn-outline-primary mb-2">
                   <i class="fas fa-edit me-1"></i>Reschedule
@@ -333,6 +210,7 @@
                   <i class="fas fa-times me-1"></i>Cancel
                 </a>
               </div>
+              {% endif %}
             </div>
           </div>
           {% endif %}
@@ -377,9 +255,11 @@
             <i class="fas fa-calendar-times fa-3x text-muted mb-3 opacity-25"></i>
             <h5>No Viewings Scheduled</h5>
             <p class="text-muted mb-4">Schedule a viewing to get started</p>
+            {% if request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
             <a href="{% url 'property:schedule_viewing' lead.pk %}" class="btn btn-primary">
               <i class="fas fa-calendar-plus me-1"></i>Schedule First Viewing
             </a>
+            {% endif %}
           </div>
           {% endif %}
         </div>
@@ -389,6 +269,7 @@
     <!-- Sidebar Column -->
     <div class="col-lg-4">
       <!-- Quick Actions Card -->
+      {% if request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
       <div class="card mb-4 border-0 shadow-sm">
         <div class="card-header bg-white py-3">
           <h5 class="mb-0"><i class="fas fa-bolt text-primary me-2"></i>Quick Actions</h5>
@@ -408,21 +289,10 @@
               <i class="fas fa-calendar-plus me-2"></i>Schedule Viewing
             </a>
             {% endif %}
-
-            {% comment %} <button class="btn btn-outline-primary mb-2">
-              <i class="fas fa-envelope me-2"></i>Send Email
-            </button> {% endcomment %}
-
-            {% comment %} <button class="btn btn-outline-primary mb-2">
-              <i class="fas fa-phone me-2"></i>Call Client
-            </button> {% endcomment %}
-
-            {% comment %} <button class="btn btn-outline-danger">
-              <i class="fas fa-archive me-2"></i>Archive Lead
-            </button> {% endcomment %}
           </div>
         </div>
       </div>
+      {% endif %}
 
       <!-- Activity Log Card -->
       <div class="card mb-4 border-0 shadow-sm">
@@ -445,11 +315,13 @@
             </div>
             {% endfor %}
           </div>
+          {% if request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
           <div class="text-center mt-3">
             <a href="#" class="btn btn-sm btn-outline-primary">
               View Full History
             </a>
           </div>
+          {% endif %}
           {% else %}
           <div class="text-center py-3">
             <i class="fas fa-history fa-2x text-muted mb-3 opacity-25"></i>
@@ -463,6 +335,7 @@
 </div>
 
 <!-- Notes Modal -->
+{% if request.user.is_agent and lead.agent.user == request.user or request.user.is_staff %}
 <div class="modal fade" id="notesModal" tabindex="-1" aria-labelledby="notesModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -525,4 +398,5 @@
     </div>
   </div>
 </div>
+{% endif %}
 {% endblock %}

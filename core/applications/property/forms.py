@@ -9,7 +9,9 @@ from core.applications.property.models import PropertyImage
 from core.applications.property.models import PropertySubscription
 from core.applications.property.models import PropertyType
 from core.applications.property.models import PropertyViewing
-from core.helper.enums import PropertyTypeChoices
+from core.applications.subscriptions.features import FEATURE_LIMITS
+from core.applications.subscriptions.models import FeaturedListing
+from core.helper.enums import PropertyTypeChoices, SubscriptionPlan
 
 
 class PropertyForm(forms.ModelForm):
@@ -143,43 +145,54 @@ class PropertyForm(forms.ModelForm):
             raise forms.ValidationError("Square footage cannot be negative.")
         return sqft
 
+    from django.core.exceptions import ValidationError
+
     def clean(self):
         cleaned_data = super().clean()
         property_type = cleaned_data.get("property_type")
         new_property_type = cleaned_data.get("new_property_type", "").strip()
 
-        # If both fields are empty
+        # ✅ Subscription-based property limit enforcement
+        agent = getattr(self.instance, "agent", None)
+        if agent:
+            subscription = getattr(agent, "current_subscription", None)
+            plan = subscription.plan if subscription else SubscriptionPlan.FREE
+            property_count = agent.properties.count()
+            limit = FEATURE_LIMITS.get(plan, {}).get("properties")
+
+            if limit is not None and property_count >= limit:
+                raise ValidationError(
+                    {
+                        "__all__": f"You have reached your property limit ({limit}) for the {plan} plan. Please upgrade your subscription."
+                    }
+                )
+
+        # Existing property_type validation
         if not property_type and not new_property_type:
-            raise forms.ValidationError(
+            raise ValidationError(
                 "Please select a property type or enter a new one.",
                 code="missing_property_type",
             )
 
-        # If new property type is entered
         if new_property_type:
-            # Validate the new type
             if len(new_property_type) < 3:
-                raise forms.ValidationError(
+                raise ValidationError(
                     "Property type must be at least 3 characters.",
                     code="invalid_property_type_length",
                 )
 
-            # Check for existing type (case insensitive)
             existing_type = PropertyType.objects.filter(
                 title__iexact=new_property_type,
             ).first()
 
             if existing_type:
-                # Use existing type instead
                 cleaned_data["property_type"] = existing_type
-                self.instance.property_type = existing_type  # Assign to model instance
+                self.instance.property_type = existing_type
             else:
-                # Create and assign new type
                 new_type = PropertyType.objects.create(title=new_property_type)
                 cleaned_data["property_type"] = new_type
-                self.instance.property_type = new_type  # Assign to model instance
+                self.instance.property_type = new_type
 
-            # Clear the temporary new_property_type field
             cleaned_data["new_property_type"] = ""
             if hasattr(self.instance, "new_property_type"):
                 self.instance.new_property_type = ""
@@ -215,6 +228,33 @@ class PropertyImageForm(forms.ModelForm):
     class Meta:
         model = PropertyImage
         fields = ["property", "image"]
+
+
+class FeaturedListingForm(forms.ModelForm):
+    class Meta:
+        model = FeaturedListing  # or whatever your model is called
+        fields = ["property", "is_active", "boost_duration"]
+        widgets = {
+            "is_active": forms.CheckboxInput(attrs={"class": "mb-10"}),
+            "boost_duration": forms.Select(attrs={"class": "mb-10"}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        agent = getattr(self.instance, "agent", None)
+        if agent:
+            subscription = getattr(agent, "current_subscription", None)
+            plan = subscription.plan if subscription else SubscriptionPlan.FREE
+            active_boosts = agent.featured_properties.filter(is_active=True).count()
+            limit = FEATURE_LIMITS.get(plan, {}).get("featured_listings")
+
+            if limit is not None and active_boosts >= limit:
+                raise forms.ValidationError(
+                    f"You have reached your featured listing limit ({limit}) for the {plan} plan. "
+                    f"Please upgrade your subscription."
+                )
+
+        return cleaned_data
 
 
 class PropertySearchForm(forms.Form):
@@ -276,7 +316,7 @@ class PropertySubscriptionForm(forms.ModelForm):
 class LeadCreateForm(forms.ModelForm):
     class Meta:
         model = Lead
-        fields = ["property_link", "message", "status", "notes"]
+        fields = ["property_link", "message", "notes"]
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)

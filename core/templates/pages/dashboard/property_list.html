@@ -4,122 +4,184 @@
 
 <!-- main-content -->
 <div class="main-content">
-  <!-- main-content-wrap -->
   <div class="main-content-inner">
-    <!-- main-content-wrap -->
     <div class="main-content-wrap">
+
+      <!-- Header Section -->
       <div class="flex items-center flex-wrap justify-between gap20 mb-27">
-        <h3>Property List</h3>
-
+        <div>
+          <h3 class="modern-title">Property List</h3>
+          <p class="modern-subtitle">Manage your property portfolio</p>
+        </div>
+        <div class="table-controls">
+          <div class="search-box">
+            <i class="icon-search"></i>
+            <input type="text" placeholder="Search properties...">
+          </div>
+          <select class="filter-select">
+            <option value="">All Types</option>
+            <option value="house">House</option>
+            <option value="apartment">Apartment</option>
+            <option value="condo">Condo</option>
+          </select>
+          <a href="{% url 'property:property_create' %}" class="btn-primary">
+            <i class="icon-plus"></i>
+            Add Property
+          </a>
+        </div>
       </div>
-      <!-- product-list -->
-      <div class="wg-box">
 
+      <!-- Modern Table -->
+      <div class="modern-table-container">
+        <div class="wg-box modern-table-wrapper">
+          <div class="wg-table table-product-list modern-table">
 
-        <div class="wg-table table-product-list">
-          <ul class="table-title flex gap20 mb-14">
-            <li>
-              <div class="body-title">Property</div>
-            </li>
+            <!-- Table Header -->
+            <div class="table-header modern-header flex gap20">
+              <div class="header-col property-col"><div class="body-title">Property</div></div>
+              <div class="header-col"><div class="body-title">Price</div></div>
+              <div class="header-col"><div class="body-title">Type</div></div>
+              <div class="header-col"><div class="body-title">Status</div></div>
+              <div class="header-col actions-col"><div class="body-title">Actions</div></div>
+            </div>
 
-            <li>
-              <div class="body-title">Price</div>
-            </li>
-            <li>
-              <div class="body-title">Proprty Type</div>
-            </li>
-
-            <li>
-              <div class="body-title">Available</div>
-            </li>
-
-            <li>
-              <div class="body-title">Action</div>
-            </li>
-          </ul>
-          <ul class="flex flex-column">
-            {% for property in properties %}
-            <li class="product-item gap14">
-              <div class="image no-bg">
-                <img src="{{ property.main_image_url }}" alt="">
-              </div>
-              <div class="flex items-center justify-between gap20 flex-grow">
-                <div class="name">
-                  <a href="#" class="body-title-2">{{ property.title}}</a>
+            <!-- Property Rows -->
+            <div class="table-body modern-body">
+              {% for property in properties %}
+              <div class="table-row modern-row flex items-center">
+                <div class="table-col property-col">
+                  <div class="property-info-cell">
+                    <div class="property-image">
+                      <img src="{{ property.main_image_url }}" alt="{{ property.title }}">
+                      {% if property.is_featured %}
+                      <div class="featured-badge">
+                        <i class="icon-star"></i>
+                      </div>
+                      {% endif %}
+                    </div>
+                    <div class="property-details">
+                      <a href="#" class="property-title">{{ property.title }}</a>
+                      <div class="property-location">
+                        <i class="icon-map-pin"></i>
+                        {{ property.location|default:"Location not set" }}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div class="body-text">${{ property.price }}</div>
-                <div class="body-text">{{ property.property_type}}</div>
-                {% comment %} <div class="body-text">{{ property.bedrooms }}</div> {% endcomment %}
-                <div>
 
+                <div class="table-col">
+                  <div class="price-cell">
+                    <span class="price-value">${{ property.price }}</span>
+                    {% if property.price_per_sqft %}
+                    <span class="price-unit">${{ property.price_per_sqft }}/sqft</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="table-col">
+                  <div class="type-cell">
+                    <span class="type-badge {{ property.property_type|lower }}">{{ property.property_type }}</span>
+                  </div>
+                </div>
+
+                <div class="table-col">
+                  <div class="status-cell">
                     {% if property.is_available %}
-                    <div class="block-not-available">Yes</div>
+                      <span class="status-badge available">
+                        <i class="icon-check-circle"></i> Available
+                      </span>
                     {% else %}
-                    <div class="block-not-available">No</div>
+                      <span class="status-badge unavailable">
+                        <i class="icon-x-circle"></i> Unavailable
+                      </span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="table-col actions-col">
+                  <div class="actions-cell">
+                    <!-- View -->
+                    <a href="#" class="action-btn view" title="View Property">
+                      <i class="icon-eye"></i>
+                    </a>
+
+                    <!-- Edit -->
+                    <a href="{% url 'property:property_update' property.id %}" class="action-btn edit" title="Edit Property">
+                      <i class="icon-edit-3"></i>
+                    </a>
+
+                    <!-- Feature/Unfeature -->
+                    {% if property.is_featured %}
+                      <form action="{% url 'property:unfeature_property' property.id %}" method="post" class="action-form">
+                        {% csrf_token %}
+                        <button type="submit" class="action-btn feature active" title="Unfeature Property">
+                          <i class="icon-star"></i>
+                        </button>
+                      </form>
+                    {% else %}
+                      <form action="{% url 'property:feature_property' property.id %}" method="post" class="action-form">
+                        {% csrf_token %}
+                        <button type="submit" class="action-btn feature" title="Feature Property">
+                          <i class="icon-star"></i>
+                        </button>
+                      </form>
                     {% endif %}
 
-
-                </div>
-                <div class="list-icon-function">
-                  <div class="item eye">
-                    <a href="">
-                        <i class="icon-eye"></i>
-                    </a>
-                  </div>
-                  <div class="item edit">
-                    <a href="{% url 'property:property_update' property.id %}">
-                        <i class="icon-edit-3"></i>
-                    </a>
-                  </div>
-                  <div class="item trash">
-                    <a href="{% url 'property:property_delete' property.id %}">
-                        <i class="icon-trash-2"></i>
+                    <!-- Delete -->
+                    <a href="{% url 'property:property_delete' property.id %}" class="action-btn delete" title="Delete Property">
+                      <i class="icon-trash-2"></i>
                     </a>
                   </div>
                 </div>
               </div>
-            </li>
-            {% endfor %}
+              {% empty %}
+              <div class="empty-table-state">
+                <div class="empty-icon">
+                  <i class="icon-home"></i>
+                </div>
+                <h4>No Properties Found</h4>
+                <p>You haven't added any properties yet.</p>
+                <a href="#" class="btn-primary">
+                  <i class="icon-plus"></i>
+                  Add New Property
+                </a>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
 
-          </ul>
-        </div>
-        <div class="divider"></div>
-        <div class="flex items-center justify-between flex-wrap gap10">
-          <div class="text-tiny">Showing 10 entries</div>
-          <ul class="wg-pagination">
-            <li>
-              <a href="#"><i class="icon-chevron-left"></i></a>
-            </li>
-            <li>
-              <a href="#">1</a>
-            </li>
-            <li class="active">
-              <a href="#">2</a>
-            </li>
-            <li>
-              <a href="#">3</a>
-            </li>
-            <li>
-              <a href="#"><i class="icon-chevron-right"></i></a>
-            </li>
-          </ul>
+          <div class="table-divider"></div>
+
+          <!-- Pagination -->
+          <div class="table-footer flex items-center justify-between flex-wrap gap10">
+            <div class="pagination-info">
+              Showing <strong>1-{{ properties|length }}</strong> of <strong>{{ properties|length }}</strong> properties
+            </div>
+            <ul class="wg-pagination modern-pagination">
+              <li><a href="#" class="pagination-nav"><i class="icon-chevron-left"></i></a></li>
+              <li><a href="#" class="pagination-page">1</a></li>
+              <li><a href="#" class="pagination-page active">2</a></li>
+              <li><a href="#" class="pagination-page">3</a></li>
+              <li><a href="#" class="pagination-nav"><i class="icon-chevron-right"></i></a></li>
+            </ul>
+          </div>
         </div>
       </div>
       <!-- /product-list -->
     </div>
-    <!-- /main-content-wrap -->
   </div>
-  <!-- /main-content-wrap -->
+
   <!-- bottom-page -->
   <div class="bottom-page">
     <div class="body-text">Copyright © 2025 REM. Design with</div>
     <i class="icon-heart"></i>
-    <div class="body-text">by <a href="user/REM/portfoliouser/REM/portfolio">REM</a> All rights
-      reserved.</div>
+    <div class="body-text">
+      by <a href="user/REM/portfoliouser/REM/portfolio">REM</a> All rights reserved.
+    </div>
   </div>
-  <!-- /bottom-page -->
 </div>
 <!-- /main-content -->
-</div>
+
+
 
 {% endblock content %}

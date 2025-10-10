@@ -12,7 +12,7 @@ from django.db.models import EmailField
 from django.db.models import FileField
 from django.db.models import ImageField
 from django.db.models import JSONField
-from django.db.models import TextField
+from django.db.models import TextField, SET_NULL
 from django.db.models import URLField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -76,6 +76,11 @@ class User(AbstractUser):
     @property
     def is_agent(self) -> bool:
         return self.role == UserRoleChoice.AGENT.value
+
+    @property
+    def agent_profile_or_none(self):
+        """Return the agent profile if it exists, else None."""
+        return getattr(self, "agent_profile", None)
 
 
 class BaseProfile(UIDTimeBasedModel):
@@ -184,6 +189,13 @@ class AgentProfile(BaseProfile):
         choices=VerificationStatusChoices.choices,
         default=VerificationStatusChoices.PENDING,
     )
+    current_subscription = auto_prefetch.OneToOneField(
+        "subscriptions.AgentSubscription",
+        on_delete=SET_NULL,
+        null=True,
+        blank=True,
+        related_name="active_for_agent",
+    )
     verified = BooleanField(default=False)
 
     class Meta(auto_prefetch.Model.Meta):
@@ -192,23 +204,47 @@ class AgentProfile(BaseProfile):
         ordering = ["-id"]
 
     def clean(self):
-        """Validate agent-specific fields"""
+        """Validate agent-specific fields."""
         if self.agent_type == AgentTypeChoices.REAL_ESTATE_AGENT:
             if not self.company_name:
                 raise ValidationError(
-                    {
-                        "company_name": "Company name is required for real estate agents.",
-                    },
+                    {"company_name": "Company name is required for real estate agents."}
                 )
             if not self.license_number:
                 raise ValidationError(
                     {
-                        "license_number": "License number is required for real estate agents.",
-                    },
+                        "license_number": "License number is required for real estate agents."
+                    }
                 )
 
     def __str__(self):
         return self.user.name
+
+    # --- Subscription Helpers ---
+
+    def has_active_subscription(self) -> bool:
+        """Check if agent currently has a valid subscription."""
+        return self.current_subscription and self.current_subscription.is_valid()
+
+    def subscription_plan(self) -> str | None:
+        """Return current subscription plan or None."""
+        return self.current_subscription.plan if self.current_subscription else None
+
+    def days_left_in_subscription(self) -> int | None:
+        """Return remaining days of active subscription."""
+        if not self.current_subscription:
+            return None
+        return self.current_subscription.remaining_days()
+
+    def set_current_subscription(self, subscription):
+        """
+        Helper to assign or update current active subscription.
+        Ensures only valid subscription is linked.
+        """
+        if subscription and not subscription.is_valid():
+            raise ValidationError("Cannot assign an expired subscription.")
+        self.current_subscription = subscription
+        self.save(update_fields=["current_subscription"])
 
 
 # class RealEstateOwnerProfile(UIDTimeBasedModel):

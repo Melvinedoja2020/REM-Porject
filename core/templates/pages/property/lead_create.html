@@ -2,68 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<style>
-  .btn-primary {
-    background-color: #E8960F;
-    border-color: #E8960F;
-  }
 
-  .btn-primary:hover,
-  .btn-primary:focus {
-    background-color: #cf830d;
-    border-color: #cf830d;
-  }
-
-  .btn-outline-primary {
-    color: #E8960F;
-    border-color: #E8960F;
-  }
-
-  .btn-outline-primary:hover,
-  .btn-outline-primary:focus {
-    background-color: #E8960F;
-    border-color: #E8960F;
-    color: white;
-  }
-
-  .text-primary {
-    color: #E8960F !important;
-  }
-
-  .border-primary {
-    border-color: #E8960F !important;
-  }
-
-  .card-header {
-    font-weight: 600;
-    background-color: white;
-    border-bottom: 1px solid rgba(0, 0, 0, .125);
-  }
-
-  .client-display-box {
-    background-color: #f8f9fa;
-    border-radius: 0.375rem;
-    padding: 0.75rem;
-    border: 1px solid #dee2e6;
-  }
-
-  .tips-list .list-group-item {
-    border-left: 0;
-    border-right: 0;
-    padding: 0.75rem 0;
-  }
-
-  .tips-list .list-group-item:first-child {
-    border-top: 0;
-    padding-top: 0;
-  }
-
-  .tips-list .list-group-item:last-child {
-    border-bottom: 0;
-    padding-bottom: 0;
-  }
-
-</style>
 
 <div class="container-fluid px-4 px-lg-5">
   <!-- Header -->
@@ -78,10 +17,14 @@
   {% include 'partials/messages.html' %}
 
   <!-- Display form errors -->
-  {% if form.non_field_errors %}
-  <div class="alert alert-danger mb-4">
-    <i class="fas fa-exclamation-circle me-2"></i>
-    {{ form.non_field_errors }}
+  {% if form.errors %}
+  <div class="alert alert-danger mt-3">
+    <strong>There were some errors with your submission:</strong>
+    <ul class="mb-0">
+      {% for field, errors in form.errors.items %}
+      <li><strong>{{ field|capfirst }}</strong>: {{ errors|join:", " }}</li>
+      {% endfor %}
+    </ul>
   </div>
   {% endif %}
 

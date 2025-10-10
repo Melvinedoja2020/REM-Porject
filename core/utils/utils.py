@@ -139,21 +139,31 @@ def process_new_lead(lead):
         if not hasattr(lead.user, "profile"):
             raise ValueError("Lead user has no profile")
 
+        property_obj = lead.property  # ✅ use the correct related field
+
+        dashboard_url = getattr(
+            settings,
+            "FRONTEND_DASHBOARD_URL",
+            "http://localhost:8000",
+        )
+
+        # ✅ Build correct backend URL for the lead detail
+        lead_detail_path = reverse("property:lead_detail", kwargs={"pk": lead.pk})
+        lead_detail_url = f"{dashboard_url.rstrip('/')}{lead_detail_path}"
+
         context = {
             "lead": lead,
             "agent": lead.agent.user.agent_profile,
             "user": lead.user.profile,
-            "property": lead.property_link,
-            "dashboard_url": getattr(
-                settings,
-                "FRONTEND_DASHBOARD_URL",
-                "http://localhost:8000",
-            ),
+            "property": property_obj,
+            "dashboard_url": dashboard_url,
+            "lead_detail_url": lead_detail_url,  # ✅ Add this
+            "site_name": getattr(settings, "SITE_NAME", "Real Estate Market"),  # optional
         }
 
         # Email agent
         send_mail(
-            subject=f"New Lead: {lead.property_link.title}",
+            subject=f"New Lead: {property_obj.title}",
             message=render_to_string(
                 "pages/notifications/lead_notification.txt",
                 context,
@@ -169,7 +179,7 @@ def process_new_lead(lead):
 
         # Email user
         send_mail(
-            subject=f"Your inquiry about {lead.property_link.title}",
+            subject=f"Your inquiry about {property_obj.title}",
             message=render_to_string(
                 "pages/notifications/lead_confirmation.txt",
                 context,
@@ -183,20 +193,24 @@ def process_new_lead(lead):
             fail_silently=False,
         )
 
-        # Notification
+        # Create in-app notification
         Notification.objects.create(
             user=lead.agent.user,
             notification_type=NotificationType.NEW_LEAD,
             title=f"New Lead from {lead.user.profile.full_name}",
-            message=f"Interested in {lead.property_link.title}",
+            message=f"Interested in {property_obj.title}",
             metadata={
                 "lead_id": str(lead.id),
-                "property_id": str(lead.property_link.id),
+                "property_id": str(property_obj.id),
+                "lead_detail_url": lead_detail_url,
             },
         )
 
+        print("✅ Lead processed successfully.")
+
     except Exception as e:
         logger.error(f"Failed to process new lead: {e!s}", exc_info=True)
+        print("❌ Failed to process new lead:", e)
 
 
 def process_viewing_scheduled(viewing):

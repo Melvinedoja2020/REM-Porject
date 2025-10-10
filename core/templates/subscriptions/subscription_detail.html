@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Subscription Details{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <!-- Header Section -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="fw-bold display-6 mb-2" style="color:#333;">Your Subscription</h1>
+          <p class="text-muted">Manage your subscription details and billing information</p>
+        </div>
+        <div class="status-badge">
+          <span
+            class="badge rounded-pill py-2 px-3 fs-6 {% if subscription.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+            {{ subscription.is_active|yesno:"Active,Inactive" }}
+          </span>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <!-- Subscription Details Card -->
+        <div class="col-lg-8">
+          <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 py-4">
+              <h4 class="fw-bold mb-0" style="color:#333;">
+                <i class="bi bi-card-checklist me-2" style="color:#ecaa3c;"></i>
+                Subscription Overview
+              </h4>
+            </div>
+            <div class="card-body p-4">
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3"
+                      style="width: 40px; height: 40px; background-color: rgba(236, 170, 60, 0.1);">
+                      <i class="bi bi-layers-fill" style="color:#ecaa3c;"></i>
+                    </div>
+                    <div>
+                      <p class="text-muted small mb-0">Current Plan</p>
+                      <h5 class="fw-bold mb-0" style="color:#333;">{{ subscription.get_plan_display }}</h5>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3"
+                      style="width: 40px; height: 40px; background-color: rgba(236, 170, 60, 0.1);">
+                      <i class="bi bi-currency-exchange" style="color:#ecaa3c;"></i>
+                    </div>
+                    <div>
+                      <p class="text-muted small mb-0">Amount Paid</p>
+                      <h5 class="fw-bold mb-0" style="color:#333;">
+                        ₦{{ subscription.amount_paid|floatformat:0|intcomma }}</h5>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3"
+                      style="width: 40px; height: 40px; background-color: rgba(236, 170, 60, 0.1);">
+                      <i class="bi bi-calendar-check" style="color:#ecaa3c;"></i>
+                    </div>
+                    <div>
+                      <p class="text-muted small mb-0">Start Date</p>
+                      <h5 class="fw-bold mb-0" style="color:#333;">{{ subscription.start_date|date:"M d, Y" }}</h5>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3"
+                      style="width: 40px; height: 40px; background-color: rgba(236, 170, 60, 0.1);">
+                      <i class="bi bi-calendar-x" style="color:#ecaa3c;"></i>
+                    </div>
+                    <div>
+                      <p class="text-muted small mb-0">End Date</p>
+                      <h5 class="fw-bold mb-0" style="color:#333;">{{ subscription.end_date|date:"M d, Y" }}</h5>
+                    </div>
+                  </div>
+                </div>
+
+                {% if subscription.remaining_days %}
+                <div class="col-12">
+                  <div class="progress-container mt-2">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="text-muted small">Subscription Progress</span>
+                      <span class="text-muted small">{{ subscription.remaining_days }} days remaining</span>
+                    </div>
+                    <div class="progress" style="height: 8px; background-color: #f0f0f0;">
+                      <div class="progress-bar rounded-pill"
+                        style="background: linear-gradient(135deg, #ecaa3c, #d3912e); width: {% widthratio subscription.remaining_days subscription.total_days 100 %}%;">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions Sidebar -->
+        {% comment %} <div class="col-lg-4">
+          <div class="card shadow-sm border-0 rounded-4 h-100">
+            <div class="card-header bg-transparent border-0 py-4">
+              <h5 class="fw-bold mb-0" style="color:#333;">
+                <i class="bi bi-lightning-charge me-2" style="color:#ecaa3c;"></i>
+                Quick Actions
+              </h5>
+            </div>
+            <div class="card-body p-4">
+              <div class="d-grid gap-3">
+                {% if subscription.is_active %}
+                <button class="btn btn-outline-primary py-2 rounded-3 d-flex align-items-center justify-content-center">
+                  <i class="bi bi-arrow-up-circle me-2"></i>
+                  Upgrade Plan
+                </button>
+                <button
+                  class="btn btn-outline-secondary py-2 rounded-3 d-flex align-items-center justify-content-center">
+                  <i class="bi bi-pause-circle me-2"></i>
+                  Pause Subscription
+                </button>
+                {% else %}
+                <button class="btn py-2 rounded-3 d-flex align-items-center justify-content-center text-white"
+                  style="background: linear-gradient(135deg, #ecaa3c, #d3912e);">
+                  <i class="bi bi-play-circle me-2"></i>
+                  Reactivate Plan
+                </button>
+                {% endif %}
+                <button class="btn btn-outline-danger py-2 rounded-3 d-flex align-items-center justify-content-center">
+                  <i class="bi bi-download me-2"></i>
+                  Download Invoice
+                </button>
+              </div>
+            </div>
+          </div>
+        </div> {% endcomment %}
+      </div>
+
+      <!-- Payment History Section -->
+      <div class="card shadow-sm border-0 rounded-4 mt-4">
+        <div class="card-header bg-transparent border-0 py-4">
+          <h4 class="fw-bold mb-0" style="color:#333;">
+            <i class="bi bi-receipt me-2" style="color:#ecaa3c;"></i>
+            Payment History
+          </h4>
+        </div>
+        <div class="card-body p-4">
+          {% if subscription.payment_set.exists %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead style="background-color: #f8f9fa;">
+                <tr>
+                  <th scope="col" class="fw-semibold">Reference</th>
+                  <th scope="col" class="fw-semibold">Status</th>
+                  <th scope="col" class="fw-semibold">Method</th>
+                  <th scope="col" class="fw-semibold">Date</th>
+                  <th scope="col" class="fw-semibold text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for payment in subscription.payment_set.all %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="icon-wrapper rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style="width: 36px; height: 36px; background-color: rgba(236, 170, 60, 0.1);">
+                        <i class="bi bi-receipt" style="color:#ecaa3c; font-size: 0.9rem;"></i>
+                      </div>
+                      <span class="fw-medium">{{ payment.reference }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge rounded-pill py-2 px-3
+                        {% if payment.status == 'completed' %}bg-success
+                        {% elif payment.status == 'pending' %}bg-warning
+                        {% else %}bg-danger{% endif %}">
+                      {{ payment.status|capfirst }}
+                    </span>
+                  </td>
+                  <td class="text-capitalize">{{ payment.payment_method }}</td>
+                  <td class="text-muted">{{ payment.created_at|date:"M d, Y" }}</td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                      <i class="bi bi-download me-1"></i> Receipt
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-5">
+            <div class="mb-4">
+              <i class="bi bi-receipt-cutoff display-1" style="color:#f0f0f0;"></i>
+            </div>
+            <h5 class="fw-bold mb-2" style="color:#333;">No Payment Records</h5>
+            <p class="text-muted mb-4">No payment history found for this subscription.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Support Section -->
+      {% comment %} <div class="card shadow-sm border-0 rounded-4 mt-4">
+        <div class="card-body p-4 text-center">
+          <div class="row align-items-center">
+            <div class="col-md-8 text-md-start">
+              <h5 class="fw-bold mb-2" style="color:#333;">Need help with your subscription?</h5>
+              <p class="text-muted mb-0">Our support team is here to help you with any questions.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+              <button class="btn py-2 px-4 rounded-3 text-white d-inline-flex align-items-center"
+                style="background: linear-gradient(135deg, #ecaa3c, #d3912e);">
+                <i class="bi bi-headset me-2"></i>
+                Contact Support
+              </button>
+            </div>
+          </div>
+        </div>
+      </div> {% endcomment %}
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

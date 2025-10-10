@@ -93,3 +93,15 @@ ICON_CLASSES = {
     "townhouse": "icon-townhouse",
     "commercial": "icon-commercial",
 }
+
+class SubscriptionPlan(TextChoices):
+    FREE = ("Free", "Free")
+    BASIC = ("Basic", "Basic")
+    PREMIUM = ("Premium", "Premium")
+    ENTERPRISE = ("Enterprise", "Enterprise")
+
+
+class PaymentStatus(TextChoices):
+    PENDING = ("Pending", "Pending")
+    PAID = ("Paid", "Paid")
+    FAILED = ("Failed", "Failed")

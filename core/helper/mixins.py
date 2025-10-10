@@ -30,16 +30,26 @@ class RoleRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
 class AgentApprovalRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         print("🔥 AgentApprovalRequiredMixin dispatch called")
-        if (
-            hasattr(request.user, "agent_profile")
-            and not request.user.agent_profile.verified
-        ):
+
+        # If user is not an agent, redirect
+        if not request.user.is_authenticated or not request.user.is_agent:
+            messages.error(request, "You must be an approved agent to access this page.")
+            return redirect("home:home")
+
+        agent_profile = request.user.agent_profile_or_none
+        if not agent_profile:
+            messages.error(request, "Agent profile not found. Please complete your setup.")
+            return redirect("home:home")
+
+        if not agent_profile.verified:
             messages.warning(
                 request,
-                "Your agent profile is pending approval you will have access once approved.",
+                "Your agent profile is pending approval. You will have access once approved.",
             )
             return redirect("home:home")
+
         return super().dispatch(request, *args, **kwargs)
+
 
 
 class AgentRequiredMixin(LoginRequiredMixin):

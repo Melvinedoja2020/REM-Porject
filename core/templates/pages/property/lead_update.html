@@ -2,51 +2,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<style>
-  .btn-primary {
-    background-color: #E8960F;
-    border-color: #E8960F;
-  }
 
-  .btn-primary:hover, .btn-primary:focus {
-    background-color: #cf830d;
-    border-color: #cf830d;
-  }
-
-  .btn-outline-primary {
-    color: #E8960F;
-    border-color: #E8960F;
-  }
-
-  .btn-outline-primary:hover, .btn-outline-primary:focus {
-    background-color: #E8960F;
-    border-color: #E8960F;
-    color: white;
-  }
-
-  .text-primary {
-    color: #E8960F !important;
-  }
-
-  .border-primary {
-    border-color: #E8960F !important;
-  }
-
-  .card-header {
-    font-weight: 600;
-    background-color: white;
-    border-bottom: 1px solid rgba(0,0,0,.125);
-  }
-
-  .property-info-card {
-    transition: all 0.3s ease;
-  }
-
-  .property-info-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-</style>
 
 
 
@@ -71,14 +27,14 @@
             {% csrf_token %}
             <div class="row">
               <div class="col-md-6 mb-3">
-                {{ form.status|as_crispy_field }}
+                {{ form.status }}
               </div>
               {% comment %} <div class="col-md-6 mb-3">
-                {{ form.source|as_crispy_field }}
+                {{ form.source }}
               </div> {% endcomment %}
             </div>
             <div class="mb-3">
-              {{ form.notes|as_crispy_field }}
+              {{ form.notes }}
             </div>
 
             <div class="d-flex justify-content-between border-top pt-3 mt-4">

@@ -15,6 +15,7 @@ urlpatterns = [
     path("", include("core.applications.home.urls", namespace="home")),
     path("", include("core.applications.notifications.urls", namespace="notification")),
     path("property/", include("core.applications.property.urls", namespace="property")),
+    path("subscription/", include("core.applications.subscriptions.urls", namespace="subscription")),
     # User management
     path("users/", include("core.applications.users.urls", namespace="users")),
     # path("accounts/", include("allauth.urls")),

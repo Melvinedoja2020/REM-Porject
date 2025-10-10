@@ -2,3 +2,11 @@
 # ------------------------------------------------------------------------------
 USE_DOCKER=yes
 IPYTHONDIR=/app/.ipython
+
+
+# Paystack Settings
+PAYSTACK_SECRET_KEY=sk_test_dc17d6890d09ac7d051b53356869f200c32cc57a
+PAYSTACK_PUBLIC_KEY=pk_test_0bfc21f7de14fc3229357aecd6cf570ccf042591
+PAYSTACK_BASE_URL=https://api.paystack.co
+# PAYSTACK_BASE_URL=http://localhost:8000
+PAYSTACK_CALLBACK_URL=http://localhost:8000/subscriptions/verify/

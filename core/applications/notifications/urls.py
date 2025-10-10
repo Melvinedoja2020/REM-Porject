@@ -6,6 +6,7 @@ from core.applications.notifications.views import MessageDetailView
 from core.applications.notifications.views import MessageListView
 from core.applications.notifications.views import NotificationDetailView
 from core.applications.notifications.views import NotificationListView
+from django.views.generic import RedirectView
 
 app_name = "notification"
 
@@ -18,8 +19,8 @@ urlpatterns = [
         MessageCreateView.as_view(),
         name="message_create_to_agent",
     ),
-    path("messages/<uuid:pk>/", MessageDetailView.as_view(), name="message_detail"),
-    path("messages/<uuid:pk>/reply/", MessageDetailView.as_view(), name="send_reply"),
+    path("messages/<str:pk>/", MessageDetailView.as_view(), name="message_detail"),
+    path("messages/<str:pk>/reply/", MessageDetailView.as_view(), name="send_reply"),
     path("notifications", NotificationListView.as_view(), name="notification_list"),
     path("<str:pk>/", NotificationDetailView.as_view(), name="notification_detail"),
     path(
@@ -27,4 +28,5 @@ urlpatterns = [
         MarkAllNotificationsReadView.as_view(),
         name="mark_all_read",
     ),
+    path("favicon.ico", RedirectView.as_view(url="/static/favicon.ico")),
 ]

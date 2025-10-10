@@ -1,6 +1,10 @@
 from django.urls import path
 
-from core.applications.property.views import CreatePropertySubscriptionView
+from core.applications.property.views import (
+    CreatePropertySubscriptionView,
+    FeaturePropertyView,
+    UnfeaturePropertyView,
+)
 from core.applications.property.views import FavoriteDeleteView
 from core.applications.property.views import FavoriteLeadCreateView
 from core.applications.property.views import FavoriteListView
@@ -52,5 +56,11 @@ urlpatterns = [
         "leads/<str:pk>/schedule/",
         ViewingScheduleView.as_view(),
         name="schedule_viewing",
+    ),
+    path("feature/<uuid:pk>/", FeaturePropertyView.as_view(), name="feature_property"),
+    path(
+        "unfeature/<uuid:pk>/",
+        UnfeaturePropertyView.as_view(),
+        name="unfeature_property",
     ),
 ]

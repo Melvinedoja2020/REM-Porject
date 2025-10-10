@@ -185,9 +185,18 @@
         <span class="body-1">Show Dashboard</span>
       </div> {% endcomment %}
       {% include 'partials/messages.html' %}
+
       <div class="widget-box-2">
         {% if request.user.agent_profile and not request.user.agent_profile.verified %}
         <div class="box">
+
+          {% if form.errors %}
+          <div class="alert alert-danger" role="alert">
+            <strong>Please correct the errors below.</strong>
+            {{form.errors}}
+          </div>
+
+          {% else %}
           <div class="box-agent-account">
             <h6>Agent Profile</h6>
             <p class="note">Dear {{ request.user.name }}, <br>
@@ -197,6 +206,9 @@
             </p>
 
           </div>
+
+          {% endif %}
+
         </div>
         {% endif %}
         <form method=post enctype="multipart/form-data">

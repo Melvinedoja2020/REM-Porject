@@ -8,9 +8,9 @@
     data-tooltip-placement="top"
   >
     {% if property.id in favorite_property_ids %}
-      <i class="icon-save-filled text-red-500 animate-pop" aria-hidden="true"></i>
+      <i class="fas fa-heart text-red-500 animate-pop" aria-hidden="true"></i>
     {% else %}
-      <i class="icon-save text-gray-400 hover:text-red-500 transition-colors" aria-hidden="true"></i>
+      <i class="far fa-heart text-gray-400 hover:text-red-500 transition-colors" aria-hidden="true"></i>
     {% endif %}
     <span class="tooltip">
       {% if property.id in favorite_property_ids %}
@@ -23,23 +23,22 @@
 </div>
 
 <style>
-  /* Micro-interaction: Subtle bounce when favorited */
+/* Subtle pop animation when favorited */
 @keyframes pop {
   0% { transform: scale(1); }
   50% { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
-
 .animate-pop {
   animation: pop 0.3s ease-out;
 }
 
-/* Smoother tooltips */
+/* Tooltip transition */
 .tooltip {
   transition: opacity 0.2s, transform 0.2s;
 }
 
-/* Focus state for keyboard users */
+/* Keyboard accessibility */
 .btn-icon:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;

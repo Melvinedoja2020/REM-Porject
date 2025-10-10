@@ -35,12 +35,8 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["properties"] = Property.objects.filter(
-            is_available=True,
-        ).order_by("-created_at")[:6]
-        context["agents_profile"] = AgentProfile.objects.filter(
-            verified=True,
-        )
+        context["properties"] = Property.objects.available().featured_first()[:6]
+        context["agents_profile"] = AgentProfile.objects.filter(verified=True)
         context["property_types"] = PropertyTypeChoices.choices
         return context
 
@@ -111,15 +107,14 @@ class RentPropertyListView(PropertySearchMixin, ListView):
     paginate_by = 6
 
     def get_queryset(self):
+        """"""
         base_queryset = (
-            Property.objects.filter(
-                is_available=True,
-                property_listing=PropertyListingType.RENT,
-            )
+            Property.objects.available()
+            .filter(property_listing=PropertyListingType.RENT)
+            .featured_first()
             .select_related("agent")
             .prefetch_related("images", "amenities")
         )
-
         return self.get_filtered_queryset(base_queryset)
 
     def get_context_data(self, **kwargs):
@@ -146,14 +141,12 @@ class BuyPropertyListView(PropertySearchMixin, ListView):
 
     def get_queryset(self):
         base_queryset = (
-            Property.objects.filter(
-                is_available=True,
-                property_listing=PropertyListingType.FOR_SALE,
-            )
+            Property.objects.available()
+            .filter(property_listing=PropertyListingType.FOR_SALE)
+            .featured_first()
             .select_related("agent")
             .prefetch_related("images", "amenities")
         )
-
         return self.get_filtered_queryset(base_queryset)
 
     def get_context_data(self, **kwargs):

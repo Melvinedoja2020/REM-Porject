@@ -5,7 +5,9 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.text import slugify
 
-from core.helper.enums import Lead_Status_Choices
+from core.applications.property.manager import PropertyManager
+from core.applications.subscriptions.features import FEATURE_LIMITS
+from core.helper.enums import Lead_Status_Choices, SubscriptionPlan
 from core.helper.enums import LeadStatus
 from core.helper.enums import PropertyListingType
 from core.helper.enums import PropertyTypeChoices
@@ -13,6 +15,12 @@ from core.helper.enums import PropertyViewingChoices
 from core.helper.media import MediaHelper
 from core.helper.models import TimeBasedModel
 from core.helper.models import TitleTimeBasedModel
+
+
+from django.contrib.auth import get_user_model
+from django.db import models
+
+User = get_user_model()
 
 
 class PropertyType(TitleTimeBasedModel): ...
@@ -56,6 +64,7 @@ class Property(TitleTimeBasedModel):
 
     is_available = models.BooleanField(default=True)
 
+    objects = PropertyManager()
     class Meta(auto_prefetch.Model.Meta):
         ordering = ["-created_at", "-updated_at", "-id"]
         verbose_name = "Property"
@@ -65,8 +74,33 @@ class Property(TitleTimeBasedModel):
         return f"{self.title} - {self.property_listing}"
 
     def save(self, *args, **kwargs):
+        """
+        Enforce property limits based on agent's subscription plan.
+        Auto-generate slug from title if not provided.
+        Ensure slug uniqueness.
+        """
+        if not self.pk:  # new property
+            subscription = getattr(self.agent, "current_subscription", None)
+            plan = subscription.plan if subscription else SubscriptionPlan.FREE
+
+            property_count = self.agent.properties.count()
+            limit = FEATURE_LIMITS.get(plan, {}).get("properties")
+
+            if limit is not None and property_count >= limit:
+                raise ValidationError(
+                    f"You have reached your property limit ({limit}) "
+                    f"for the {plan} plan. Please upgrade your subscription."
+                )
+
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while Property.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+
         super().save(*args, **kwargs)
 
     @property
@@ -112,6 +146,15 @@ class Property(TitleTimeBasedModel):
             return False
         return self.favoriteproperty_set.filter(user=user).exists()
 
+    @property
+    def is_featured(self):
+        """
+        Returns True if the property currently has an active FeaturedListing.
+        """
+        return self.featured_listings.filter(
+            is_active=True, end_date__gte=timezone.now()
+        ).exists()
+
 
 class PropertyImage(TimeBasedModel):
     property = auto_prefetch.ForeignKey(
@@ -140,12 +183,6 @@ class Amenity(TimeBasedModel):
 
     def __str__(self):
         return self.name
-
-
-from django.contrib.auth import get_user_model
-from django.db import models
-
-User = get_user_model()
 
 
 class PropertySubscription(TimeBasedModel):

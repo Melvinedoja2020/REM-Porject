@@ -14,11 +14,11 @@
       <li><strong>Submitted:</strong> {{ lead.created_at|date:"F j, Y, g:i a" }}</li>
     </ul>
 
-    <p>
+    {% comment %} <p>
       <a href="" style="padding: 10px 15px; background-color: #E8960F; color: white; text-decoration: none; border-radius: 5px;">
         View in Dashboard
       </a>
-    </p>
+    </p> {% endcomment %}
 
     <p>Thank you,<br>{{ settings.DEFAULT_FROM_EMAIL }}</p>
   </body>

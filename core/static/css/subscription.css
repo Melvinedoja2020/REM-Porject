@@ -1,0 +1,58 @@
+.plan-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .popular-plan {
+    transform: scale(1.03);
+    z-index: 1;
+  }
+
+  .icon-wrapper {
+    transition: transform 0.3s ease;
+  }
+
+  .plan-card:hover .icon-wrapper {
+    transform: scale(1.1);
+  }
+
+  .accordion-button:not(.collapsed) {
+    background-color: rgba(236, 170, 60, 0.1);
+    color: #333;
+    box-shadow: none;
+  }
+
+  .accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(236, 170, 60, 0.5);
+  }
+
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .icon-wrapper {
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover .icon-wrapper {
+    transform: scale(1.05);
+  }
+
+  .btn {
+    transition: all 0.3s ease;
+  }
+
+  .table tbody tr {
+    transition: background-color 0.2s ease;
+  }
+
+  .table tbody tr:hover {
+    background-color: rgba(236, 170, 60, 0.05);
+  }

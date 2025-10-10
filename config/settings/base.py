@@ -77,6 +77,7 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.mfa",
     "allauth.socialaccount",
+    "django.contrib.humanize",
     # "allauth.socialaccount.providers.google",
     # "allauth.socialaccount.providers.facebook",
 ]
@@ -183,6 +184,8 @@ TEMPLATES = [
             "context_processors": [
                 "core.applications.home.context_processors.user_context",
                 "core.applications.home.context_processors.announcements",
+                "core.applications.home.context_processors.agent_dashboard_context",
+                "core.applications.home.context_processors.customer_dashboard_context",
                 # "core.applications.home.context_processors.favorite_property_ids",
                 # "core.applications.home.context_processors.favorites_context",
                 "django.template.context_processors.debug",
@@ -309,3 +312,10 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 
 # Default property image URL
 DEFAULT_PROPERTY_IMAGE_URL = "/static/images/placeholder.jpg"
+
+
+# Paystack Keys and integrations
+PAYSTACK_SECRET_KEY = env("PAYSTACK_SECRET_KEY", default="")
+PAYSTACK_PUBLIC_KEY = env("PAYSTACK_PUBLIC_KEY", default="")
+PAYSTACK_BASE_URL = env("PAYSTACK_BASE_URL", default="")
+PAYSTACK_CALLBACK_URL = env("PAYSTACK_CALLBACK_URL", default="")
