@@ -60,6 +60,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # APPS
 # ------------------------------------------------------------------------------
 DJANGO_APPS = [
+    "jazzmin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -319,3 +320,24 @@ PAYSTACK_SECRET_KEY = env("PAYSTACK_SECRET_KEY", default="")
 PAYSTACK_PUBLIC_KEY = env("PAYSTACK_PUBLIC_KEY", default="")
 PAYSTACK_BASE_URL = env("PAYSTACK_BASE_URL", default="")
 PAYSTACK_CALLBACK_URL = env("PAYSTACK_CALLBACK_URL", default="")
+
+
+# Jazmin settings
+JAZZMIN_SETTINGS ={
+    "site_title": "Real Estate Market Place Admin",
+    "site_header": "Real Estate Market Place",
+    "welcome_sign": "Welcome to the Real Estate Market Place Admin",
+    "copyright": "Real Estate Market Place Ltd",
+    "welcome_sign": "Welcome to the Real Estate Market Place Admin",
+    "search_model": "users.User",
+    "site_brand": "Real Estate Market Place",
+    # "site_logo": "images/logo.png",
+    # User Menu Customization
+    "usermenu_links": [
+        {"name": "Profile", "url": "admin:auth_user_changelist"},
+        {"model": "auth.user"},
+    ],
+    "show_sidebar": True,
+    "navigation_expanded": True,  # Keep sidebar expanded by default
+
+}
