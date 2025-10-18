@@ -29,13 +29,13 @@
             We track these errors automatically, but if the problem persists feel free to contact us.<br>
             In the meantime, try refreshing.
           </p>
-          <a href="index.html" class="tf-btn bg-color-primary rounded-4 pd-3 fw-6 mx-auto">Back to home</a>
+          <a href="{% url 'home:home' %}" class="tf-btn bg-color-primary rounded-4 pd-3 fw-6 mx-auto">Back to home</a>
         </div>
 
       </div>
 
       <!-- section-CTA -->
-      <section class="section-CTA">
+      {% comment %} <section class="section-CTA">
         <div class="tf-container">
           <div class="row">
             <div class="col-12">
@@ -54,7 +54,7 @@
             </div>
           </div>
         </div>
-      </section>
+      </section> {% endcomment %}
       <!-- /section-CTA -->
 
     </div>
