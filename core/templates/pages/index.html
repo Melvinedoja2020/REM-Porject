@@ -4,6 +4,22 @@
 {% load custom_tags %}
 {% include 'partials/messages.html' %}
 
+<style>
+  .placeholder-white::placeholder {
+    color: white !important;
+    opacity: 1;
+  }
+
+  .placeholder-white:-ms-input-placeholder {
+    color: white !important;
+  }
+
+  .placeholder-white::-ms-input-placeholder {
+    color: white !important;
+  }
+</style>
+
+
 <!-- .page-title  -->
 <div class="page-title home02 video-banner position-relative text-white">
   <!-- Background Video -->
@@ -52,7 +68,7 @@
                 <div class="col-md-6">
                   <input type="text" name="city"
                     class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="City">
+                    placeholder="City" style="color:white">
                 </div>
 
                 <!-- Property Type -->
@@ -70,19 +86,19 @@
                 <div class="col-md-6">
                   <input type="number" name="bedrooms"
                     class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Bedrooms">
+                    placeholder="Bedrooms" style="color:white">
                 </div>
 
                 <!-- Price Range -->
                 <div class="col-md-3">
                   <input type="number" name="price_min"
                     class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Min Price">
+                    placeholder="Min Price" style="color:white">
                 </div>
                 <div class="col-md-3">
                   <input type="number" name="price_max"
                     class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Max Price">
+                    placeholder="Max Price" style="color:white">
                 </div>
 
                 <!-- Submit -->
@@ -104,7 +120,7 @@
                 <div class="col-md-6">
                   <input type="text" name="city"
                     class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="City">
+                    placeholder="City" style="color:white">
                 </div>
 
                 <!-- Property Type -->
@@ -122,19 +138,19 @@
                 <div class="col-md-6">
                   <input type="number" name="bedrooms"
                     class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Bedrooms">
+                    placeholder="Bedrooms" style="color:white">
                 </div>
 
                 <!-- Price Range -->
                 <div class="col-md-3">
                   <input type="number" name="price_min"
                     class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Min Price">
+                    placeholder="Min Price" style="color:white">
                 </div>
                 <div class="col-md-3">
                   <input type="number" name="price_max"
                     class="form-control bg-transparent text-white placeholder-white border border-white rounded-2 p-2"
-                    placeholder="Max Price">
+                    placeholder="Max Price" style="color:white">
                 </div>
 
                 <!-- Submit -->
@@ -575,7 +591,7 @@
                 </svg>
 
               </div>
-              <h5 class="title"><a href="#">Decades Serving Our Community</a></h5>
+              <h5 class="title"><a href="#">Services</a></h5>
               <p class="text-1">With decades of experience in the local market, we provide discreet, client-focused
                 service tailored to your unique needs.</p>
             </div>
@@ -593,8 +609,7 @@
 
 
               </div>
-              <h5 class="title "><a href="#">We Have <br>
-                  Happy Clients</a></h5>
+              <h5 class="title "><a href="#">Happy Clients</a></h5>
               <p class=" text-1">Not all agents have the skills or experience to ensure you get
                 the highest price for your property. Our experience is your guarantee of best
                 price.</p>
@@ -619,7 +634,7 @@
 
 
               </div>
-              <h5 class="title"><a href="#">A Different Kind of Real Estate Experience</a></h5>
+              <h5 class="title"><a href="#">Experience</a></h5>
               <p class="text-1">Professional service without the ego - we listen first and always put your interests
                 ahead of our own.</p>
             </div>
@@ -636,7 +651,7 @@
 
 
               </div>
-              <h5 class="title"><a href="#">More Than an Agent - A Neighborhood Advocate</a></h5>
+              <h5 class="title"><a href="#">Advocate</a></h5>
               <p class="text-1">We don't just sell houses; we leverage our community relationships to showcase your
                 property's true worth.</p>
             </div>
