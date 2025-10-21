@@ -92,7 +92,25 @@ ICON_CLASSES = {
     "office": "icon-office1",
     "townhouse": "icon-townhouse",
     "commercial": "icon-commercial",
+    "duplex": "icon-duplex",
+    "penthouse": "icon-penthouse",
+    "bungalow": "icon-bungalow",
+    "house": "icon-house1",
 }
+
+IMAGE_PATHS = {
+    "apartment": "images/property/apartments.jpg",
+    "villa": "images/property/villa.jpg",
+    "studio": "images/property/studio.jpg",
+    "office": "images/property/office.jpg",
+    "townhouse": "images/property/row-houses-suburban-area.jpg",
+    "commercial": "images/property/commercial.jpg",
+    "duplex": "images/property/duplex.jpg",
+    "penthouse": "images/property/penthouse.jpg",
+    "bungalow": "images/property/bungalow.jpg",
+    "house": "images/property/apartment.avif",
+}
+
 
 class SubscriptionPlan(TextChoices):
     FREE = ("Free", "Free")

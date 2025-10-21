@@ -3,7 +3,7 @@ from django.utils import timezone
 from core.applications.notifications.models import Announcement
 from core.applications.notifications.models import Notification
 from core.applications.property.models import FavoriteProperty, Lead, Property, PropertyViewing
-from core.helper.enums import ICON_CLASSES
+from core.helper.enums import ICON_CLASSES, IMAGE_PATHS
 from core.helper.enums import PropertyTypeChoices
 from django.db.models import Count, Sum
 
@@ -16,8 +16,7 @@ def user_context(request):
     - Latest notifications (limit 5)
     - Unread notifications count
     - Property listing type counts
-    - Property listing types
-    - Property listing type choices
+    - Property listing types (with icon & image support)
     """
 
     context = {
@@ -29,10 +28,8 @@ def user_context(request):
             {
                 "label": choice.label,
                 "value": choice.value,
-                "icon_class": ICON_CLASSES.get(
-                    choice.value,
-                    "icon-apartment1",
-                ),  # fallback
+                "icon_class": ICON_CLASSES.get(choice.value, "icon-apartment1"),
+                "image_url": IMAGE_PATHS.get(choice.value, "images/property/villa.avif"),
             }
             for choice in PropertyTypeChoices
         ],
@@ -42,18 +39,18 @@ def user_context(request):
         },
     }
 
+    # Add user-specific data if authenticated
     if request.user.is_authenticated:
         user = request.user
         context["favorite_property_ids"] = list(
             user.favorites.values_list("property_id", flat=True),
         )
         context["user_has_favorites"] = user.favorites.exists()
-        context["latest_notifications"] = Notification.objects.filter(
-            user=user,
-        ).order_by("-created_at")[:5]
+        context["latest_notifications"] = (
+            Notification.objects.filter(user=user).order_by("-created_at")[:5]
+        )
         context["unmarked_notifications"] = Notification.objects.filter(
-            user=user,
-            is_read=False,
+            user=user, is_read=False
         ).count()
 
     return context

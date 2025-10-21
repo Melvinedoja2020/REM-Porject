@@ -1,172 +1,198 @@
-{% extends "base.html" %}
-
+{% extends 'dashboard_base.html' %}
+{% load static %}
 {% block content %}
-  {% comment %} {% include 'partials/messages.html' %} {% endcomment %}
 
-  <div class="container py-4 message-container">
-    <div class="card border-0 shadow-sm">
+<!-- main-content -->
+<div class="main-content">
+  <div class="main-content-inner">
+    <div class="main-content-wrap">
 
-      <!-- Header -->
-      <div class="card-header bg-white border-bottom-0">
-        <div class="d-flex justify-content-between align-items-center">
-          <h2 class="h5 mb-0">
-            <i class="bi bi-envelope me-2 text-secondary"></i>
-            My Messages
-          </h2>
-          <a href="{% url 'notification:send_message' %}" class="btn btn-secondary btn-sm">
-            <i class="bi bi-plus-lg me-1"></i> New Message
+      <!-- Header Section -->
+      <div class="flex items-center flex-wrap justify-between gap20 mb-27">
+        <div>
+          <h3 class="modern-title">Messages</h3>
+          <p class="modern-subtitle">View and manage your conversations</p>
+        </div>
+
+        <div class="table-controls">
+          <div class="search-box">
+            <i class="icon-search"></i>
+            <input type="text" placeholder="Search messages...">
+          </div>
+
+          <a href="{% url 'notification:send_message' %}" class="btn-primary">
+            <i class="icon-plus"></i> New Message
           </a>
         </div>
       </div>
 
-      <!-- Body -->
-      <div class="card-body p-0">
+      <!-- Modern Table -->
+      <div class="modern-table-container">
+        <div class="wg-box modern-table-wrapper">
+          <div class="wg-table table-product-list modern-table">
 
-        {% if messages %}
-          <div class="list-group list-group-flush">
+            <!-- Table Header -->
+            <div class="table-header modern-header flex gap20">
+              <div class="header-col property-col">
+                <div class="body-title">Sender / Receiver</div>
+              </div>
+              <div class="header-col">
+                <div class="body-title">Subject</div>
+              </div>
+              <div class="header-col">
+                <div class="body-title">Message</div>
+              </div>
+              <div class="header-col">
+                <div class="body-title">Date</div>
+              </div>
+              <div class="header-col actions-col">
+                <div class="body-title">Actions</div>
+              </div>
+            </div>
 
-            {% for message in messages %}
-              <a
-                href="{% url 'notification:message_detail' message.pk %}"
-                class="list-group-item list-group-item-action py-3 message-card
-                       {% if not message.is_read and message.receiver == request.user %}
-                         message-unread
-                       {% endif %}"
-              >
-                <div class="d-flex align-items-start">
+            <!-- Table Body -->
+            <div class="table-body modern-body">
+              {% for message in messages %}
+              <div class="table-row modern-row flex items-center {% if not message.is_read and message.receiver == request.user %}unread-row{% endif %}">
 
-                  <!-- Avatar -->
-                  <div class="position-relative me-3">
-                    {% if message.sender.agent_profile %}
-                      <img
-                        src="{{ message.sender.agent_profile.get_profile_picture }}"
-                        alt="{{ message.sender.name }}"
-                        class="rounded-circle message-avatar"
-                      />
-                    {% else %}
-                      <img
-                        src="{{ message.sender.profile.get_profile_picture }}"
-                        alt="{{ message.sender.name }}"
-                        class="rounded-circle message-avatar"
-                      />
-                    {% endif %}
-
-                    {% if not message.is_read and message.receiver == request.user %}
-                      <span
-                        class="position-absolute top-0 start-100 translate-middle badge badge-unread rounded-pill"
-                      >
-                        New
-                      </span>
-                    {% endif %}
-                  </div>
-
-                  <!-- Message Details -->
-                  <div class="flex-grow-1">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                      <h6 class="mb-0">
-                        {% if message.sender == request.user %}
-                          <span class="text-muted">To:</span>
-                          {{ message.receiver.name|default:message.receiver.username }}
-                        {% else %}
-                          <span class="text-muted">From:</span>
-                          {{ message.sender.name|default:message.sender.username }}
-                        {% endif %}
-
-                        {% if message.sender.agent_profile %}
-                          <span class="badge bg-info ms-2">Agent</span>
-                        {% endif %}
-                      </h6>
-                      <small class="message-time">
-                        {{ message.created_at|timesince }} ago
-                      </small>
+                <!-- Sender/Receiver -->
+                <div class="table-col property-col">
+                  <div class="property-info-cell">
+                    <div class="property-image">
+                      {% if message.sender.agent_profile %}
+                        <img src="{{ message.sender.agent_profile.get_profile_picture }}" alt="{{ message.sender.name }}">
+                      {% else %}
+                        <img src="{{ message.sender.profile.get_profile_picture }}" alt="{{ message.sender.name }}">
+                      {% endif %}
+                      {% if not message.is_read and message.receiver == request.user %}
+                      <div class="featured-badge"><i class="icon-mail"></i></div>
+                      {% endif %}
                     </div>
+                    <div class="property-details">
+                      {% if message.sender == request.user %}
+                        <a href="{% url 'notification:message_detail' message.pk %}" class="property-title">
+                          To: {{ message.receiver.name|default:message.receiver.username }}
+                        </a>
+                      {% else %}
+                        <a href="{% url 'notification:message_detail' message.pk %}" class="property-title">
+                          From: {{ message.sender.name|default:message.sender.username }}
+                        </a>
+                      {% endif %}
 
-                    <p class="mb-1">
-                      <strong>{{ message.subject|default:"No subject" }}</strong> -
-                      {{ message.message|truncatewords:15 }}
-                    </p>
-
-                    {% if message.property %}
-                      <div class="d-flex align-items-center mt-2">
-                        <img
-                          src="{{ message.property.images.first.image.url|default:'/static/images/default-property.jpg' }}"
-                          alt="{{ message.property.title }}"
-                          class="message-property-img me-2"
-                        />
-                        <small class="text-muted">
-                          {{ message.property.title|truncatewords:5 }}
-                        </small>
-                      </div>
-                    {% endif %}
+                      {% if message.sender.agent_profile %}
+                        <div class="property-location">
+                          <i class="icon-user"></i> Agent
+                        </div>
+                      {% endif %}
+                    </div>
                   </div>
                 </div>
-              </a>
-            {% endfor %}
+
+                <!-- Subject -->
+                <div class="table-col">
+                  <div class="price-cell">
+                    <span class="price-value">{{ message.subject|default:"(No subject)"|truncatechars:40 }}</span>
+                  </div>
+                </div>
+
+                <!-- Message Snippet -->
+                <div class="table-col">
+                  <div class="price-cell">
+                    <span class="price-value text-muted">{{ message.message|truncatechars:70 }}</span>
+                  </div>
+                </div>
+
+                <!-- Date -->
+                <div class="table-col">
+                  <div class="type-cell">
+                    <span class="type-badge">{{ message.created_at|date:"M d, Y h:i A" }}</span>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="table-col actions-col">
+                  <div class="actions-cell">
+                    <!-- View -->
+                    <a href="{% url 'notification:message_detail' message.pk %}" class="action-btn view" title="View Message">
+                      <i class="icon-eye"></i>
+                    </a>
+
+                    <!-- Mark as Read -->
+                    {% if not message.is_read and message.receiver == request.user %}
+                    <form action="{% url 'notification:mark_message_read' message.pk %}" method="post" class="action-form">
+                      {% csrf_token %}
+                      <button type="submit" class="action-btn edit" title="Mark as Read">
+                        <i class="icon-check"></i>
+                      </button>
+                    </form>
+                    {% endif %}
+
+                    <!-- Delete -->
+                    <form action="{% url 'notification:message_delete' message.pk %}" method="post" class="action-form">
+                      {% csrf_token %}
+                      <button type="submit" class="action-btn delete" title="Delete Message">
+                        <i class="icon-trash-2"></i>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              {% empty %}
+              <!-- Empty State -->
+              <div class="empty-table-state">
+                <div class="empty-icon">
+                  <i class="icon-mail"></i>
+                </div>
+                <h4>No Messages Found</h4>
+                <p>You don’t have any messages yet.</p>
+                <a href="{% url 'notification:send_message' %}" class="btn-primary">
+                  <i class="icon-plus"></i> Start a Conversation
+                </a>
+              </div>
+              {% endfor %}
+            </div>
           </div>
 
-        {% else %}
-          <!-- Empty State -->
-          <div class="text-center empty-state py-5">
-            <i class="bi bi-envelope-open display-4 text-muted mb-3"></i>
-            <h4 class="mb-2">No messages yet</h4>
-            <p class="text-muted mb-4">
-              Start a conversation by sending your first message
-            </p>
-            <a href="{% url 'notification:send_message' %}" class="btn btn-secondary">
-              <i class="bi bi-pencil-square me-1"></i> Compose Message
-            </a>
-          </div>
-        {% endif %}
-      </div>
+          <div class="table-divider"></div>
 
-      <!-- Pagination -->
-      {% if is_paginated %}
-        <div class="card-footer bg-white border-top-0">
-          <nav aria-label="Message pagination">
-            <ul class="pagination pagination-sm justify-content-center mb-0">
-
+          <!-- Pagination -->
+          {% if is_paginated %}
+          <div class="table-footer flex items-center justify-between flex-wrap gap10">
+            <div class="pagination-info">
+              Showing <strong>{{ page_obj.start_index }}</strong> - <strong>{{ page_obj.end_index }}</strong>
+              of <strong>{{ page_obj.paginator.count }}</strong> messages
+            </div>
+            <ul class="wg-pagination modern-pagination">
               {% if page_obj.has_previous %}
-                <li class="page-item">
-                  <a class="page-link" href="?page=1" aria-label="First">
-                    <span aria-hidden="true">&laquo;&laquo;</span>
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                  </a>
-                </li>
+                <li><a href="?page={{ page_obj.previous_page_number }}" class="pagination-nav"><i class="icon-chevron-left"></i></a></li>
               {% endif %}
-
               {% for num in page_obj.paginator.page_range %}
                 {% if page_obj.number == num %}
-                  <li class="page-item active">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                  </li>
-                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                  <li class="page-item">
-                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                  </li>
+                  <li><a href="?page={{ num }}" class="pagination-page active">{{ num }}</a></li>
+                {% else %}
+                  <li><a href="?page={{ num }}" class="pagination-page">{{ num }}</a></li>
                 {% endif %}
               {% endfor %}
-
               {% if page_obj.has_next %}
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-                    <span aria-hidden="true">&raquo;&raquo;</span>
-                  </a>
-                </li>
+                <li><a href="?page={{ page_obj.next_page_number }}" class="pagination-nav"><i class="icon-chevron-right"></i></a></li>
               {% endif %}
-
             </ul>
-          </nav>
+          </div>
+          {% endif %}
         </div>
-      {% endif %}
+      </div>
     </div>
   </div>
+
+  <!-- bottom-page -->
+  <div class="bottom-page">
+    <div class="body-text">Copyright © 2025 REM. Design with</div>
+    <i class="icon-heart"></i>
+    <div class="body-text">
+      by <a href="#">REM</a> All rights reserved.
+    </div>
+  </div>
+</div>
+<!-- /main-content -->
+
 {% endblock %}

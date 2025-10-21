@@ -214,7 +214,7 @@
           </div>
 
           <!-- Video Player Section -->
-          <div class="wg-property box-virtual-tour spacing-6">
+          {% comment %} <div class="wg-property box-virtual-tour spacing-6">
             <div class="wg-title text-11 fw-6 text-color-heading">Virtual Tour</div>
             <div class="video-player-wrapper">
               <video
@@ -258,7 +258,7 @@
                 {% endif %}
               </div>
             </div>
-          </div>
+          </div> {% endcomment %}
 
         </div>
         <div class="col-xl-4 col-lg-5">
@@ -274,6 +274,10 @@
                 <div class="content">
                   <h6 class="name">{{ property.agent.user.name }}</h6>
                   <ul class="contact">
+                    <a href="{% url 'notification:message_create_to_agent' receiver_id=property.agent.user.id %}" class="btn-icon"
+                  title="Message this agent">
+                  <i class="bi bi-chat-dots"></i>
+                </a>
                     <li><i class="icon-phone-1"></i><span>{{ property.agent.office_phone_no }}</span></li>
                     <li><i class="icon-mail"></i><a href="#">{{ property.agent.user.email }}</a></li>
                   </ul>
@@ -301,7 +305,7 @@
               <div class="swiper-slide">
                 <div class="box-house hover-img">
                   <div class="image-wrap">
-                    <a href="property-detail-v1.html">
+                    <a href="{% url 'home:rent_property_detail' similar.slug %}">
                       <img class="lazyload" data-src="{{ similar.main_image_url }}" src="{{ similar.main_image_url}}"
                         alt="">
                     </a>
@@ -311,7 +315,7 @@
                   </div>
                   <div class="content">
                     <h5 class="title">
-                      <a href="property-detail-v1.html">{{ similar.title }}</a>
+                      <a href="{% url 'home:rent_property_detail' similar.slug %}">{{ similar.title }}</a>
                     </h5>
                     <p class="location text-1 flex items-center gap-8">
                       <i class="icon-location"></i> {{ similar.location }}

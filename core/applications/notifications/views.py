@@ -204,6 +204,28 @@ class MessageCreateView(LoginRequiredMixin, CreateView):
         django_messages.success(self.request, "Your message has been sent.")
         return super().form_valid(form)
 
+class MessageDeleteView(LoginRequiredMixin, DeleteView):
+    model = Message
+    template_name = "pages/notifications/message_confirm_delete.html"
+    context_object_name = "message"
+    success_url = reverse_lazy("notification:message_list")
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Ensure only the sender or receiver can delete this message.
+        """
+        message = self.get_object()
+        if message.sender != request.user and message.receiver != request.user:
+            messages.error(request, "You don't have permission to delete this message.")
+            return redirect("notification:message_list")
+        return super().dispatch(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Override delete to add success message.
+        """
+        messages.success(request, "Message deleted successfully.")
+        return super().delete(request, *args, **kwargs)
 
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification

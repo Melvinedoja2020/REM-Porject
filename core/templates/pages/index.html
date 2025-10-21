@@ -286,41 +286,58 @@
 
   <!-- Categories -->
   <section class="tf-spacing-1 section-categories pb-0">
-    <div class="tf-container">
-      <div class="heading-section text-center mb-48">
-        <h2 class="title split-text effect-right">Try Searching For</h2>
-        <p class="text-1 split-text split-lines-transform">Thousands of luxury home enthusiasts just
-          like you have found their
-          dream home
-        </p>
-      </div>
-      <div class="wrap-categories-sw">
-        <div class="swiper sw-layout style-pagination" data-preview="6" data-tablet="4" data-mobile-sm="3"
-          data-mobile="2" data-space="15" data-space-md="30" data-space-lg="30">
-          <div class="swiper-wrapper">
+  <div class="tf-container">
+    <div class="heading-section text-center mb-48">
+      <h2 class="title split-text effect-right">Try Searching For</h2>
+      <p class="text-1 split-text split-lines-transform">
+        Thousands of luxury home enthusiasts just like you have found their dream home
+      </p>
+    </div>
 
-            {% for item in property_listing_types %}
-            <div class="swiper-slide">
-              <a href="{% url 'home:property_type_list' item.value %}" class="categories-item">
-                <div class="icon-box">
-                  <i class="icon {{ item.icon_class }}"></i>
-                </div>
-                <div class="content text-center">
-                  <h5>{{ item.label }}</h5>
-                  {% comment %} <p class="mt-4 text-1">
-                    {{ property_listing_type_counts|get_item:item.value|default:0 }} Property
-                  </p> {% endcomment %}
-                </div>
-              </a>
-            </div>
-            {% endfor %}
-
+    <div class="wrap-categories-sw">
+      <div
+        class="swiper sw-layout style-pagination"
+        data-preview="6"
+        data-tablet="4"
+        data-mobile-sm="3"
+        data-mobile="2"
+        data-space="15"
+        data-space-md="30"
+        data-space-lg="30"
+      >
+        <div class="swiper-wrapper">
+          {% for item in property_listing_types %}
+          <div class="swiper-slide">
+            <a href="{% url 'home:property_type_list' item.value %}" class="categories-item">
+              <div class="icon-box position-relative">
+                {% if item.image_url %}
+                  <img
+                    src="{% static item.image_url %}"
+                    alt="{{ item.label }}"
+                    class="img-fluid rounded-3 mb-2"
+                    style="width: 80px; height: 80px; object-fit: cover;"
+                  />
+                {% endif %}
+                <i class="icon {{ item.icon_class }} position-absolute top-50 start-50 translate-middle text-white fs-3"></i>
+              </div>
+              <div class="content text-center mt-2">
+                <h5 class="fw-semibold">{{ item.label }}</h5>
+                {% comment %}
+                <p class="mt-2 text-1">
+                  {{ property_listing_type_counts|get_item:item.value|default:0 }} Property
+                </p>
+                {% endcomment %}
+              </div>
+            </a>
           </div>
-          <div class="sw-pagination sw-pagination-layout text-center d-lg-none mt-20 d-block"></div>
+          {% endfor %}
         </div>
+
+        <div class="sw-pagination sw-pagination-layout text-center d-lg-none mt-20 d-block"></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- End Categories -->
 
