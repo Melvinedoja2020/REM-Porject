@@ -301,8 +301,7 @@
                                 {{ latest_notification.notification_type}}
                               </div>
                               <div class="text-tiny">
-                                {{
-                                latest_notification.message|truncatechars:10}}
+                                {{latest_notification.message|truncatechars:10}}
                               </div>
                             </div>
                           </div>
@@ -338,8 +337,11 @@
                               >{{ request.user.name.capitalize }}</span
                             >
                             <span class="text-tiny">
-                              {% if request.user.role == "Agent" %}Agent{% else
-                              %}Customer{% endif %}
+                              {% if request.user.role == "Agent" %}
+                              Agent
+                              {% else %}
+                              Customer
+                              {% endif %}
                             </span>
                           </span>
                         </span>
@@ -360,8 +362,10 @@
               </div>
             </div>
             <!-- /header-dashboard -->
-            {% include 'partials/messages.html' %} {% block content %} {%
-            endblock content %}
+            {% include 'partials/messages.html' %}
+            {% block content %}
+
+            {% endblock content %}
           </div>
           <!-- /section-content-right -->
         </div>

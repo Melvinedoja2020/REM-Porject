@@ -11,7 +11,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.views.generic import DetailView
 from django.views.generic import ListView
-from django.views.generic import View
+from django.views.generic import View, DeleteView
 
 from core.applications.notifications.forms import MessageForm
 from core.applications.notifications.forms import ReplyForm
@@ -33,15 +33,20 @@ class MessageListView(LoginRequiredMixin, ListView):
     ordering = ["-created_at"]
 
     def get_queryset(self):
-        # Only messages sent or received by the user
-        queryset = Message.objects.filter(
-            Q(sender=self.request.user) | Q(receiver=self.request.user),
-        ).order_by("-created_at")
+        user = self.request.user
 
-        # Mark unread received messages as read
-        Message.objects.filter(receiver=self.request.user, is_read=False).update(
-            is_read=True,
+        # Only messages where this user is either sender or receiver
+        queryset = (
+            Message.objects.filter(Q(sender=user) | Q(receiver=user))
+            .select_related("sender", "receiver", "property")
+            .order_by("-created_at")
+            .distinct()
         )
+
+        # Mark only unread messages *received* by this user as read
+        unread_messages = queryset.filter(receiver=user, is_read=False)
+        if unread_messages.exists():
+            unread_messages.update(is_read=True)
 
         return queryset
 
@@ -245,3 +250,35 @@ class MarkAllNotificationsReadView(LoginRequiredMixin, View):
         notifications.update(is_read=True)
         messages.success(request, "All notifications marked as read.")
         return redirect("notifications:list")
+
+
+class NotificationDeleteView(LoginRequiredMixin, DeleteView):
+    model = Notification
+    template_name = "notifications/notification_confirm_delete.html"
+    success_url = reverse_lazy("notification:notification_list")
+
+    def test_func(self):
+        """
+        Ensure the logged-in user owns this notification.
+        """
+        notification = self.get_object()
+        return notification.user == self.request.user
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Override delete to add a success message.
+        """
+        response = super().delete(request, *args, **kwargs)
+        messages.success(request, "Notification deleted successfully.")
+        return response
+
+
+class MarkNotificationReadView(View):
+    def post(self, request, pk):
+        notification = get_object_or_404(Notification, pk=pk, user=request.user)
+        notification.is_read = True
+        notification.save()
+        messages.success(request, "Notification marked as read.")
+        return redirect(
+            request.headers.get("referer", "notification:notification_list")
+        )

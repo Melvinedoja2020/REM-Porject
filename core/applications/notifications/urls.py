@@ -1,6 +1,10 @@
 from django.urls import path
 
-from core.applications.notifications.views import MarkAllNotificationsReadView
+from core.applications.notifications.views import (
+    MarkAllNotificationsReadView,
+    MarkNotificationReadView,
+    NotificationDeleteView,
+)
 from core.applications.notifications.views import MessageCreateView
 from core.applications.notifications.views import MessageDetailView
 from core.applications.notifications.views import MessageListView
@@ -23,6 +27,14 @@ urlpatterns = [
     path("messages/<str:pk>/reply/", MessageDetailView.as_view(), name="send_reply"),
     path("notifications", NotificationListView.as_view(), name="notification_list"),
     path("<str:pk>/", NotificationDetailView.as_view(), name="notification_detail"),
+    path(
+        "delete/<str:pk>/", NotificationDeleteView.as_view(), name="notification_delete"
+    ),
+    path(
+        "notifications/<str:pk>/mark-read/",
+        MarkNotificationReadView.as_view(),
+        name="notification_mark_read",
+    ),
     path(
         "mark-all-read/",
         MarkAllNotificationsReadView.as_view(),
