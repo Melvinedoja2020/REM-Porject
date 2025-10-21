@@ -36,8 +36,7 @@
               <br />
               {% endfor %}
             </div>
-            {% endif %} {% if field.name != 'remember' %} {# Exclude 'remember'
-            field #} {{ field.label_tag }} {{ field }} {% endif %}
+            {% endif %} {% if field.name != 'remember' %}  {{ field.label_tag }} {{ field }} {% endif %}
           </div>
           {% endfor %}
         </div>

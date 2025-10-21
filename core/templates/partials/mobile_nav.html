@@ -189,7 +189,7 @@
         </li>
         <li class="menu-item "><a href="{% url 'home:agent_list' %}">Agents</a></li>
         <li class="menu-item ">
-          <a href="#" class="tem-menu-mobile "> Contact</a>
+          <a href="{% url 'home:contact_us' %}" class="tem-menu-mobile "> Contact</a>
         </li>
         {% if request.user.is_authenticated %}
         <li class="menu-item ">
@@ -221,7 +221,7 @@
         <a href="#" class="text-need"> Need help?</a>
         <ul class="mb-info">
           <li>Call Us Now: <span class="number">09138642555</span></li>
-          <li>Support 24/7: <a href="#">REM@gmail.com</a></li>
+          <li>Support 24/7: <a href="#">info@realestatemarketplace.africa</a></li>
           <li>
             <div class="wrap-social">
               <p>Follow us:</p>

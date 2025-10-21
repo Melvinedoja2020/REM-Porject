@@ -1,43 +1,7 @@
 {% extends "base.html" %} {% block extra_css %}
-<style>
-  .message-container {
-    max-width: 800px;
-    margin: 0 auto;
-  }
 
-  .recipient-display {
-    background-color: #f8fafc;
-    border-left: 4px solid #fdde11;
-    padding: 1rem;
-    border-radius: 0.375rem;
-  }
-
-  .message-textarea {
-    min-height: 200px;
-  }
-
-  .form-label {
-    font-weight: 500;
-    color: #374151;
-  }
-
-  .btn-action {
-    padding: 0.5rem 1.5rem;
-    font-weight: 500;
-  }
-
-  .char-counter {
-    font-size: 0.875rem;
-    color: #6b7280;
-    text-align: right;
-  }
-
-  .form-control:focus {
-    border-color: #fdde11;
-    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
-  }
-</style>
 {% endblock %} {% block content %}
+{% include 'partials/messages.html' %}
 <div class="container py-5 message-container">
   <div class="card shadow-sm border-0">
     <div class="card-header bg-white border-bottom-0 pb-3">
@@ -47,10 +11,7 @@
           {% if recipient %} Message {{ recipient.user.name }} {% else %} New
           Message {% endif %}
         </h2>
-        <a
-          href="{% url 'notification:message_list' %}"
-          class="btn btn-sm btn-outline-secondary"
-        >
+        <a href="{% url 'notification:message_list' %}" class="btn btn-sm btn-outline-secondary">
           <i class="bi bi-arrow-left me-1"></i> Back to Inbox
         </a>
       </div>
@@ -59,6 +20,15 @@
     <div class="card-body pt-0">
       <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {% for error in form.non_field_errors %}
+          {{ error }}{% if not forloop.last %}<br>{% endif %}
+          {% endfor %}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
 
         <!-- Recipient Section -->
         <div class="mb-4">
@@ -78,11 +48,7 @@
             {% endif %}
           </div>
           {% else %}
-          <input
-            type="hidden"
-            name="receiver"
-            value="{{ recipient.user.id }}"
-          />
+          <input type="hidden" name="receiver" value="{{ recipient.user.id }}" />
           <div class="recipient-display mb-3">
             <div class="d-flex align-items-center">
               <div class="me-3">
@@ -94,8 +60,7 @@
                   <i class="bi bi-briefcase me-1"></i>{{ recipient.agent_type }}
                   {% if recipient.company_name %}
                   <span class="mx-2">•</span>
-                  <i class="bi bi-building me-1"></i>{{ recipient.company_name
-                  }} {% endif %}
+                  <i class="bi bi-building me-1"></i>{{ recipient.company_name }} {% endif %}
                 </p>
               </div>
             </div>
@@ -135,9 +100,7 @@
         </div>
 
         <!-- Form Actions -->
-        <div
-          class="d-flex justify-content-between align-items-center border-top pt-4"
-        >
+        <div class="d-flex justify-content-between align-items-center border-top pt-4">
           <button type="reset" class="btn btn-outline-secondary btn-action">
             <i class="bi bi-eraser me-1"></i> Clear
           </button>
@@ -194,5 +157,6 @@
       );
     });
   });
+
 </script>
 {% endblock %}

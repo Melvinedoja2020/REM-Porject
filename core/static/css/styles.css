@@ -18374,3 +18374,86 @@ tr {
       font-size: 2rem;
     }
   }
+
+.message-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .recipient-display {
+    background-color: #f8fafc;
+    border-left: 4px solid #fdde11;
+    padding: 1rem;
+    border-radius: 0.375rem;
+  }
+
+  .message-textarea {
+    min-height: 200px;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .btn-action {
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+  }
+
+  .char-counter {
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: right;
+  }
+
+  .form-control:focus {
+    border-color: #fdde11;
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+  }
+
+  .message-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .message-card {
+    transition: all 0.2s ease;
+    border-left: 4px solid transparent;
+  }
+
+  .message-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+
+  .message-unread {
+    border-left-color: #fdde11;
+    background-color: #f8fafc;
+  }
+
+  .message-avatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+  }
+
+  .message-property-img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .message-time {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .empty-state {
+    padding: 3rem 0;
+  }
+
+  .badge-unread {
+    background-color: #fdde11;
+  }
