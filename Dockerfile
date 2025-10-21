@@ -1,105 +1,71 @@
+# Use a consistent base image and force AMD64 architecture (Render is x86_64)
+FROM --platform=linux/amd64 python:3.12.5-slim-bookworm AS base
 
-# define an alias for the specific python version used in this file.
-FROM docker.io/python:3.12.5-slim-bookworm AS python
-
-# Python build stage
-FROM python AS python-build-stage
+# ─────────────────────────────────────────────────────────────
+# 1️⃣ Build stage — create dependency wheels
+# ─────────────────────────────────────────────────────────────
+FROM base AS build
 
 ARG BUILD_ENVIRONMENT=production
 
-# Install apt packages
+# Install build dependencies (for compiling Python packages)
 RUN apt-get update && apt-get install --no-install-recommends -y \
-  # dependencies for building Python packages
-  build-essential \
-  # psycopg2 dependencies
-  libpq-dev
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Requirements are installed here to ensure they will be cached.
-COPY ./requirements .
+# Copy requirements
+COPY ./requirements ./requirements
 
-# Create Python Dependency and Sub-Dependency Wheels.
-RUN pip wheel --wheel-dir /usr/src/app/wheels  \
-  -r ${BUILD_ENVIRONMENT}.txt
+# Build dependency wheels
+RUN pip wheel --wheel-dir /usr/src/app/wheels -r ${BUILD_ENVIRONMENT}.txt
 
 
-# Python 'run' stage
-FROM python AS python-run-stage
+# ─────────────────────────────────────────────────────────────
+# 2️⃣ Runtime stage — minimal image for running Django
+# ─────────────────────────────────────────────────────────────
+FROM base AS runtime
 
 ARG BUILD_ENVIRONMENT=production
 ARG APP_HOME=/app
 
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV BUILD_ENV=${BUILD_ENVIRONMENT}
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    BUILD_ENV=${BUILD_ENVIRONMENT} \
+    PATH="/home/django/.local/bin:$PATH"
 
 WORKDIR ${APP_HOME}
 
-RUN addgroup --system django \
-    && adduser --system --ingroup django django
+# Create non-root user
+RUN addgroup --system django && adduser --system --ingroup django django
 
-
-# Install required system dependencies
+# Install runtime dependencies only
 RUN apt-get update && apt-get install --no-install-recommends -y \
-  # psycopg2 dependencies
-  libpq-dev \
-  # Translations dependencies
-  gettext \
-  # video codecs
-  # kafka compression
-  libsnappy-dev\
-  # Geodjango dependencies
-  binutils \
-  libproj-dev \
-  gdal-bin \
-  # cleaning up unused files
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-  && rm -rf /var/lib/apt/lists/*
+    bash \
+    libpq-dev \
+    gettext \
+    libsnappy-dev \
+    binutils \
+    libproj-dev \
+    gdal-bin \
+    && rm -rf /var/lib/apt/lists/*
 
-# All absolute dir copies ignore workdir instruction. All relative dir copies are wrt to the workdir instruction
-# copy python dependency wheels from python-build-stage
-COPY --from=python-build-stage /usr/src/app/wheels  /wheels/
+# Copy built dependency wheels and install them
+COPY --from=build /usr/src/app/wheels /wheels/
+RUN pip install --no-cache-dir --no-index --find-links=/wheels /wheels/* && rm -rf /wheels
 
-# use wheels to install python dependencies
-RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-  && rm -rf /wheels/
-
-# Install Node.js
-# RUN apt-get update && apt-get install -y curl
-# RUN curl -sL https://deb.nodesource.com/setup_20.x | bash -
-# RUN apt-get install -y nodejs
-
-# WORKDIR ${APP_HOME}/core/static
-# # Copy the package.json from the correct location
-# COPY ./core/static/package.json .
-
-# # Copy tailwind config file from its location
-# COPY ./core/static/tailwind.config.js .
-
-# # Install Node.js dependencies
-# RUN npm install
-
-
-# Run Tailwind CSS build
-# RUN npx tailwindcss -o css/style.css --minify
-
-# WORKDIR ${APP_HOME}
-
-# copy application code to WORKDIR
+# Copy project code
 COPY --chown=django:django . ${APP_HOME}
 
-# make django owner of the WORKDIR directory as well.
-RUN chown django:django ${APP_HOME}
-# Copy entrypoint script
+# Copy entrypoint script and make it executable
 COPY entrypoint.sh /entrypoint.sh
-
-# Switch to root user to change permissions
-USER root
-
-# Make the script executable
 RUN chmod +x /entrypoint.sh
 
-# Switch back to django user
+# Make sure bash is used as the default shell for scripts
+SHELL ["/bin/bash", "-c"]
+
+# Switch to non-root user
 USER django
 
-# Set the entrypoint script as the default command
-CMD ["/entrypoint.sh"]
+# Default command
+ENTRYPOINT ["/entrypoint.sh"]

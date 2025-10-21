@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 set -o errexit  # Exit immediately on error
-set -o pipefail
-set -o nounset
+set -o pipefail # Fail on pipe errors
+set -o nounset  # Treat unset variables as errors
 
 echo "Collecting static files..."
 python manage.py collectstatic --noinput --clear
