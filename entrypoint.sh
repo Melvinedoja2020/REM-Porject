@@ -1,4 +1,4 @@
-
+#!/bin/sh
 set -o errexit  # Exit immediately on error
 set -o pipefail
 set -o nounset
