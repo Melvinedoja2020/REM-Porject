@@ -341,3 +341,5 @@ JAZZMIN_SETTINGS ={
     "navigation_expanded": True,  # Keep sidebar expanded by default
 
 }
+
+CONTACT_EMAIL = env("CONTACT_EMAIL", default="info@realestatemarketplace.africa")

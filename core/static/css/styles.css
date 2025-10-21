@@ -56,7 +56,7 @@
   --shadown: rgba(241, 145, 61, 0.12);
   --Secondary: #2c2e33;
   --Color-1: #06a788;
-  --Color-2: #E8960F;
+  --Color-2: #fdde11;
   --Color-3: #c79e34;
   --Color-4: #7695ff;
   --Color-5: #1563df;
@@ -799,6 +799,7 @@ a {
   -ms-transition: all 0.3s ease;
   -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
+  font-size: 20px;
 }
 
 a:hover {
@@ -6987,7 +6988,7 @@ tr {
 }
 
 .theme-color-2 {
-  --Primary: #E8960F;
+  --Primary: #fdde11;
   --Sub-primary-1: rgba(253, 231, 229, 1);
   --Sub-primary-2: rgba(242, 105, 92, 0.16);
 }
@@ -13271,7 +13272,7 @@ tr {
 }
 
 .search-btn {
-  background-color: #E8960F;   /* main color */
+  background-color: #fdde11;   /* main color */
   color: #fff;                /* white text for contrast */
   border: none;
   padding: 12px 24px;
@@ -13287,7 +13288,7 @@ tr {
 }
 
 .btn-accent {
-  @apply bg-[#E8960F] text-white px-4 py-2 rounded-lg hover:bg-[#d9840d] transition;
+  @apply bg-[#fdde11] text-white px-4 py-2 rounded-lg hover:bg-[#d9840d] transition;
 }
 
 /* Inputs & dropdowns */
@@ -13310,13 +13311,13 @@ tr {
 
 .form-control:focus,
 .form-select:focus {
-  border-color: #E8960F;
+  border-color: #fdde11;
   box-shadow: 0 0 0 0.25rem rgba(232, 150, 15, 0.4);
 }
 
 /* Buttons */
 .btn-brand {
-  background-color: #E8960F;
+  background-color: #fdde11;
   color: #fff;
   font-weight: 600;
   border-radius: 0.75rem;
@@ -13330,7 +13331,7 @@ tr {
 }
 
 .nav-pills .nav-link.active {
-  background-color: #E8960F !important;
+  background-color: #fdde11 !important;
   color: #fff !important;
 }
 
@@ -18170,7 +18171,7 @@ tr {
 
 /* Priority styling */
 .priority-high {
-  border-left: 3px solid #E8960F;
+  border-left: 3px solid #fdde11;
   background-color: rgba(220, 53, 69, 0.05);
 }
 
@@ -18253,3 +18254,123 @@ tr {
 .animate-fade-in {
   animation: fadeIn 0.8s 0.4s ease-out forwards;
 }
+:root {
+    --primary-color: #fdde11;
+    --primary-dark: #d0850c;
+    --primary-light: #f5b13e;
+  }
+
+  .bg-primary {
+    background-color: var(--primary-color) !important;
+  }
+
+  .text-primary {
+    color: var(--primary-color) !important;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    color: white;
+  }
+
+  .shape {
+    position: absolute;
+    opacity: 0.1;
+  }
+
+  .shape-1 {
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .shape-2 {
+    bottom: -80px;
+    left: -80px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .shape-3 {
+    top: -100px;
+    left: -100px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .shape-4 {
+    bottom: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .shape-5 {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  .card-icon {
+    width: 70px;
+    height: 70px;
+    transition: all 0.3s ease;
+    border: 2px solid #f8f9fa;
+  }
+
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .hover-lift:hover .card-icon {
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .stat-item {
+    padding: 1.5rem 0;
+  }
+
+  .testimonial-card {
+    transition: transform 0.3s ease;
+  }
+
+  .testimonial-card:hover {
+    transform: translateY(-3px);
+  }
+
+  @media (max-width: 768px) {
+    .display-4 {
+      font-size: 2.5rem;
+    }
+
+    .display-5 {
+      font-size: 2rem;
+    }
+  }

@@ -18,7 +18,7 @@
             dataLabels: {
               enabled: false
             },
-            colors: ["#E8960F"],
+            colors: ["#fdde11"],
             series: [
               {
                 name: "$",

@@ -1,84 +1,73 @@
-{% extends 'base.html' %}
-{% block content %}
-{% load static %}
+{% extends 'base.html' %} {% block content %} {% load static %}
 
 <style>
   .user-choices {
     height: 50px;
     font-size: 10px;
-
   }
-
 </style>
 
 <div class="flat-account">
   <div class="banner-account">
-    <img src="{% static 'images/section/banner-register.jpg' %}" alt="banner">
+    <img src="{% static 'images/section/banner-register.jpg' %}" alt="banner" />
   </div>
   <form class="form-account" method="post">
     {% csrf_token %}
     <div class="title-box">
-      <h4 style=text-align:center>Register</h4>
+      <h4 style="text-align: center">Register</h4>
     </div>
     {% if form.errors %}
     <div class="alert alert-danger" role="alert">
       <ul class="mb-0">
-        {% for field in form %}
-        {% for error in field.errors %}
+        {% for field in form %} {% for error in field.errors %}
         <li><strong>{{ field.label }}:</strong> {{ error }}</li>
-        {% endfor %}
-        {% endfor %}
-
-        {% for error in form.non_field_errors %}
+        {% endfor %} {% endfor %} {% for error in form.non_field_errors %}
         <li>{{ error }}</li>
         {% endfor %}
       </ul>
     </div>
-    {% endif %}
-
-    {% include 'partials/messages.html' %}
+    {% endif %} {% include 'partials/messages.html' %}
     <div class="box">
       <fieldset class="box-fieldset">
-
-        <div class="ip-field">
-          {{ form.name }}
-        </div>
+        <div class="ip-field">{{ form.name }}</div>
       </fieldset>
 
       <fieldset class="box-fieldset">
-
-        <div class="ip-field">
-          {{ form.email }}
-        </div>
+        <div class="ip-field">{{ form.email }}</div>
       </fieldset>
 
       <fieldset class="box-fieldset">
-        <label for="name"><small>Choose type of user you want to sign up as</small>:<span>*</span></label>
-        <div class="ip-field">
-          {{ form.role }}
-        </div>
+        <label for="name"
+          ><small>Choose type of user you want to sign up as</small>:<span
+            >*</span
+          ></label
+        >
+        <div class="ip-field">{{ form.role }}</div>
       </fieldset>
 
       <fieldset class="box-fieldset">
-        <div class="ip-field">
-          {{ form.password1 }}
-        </div>
+        <div class="ip-field">{{ form.password1 }}</div>
       </fieldset>
 
       <fieldset class="box-fieldset">
-        <div class="ip-field">
-          {{ form.password2 }}
-        </div>
+        <div class="ip-field">{{ form.password2 }}</div>
       </fieldset>
 
-      <button type="submit" class="btn w-100" style=background:#E8960F>Sign Up</button>
+      <button type="submit" class="btn w-100" style="background: #fdde11">
+        Sign Up
+      </button>
     </div>
     <div class="footer-account">
-      <p>Already have an account? <a href="{% url 'account_login' %}">Login</a></p>
-      {% comment %} <p>Forgot your password? <a href="{% url 'account_reset_password' %}">Reset Password</a></p>
+      <p>
+        Already have an account? <a href="{% url 'account_login' %}">Login</a>
+      </p>
+      {% comment %}
+      <p>
+        Forgot your password?
+        <a href="{% url 'account_reset_password' %}">Reset Password</a>
+      </p>
       {% endcomment %}
     </div>
   </form>
-
 </div>
 {% endblock content %}

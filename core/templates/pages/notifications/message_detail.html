@@ -1,9 +1,7 @@
-{% extends "base.html" %}
-
-{% block extra_css %}
+{% extends "base.html" %} {% block extra_css %}
 <style>
   :root {
-    --brand-color: #E8960F;
+    --brand-color: #fdde11;
     --brand-color-hover: #cf830e;
     --you-color: #198754;
     --light-gray: #f8f9fa;
@@ -194,19 +192,21 @@
       max-width: 90%;
     }
   }
-
 </style>
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="container py-4">
   <div class="message-container">
     <!-- Header -->
-    <div class="message-header d-flex justify-content-between align-items-center">
+    <div
+      class="message-header d-flex justify-content-between align-items-center"
+    >
       <h2 class="h5 mb-0">
         <i class="bi bi-envelope me-2 text-primary"></i>Message Details
       </h2>
-      <a href="{% url 'notification:message_list' %}" class="btn btn-sm btn-brand">
+      <a
+        href="{% url 'notification:message_list' %}"
+        class="btn btn-sm btn-brand"
+      >
         <i class="bi bi-arrow-left me-1"></i>Back to Inbox
       </a>
     </div>
@@ -218,24 +218,35 @@
       <!-- Original Message -->
       <div class="original-message mb-5">
         <div class="d-flex align-items-start">
-          <img style="height:50px; width:40px"
-            src="{% if message.sender.agent_profile %}{{ message.sender.agent_profile.get_profile_picture }}{% else %}{{ message.sender.profile.get_profile_picture }}{% endif %}"
-            alt="{{ message.sender.name }}" class=20 me-3">
+          <img style="height:50px; width:40px" src="{% if
+          message.sender.agent_profile %}{{
+          message.sender.agent_profile.get_profile_picture }}{% else %}{{
+          message.sender.profile.get_profile_picture }}{% endif %}" alt="{{
+          message.sender.name }}" class=20 me-3">
           <div class="flex-grow-1">
             <div class="d-flex justify-content-between align-items-center mb-1">
               <h5 class="mb-0">
-                {{ message.sender.name|default:message.sender.username }}
-                {% if message.sender.agent_profile %}
+                {{ message.sender.name|default:message.sender.username }} {% if
+                message.sender.agent_profile %}
                 <span class="badge badge-agent ms-2">Agent</span>
                 {% endif %}
               </h5>
-              <small class="text-muted">{{ message.created_at|date:"M j, Y H:i" }}</small>
+              <small class="text-muted"
+                >{{ message.created_at|date:"M j, Y H:i" }}</small
+              >
             </div>
             <p class="text-muted mb-2">
-              <small>to {{ message.receiver.name|default:message.receiver.username }}</small>
+              <small
+                >to {{ message.receiver.name|default:message.receiver.username
+                }}</small
+              >
             </p>
-            <h6 class="fw-semibold mb-2">{{ message.subject|default:"No subject" }}</h6>
-            <div class="chat-bubble chat-left">{{ message.message|linebreaks }}</div>
+            <h6 class="fw-semibold mb-2">
+              {{ message.subject|default:"No subject" }}
+            </h6>
+            <div class="chat-bubble chat-left">
+              {{ message.message|linebreaks }}
+            </div>
             {% if message.is_read %}
             <div class="message-status">
               <i class="bi bi-check2-all"></i> Read
@@ -246,21 +257,34 @@
 
         {% if message.property %}
         <div class="mt-4">
-          <a href="{{ message.property.get_absolute_url }}" class="text-decoration-none text-dark">
+          <a
+            href="{{ message.property.get_absolute_url }}"
+            class="text-decoration-none text-dark"
+          >
             <div class="property-card p-2">
               <div class="row g-2 align-items-center">
                 <div class="col-md-4">
-                  <img src="{{ message.property.images.first.image.url|default:'/static/images/default-property.jpg' }}"
-                    class="property-card-img rounded" alt="{{ message.property.title }}">
+                  <img
+                    src="{{ message.property.images.first.image.url|default:'/static/images/default-property.jpg' }}"
+                    class="property-card-img rounded"
+                    alt="{{ message.property.title }}"
+                  />
                 </div>
                 <div class="col-md-8">
-                  <h6 class="mb-1">{{ message.property.title|truncatechars:40 }}</h6>
+                  <h6 class="mb-1">
+                    {{ message.property.title|truncatechars:40 }}
+                  </h6>
                   <p class="text-muted small mb-1">
-                    <i class="bi bi-geo-alt"></i> {{ message.property.address|truncatechars:40 }}
+                    <i class="bi bi-geo-alt"></i> {{
+                    message.property.address|truncatechars:40 }}
                   </p>
                   <p class="mb-0">
-                    <strong>${{ message.property.price|floatformat:"0" }}</strong>
-                    <span class="text-muted small ms-2">{{ message.property.get_property_type_display }}</span>
+                    <strong
+                      >${{ message.property.price|floatformat:"0" }}</strong
+                    >
+                    <span class="text-muted small ms-2"
+                      >{{ message.property.get_property_type_display }}</span
+                    >
                   </p>
                 </div>
               </div>
@@ -279,26 +303,38 @@
 
         {% for reply in replies %}
         <div
-          class="d-flex mb-4 {% if reply.sender == request.user %}justify-content-end chat-right{% else %}justify-content-start chat-left{% endif %}">
-          <div class="d-flex flex-column {% if reply.sender == request.user %}align-items-end text-end{% endif %}"
-            style="max-width: 85%;">
+          class="d-flex mb-4 {% if reply.sender == request.user %}justify-content-end chat-right{% else %}justify-content-start chat-left{% endif %}"
+        >
+          <div
+            class="d-flex flex-column {% if reply.sender == request.user %}align-items-end text-end{% endif %}"
+            style="max-width: 85%"
+          >
             <div
-              class="d-flex align-items-center mb-1 {% if reply.sender == request.user %}flex-row-reverse{% endif %}">
-              <img style="height:50px; width:40px"
+              class="d-flex align-items-center mb-1 {% if reply.sender == request.user %}flex-row-reverse{% endif %}"
+            >
+              <img
+                style="height: 50px; width: 40px"
                 src="{% if reply.sender.agent_profile %}{{ reply.sender.agent_profile.get_profile_picture }}{% else %}{{ reply.sender.profile.get_profile_picture }}{% endif %}"
                 alt="{{ reply.sender.name }}"
-                class="message-avatar {% if reply.sender == request.user %}ms-3{% else %}me-3{% endif %}">
+                class="message-avatar {% if reply.sender == request.user %}ms-3{% else %}me-3{% endif %}"
+              />
               <div>
-                <strong>{{ reply.sender.name|default:reply.sender.username }}</strong>
+                <strong
+                  >{{ reply.sender.name|default:reply.sender.username }}</strong
+                >
                 {% if reply.sender == request.user %}
                 <span class="badge badge-you ms-1">You</span>
                 {% elif reply.sender.agent_profile %}
                 <span class="badge badge-agent ms-1">Agent</span>
                 {% endif %}
-                <div class="text-muted small">{{ reply.created_at|date:"M j, Y H:i" }}</div>
+                <div class="text-muted small">
+                  {{ reply.created_at|date:"M j, Y H:i" }}
+                </div>
               </div>
             </div>
-            <div class="chat-bubble {% if reply.sender == request.user %}chat-right{% else %}chat-left{% endif %}">
+            <div
+              class="chat-bubble {% if reply.sender == request.user %}chat-right{% else %}chat-left{% endif %}"
+            >
               {{ reply.message|linebreaks }}
             </div>
             {% if reply.sender == request.user and reply.is_read %}
@@ -308,8 +344,7 @@
             {% endif %}
           </div>
         </div>
-        {% endfor %}
-        {% endif %}
+        {% endfor %} {% endif %}
       </div>
     </div>
 
@@ -323,7 +358,11 @@
           <div id="message-errors" class="invalid-feedback d-none"></div>
         </div>
         <div class="d-flex justify-content-end align-items-center">
-          <div id="loading-spinner" class="spinner-border loading-spinner text-primary me-2 d-none" role="status">
+          <div
+            id="loading-spinner"
+            class="spinner-border loading-spinner text-primary me-2 d-none"
+            role="status"
+          >
             <span class="visually-hidden">Loading...</span>
           </div>
           <button type="submit" class="btn btn-brand" id="submit-btn">
@@ -334,64 +373,64 @@
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('reply-form');
-    const spinner = document.getElementById('loading-spinner');
-    const submitBtn = document.getElementById('submit-btn');
-    const messageErrors = document.getElementById('message-errors');
-    const conversationContainer = document.getElementById('conversation-container');
-    const messageField = document.getElementById('id_message');
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("reply-form");
+    const spinner = document.getElementById("loading-spinner");
+    const submitBtn = document.getElementById("submit-btn");
+    const messageErrors = document.getElementById("message-errors");
+    const conversationContainer = document.getElementById(
+      "conversation-container"
+    );
+    const messageField = document.getElementById("id_message");
 
     // Auto-resize textarea
-    messageField.addEventListener('input', function () {
-      this.style.height = 'auto';
-      this.style.height = (this.scrollHeight) + 'px';
+    messageField.addEventListener("input", function () {
+      this.style.height = "auto";
+      this.style.height = this.scrollHeight + "px";
     });
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener("submit", function (e) {
       e.preventDefault();
 
       // Show loading state
-      spinner.classList.remove('d-none');
+      spinner.classList.remove("d-none");
       submitBtn.disabled = true;
-      messageErrors.classList.add('d-none');
+      messageErrors.classList.add("d-none");
 
       // Get form data
       const formData = new FormData(form);
-      const messageContent = formData.get('message');
+      const messageContent = formData.get("message");
 
       // Send AJAX request
       fetch(window.location.href, {
-          method: 'POST',
-          body: formData,
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        })
-        .then(response => {
+        method: "POST",
+        body: formData,
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      })
+        .then((response) => {
           if (!response.ok) {
-            return response.json().then(err => Promise.reject(err));
+            return response.json().then((err) => Promise.reject(err));
           }
           return response.json();
         })
-        .then(data => {
+        .then((data) => {
           if (data.success) {
             // Clear and reset textarea
-            messageField.value = '';
-            messageField.style.height = 'auto';
+            messageField.value = "";
+            messageField.style.height = "auto";
 
             // Create HTML for new message
             const now = new Date();
-            const formattedDate = now.toLocaleString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
+            const formattedDate = now.toLocaleString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
             });
 
             const newMessageHtml = `
@@ -408,7 +447,7 @@
                                 </div>
                             </div>
                             <div class="chat-bubble chat-right">
-                                ${messageContent.replace(/\n/g, '<br>')}
+                                ${messageContent.replace(/\n/g, "<br>")}
                             </div>
                             <div class="message-status">
                                 <i class="bi bi-check2"></i> Sent
@@ -418,45 +457,52 @@
                 `;
 
             // Add conversation heading if needed
-            if (!document.querySelector('#conversation-container .time-separator')) {
+            if (
+              !document.querySelector("#conversation-container .time-separator")
+            ) {
               const now = new Date();
-              const formattedDate = now.toLocaleString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
+              const formattedDate = now.toLocaleString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
               });
 
-              const separator = document.createElement('div');
-              separator.className = 'time-separator';
+              const separator = document.createElement("div");
+              separator.className = "time-separator";
               separator.textContent = `Conversation started ${formattedDate}`;
               conversationContainer.prepend(separator);
             }
 
             // Add new message
-            conversationContainer.insertAdjacentHTML('beforeend', newMessageHtml);
+            conversationContainer.insertAdjacentHTML(
+              "beforeend",
+              newMessageHtml
+            );
 
             // Scroll to new message
             conversationContainer.scrollTo({
               top: conversationContainer.scrollHeight,
-              behavior: 'smooth'
+              behavior: "smooth",
             });
           } else {
             // Show errors
             if (data.errors && data.errors.message) {
               messageErrors.textContent = data.errors.message[0].message;
-              messageErrors.classList.remove('d-none');
-              messageField.classList.add('is-invalid');
+              messageErrors.classList.remove("d-none");
+              messageField.classList.add("is-invalid");
             } else if (data.error) {
               alert(data.error);
             }
           }
         })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred while sending your message. Please try again.');
+        .catch((error) => {
+          console.error("Error:", error);
+          alert(
+            "An error occurred while sending your message. Please try again."
+          );
         })
         .finally(() => {
-          spinner.classList.add('d-none');
+          spinner.classList.add("d-none");
           submitBtn.disabled = false;
         });
     });
@@ -464,9 +510,8 @@
     // Scroll to bottom of conversation on load
     conversationContainer.scrollTo({
       top: conversationContainer.scrollHeight,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   });
-
 </script>
 {% endblock %}

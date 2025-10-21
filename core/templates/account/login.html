@@ -1,32 +1,32 @@
-{% extends 'base.html' %}
-{% block content %}
-{% load static %}
+{% extends 'base.html' %} {% block content %} {% load static %}
 
 <div class="flat-account">
   <div class="banner-account">
-    <img src="{% static 'images/section/banner-register.jpg' %}" alt="banner">
+    <img src="{% static 'images/section/banner-register.jpg' %}" alt="banner" />
   </div>
   <form class="form-account" method="post">
     {% csrf_token %}
     <div class="title-box">
-      <h4 style=text-align:center>Login</h4>
-    </div><br><br>
+      <h4 style="text-align: center">Login</h4>
+    </div>
+    <br /><br />
     {% if form.non_field_errors %}
     <div class="alert alert-danger" role="alert">
       <ul class="mb-0">
-        {% for error in form.non_field_errors %}<b>{{ error }}</b>{% endfor %}
+        {% for error in form.non_field_errors %}<b>{{ error }}</b
+        >{% endfor %}
       </ul>
     </div>
-    {% endif %}
-    {% include 'partials/messages.html' %}
+    {% endif %} {% include 'partials/messages.html' %}
     <div class="box">
       <fieldset class="box-fieldset">
-
-        <p>Dont have an account? <a href="{% url 'users:user_signup' %}">Register</a></p>
-        <br>
+        <p>
+          Dont have an account?
+          <a href="{% url 'users:user_signup' %}">Register</a>
+        </p>
+        <br />
 
         <div class="ip-field">
-
           {% for field in form %}
           <div class="mb-3">
             {% if field.errors %}
@@ -36,30 +36,23 @@
               <br />
               {% endfor %}
             </div>
-            {% endif %}
-            {% if field.name != 'remember' %}
-            {# Exclude 'remember' field #}
-            {{ field.label_tag }} {{ field }}
-            {% endif %}
+            {% endif %} {% if field.name != 'remember' %} {# Exclude 'remember'
+            field #} {{ field.label_tag }} {{ field }} {% endif %}
           </div>
           {% endfor %}
         </div>
       </fieldset>
 
-
-
-
-
-
-
-      <button type="submit" class="btn w-100 h-50" style=background:#E8960F>Login</button>
+      <button type="submit" class="btn w-100 h-50" style="background: #fdde11">
+        Login
+      </button>
     </div>
     <div class="footer-account">
-
-      <p>Forgot your password? <a href="{% url 'account_reset_password' %}">Reset Password</a></p>
-
+      <p>
+        Forgot your password?
+        <a href="{% url 'account_reset_password' %}">Reset Password</a>
+      </p>
     </div>
   </form>
-
 </div>
 {% endblock content %}

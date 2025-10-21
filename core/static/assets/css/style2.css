@@ -1,5 +1,5 @@
 :root {
-  --primary: #e8960f;
+  --primary: #fdde11;
   --primary-light: #fef6e8;
   --primary-dark: #d0850c;
   /* --secondary: #6c757d; */
@@ -441,4 +441,9 @@
     gap: 15px;
     text-align: center;
   }
+}
+
+
+.title{
+  font-size: 50px;
 }

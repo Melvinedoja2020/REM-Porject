@@ -1,23 +1,23 @@
-{% extends "account/base_manage.html" %}
-{% load allauth i18n %}
-
-{% block head_title %}
-  {% trans "Sign Out" %}
-{% endblock head_title %}
-
-{% block content %}
+{% extends "account/base_manage.html" %} {% load allauth i18n %} {% block
+head_title %} {% trans "Sign Out" %} {% endblock head_title %} {% block content
+%}
 <div class="container d-flex justify-content-center align-items-center vh-100">
-  <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%;">
-    <div class="card-header text-white text-center" style="background: #E8960F;">
+  <div class="card shadow-lg border-0" style="max-width: 400px; width: 100%">
+    <div class="card-header text-white text-center" style="background: #fdde11">
       <h3 class="mb-0">{% trans "Sign Out" %}</h3>
     </div>
     <div class="card-body text-center">
       <p class="mb-4">{% trans "Are you sure you want to sign out?" %}</p>
       {% url 'account_logout' as action_url %}
       <form method="post" action="{{ action_url }}">
-        {% csrf_token %}
-        {{ redirect_field }}
-        <button type="submit" class="btn text-white w-100" style="background: #E8960F;">{% trans "Sign Out" %}</button>
+        {% csrf_token %} {{ redirect_field }}
+        <button
+          type="submit"
+          class="btn text-white w-100"
+          style="background: #fdde11"
+        >
+          {% trans "Sign Out" %}
+        </button>
       </form>
     </div>
   </div>

@@ -1,3 +1,4 @@
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -26,6 +27,8 @@ from core.applications.users.models import AgentProfile
 from core.helper.enums import PropertyListingType
 from core.helper.enums import PropertyTypeChoices
 from core.helper.mixins import PropertySearchMixin
+from django.http import HttpResponse
+from django.core.mail import EmailMessage, BadHeaderError
 
 # Create your views here.
 
@@ -40,30 +43,49 @@ class HomeView(TemplateView):
         context["property_types"] = PropertyTypeChoices.choices
         return context
 
+class AboutUsView(TemplateView):
+    template_name = "pages/about.html"
 
+class WhyChooseREMView(TemplateView):
+    template_name = "pages/why_choose_rem.html"
 class ContactUsView(FormView):
     template_name = "pages/contact.html"
     form_class = ContactForm
-    success_url = reverse_lazy("contact")
+    success_url = reverse_lazy("home:contact_us")
 
-    def form_valid(self, form):
+    def form_valid(self, form: forms.Form) -> HttpResponse:
         name = form.cleaned_data["name"]
         email = form.cleaned_data["email"]
-        subject = form.cleaned_data["subject"]
+        phone = form.cleaned_data["phone"]
+        interest = form.cleaned_data["interest"]
         message = form.cleaned_data["message"]
 
-        full_message = f"Message from {name} <{email}>:\n\n{message}"
-
-        email_message = EmailMessage(
-            subject=subject,
-            body=full_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[settings.CONTACT_EMAIL],
-            reply_to=[email],  # This ensures the admin can reply directly to the user
+        full_message = (
+            f"Message from {name} <{email}>:\n"
+            f"Phone: {phone}\n"
+            f"Interest: {interest}\n\n"
+            f"Message:\n{message}"
         )
-        email_message.send()
 
-        messages.success(self.request, "Your message has been sent successfully.")
+        try:
+            email_message = EmailMessage(
+                subject=f"New Contact: {interest or 'General Inquiry'}",
+                body=full_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[settings.CONTACT_EMAIL],
+                reply_to=[email],
+            )
+            email_message.send()
+            messages.success(self.request, "Your message has been sent successfully.")
+        except BadHeaderError:
+            messages.error(self.request, "Invalid header found.")
+        except Exception as e:
+            print("❌ Email send error:", e)
+            messages.error(
+                self.request,
+                "An error occurred while sending your message. Please try again later.",
+            )
+
         return super().form_valid(form)
 
 

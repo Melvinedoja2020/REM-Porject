@@ -1,6 +1,4 @@
-{% extends 'dashboard_base.html' %}
-{% load static %}
-{% block content %}
+{% extends 'dashboard_base.html' %} {% load static %} {% block content %}
 
 <!-- main-content -->
 <div class="main-content">
@@ -12,62 +10,108 @@
         <h3>My Profile</h3>
       </div>
 
-      <div class="wg-box mb-27" style="background-color: #FFF9F0; border-left: 4px solid #E8960F;">
-        <div class="alert" style="background-color: #FFF9F0; color: #5F4B32;">
-          <strong>Welcome, {{ request.user.name }}!</strong> Please complete your profile to get the best experience.
+      <div
+        class="wg-box mb-27"
+        style="background-color: #fff9f0; border-left: 4px solid #fdde11"
+      >
+        <div class="alert" style="background-color: #fff9f0; color: #5f4b32">
+          <strong>Welcome, {{ request.user.name }}!</strong> Please complete
+          your profile to get the best experience.
         </div>
       </div>
 
-      <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+      <form
+        method="post"
+        enctype="multipart/form-data"
+        class="needs-validation"
+        novalidate
+      >
         {% csrf_token %}
 
         <!-- Basic Information Section -->
         <div class="wg-box mb-27">
-          <div class="wg-box-header" style="border-bottom: 1px solid #E8960F;">
-            <h4 class="title" style="color: #E8960F;">Basic Information <small class="text-muted">(Required)</small></h4>
+          <div class="wg-box-header" style="border-bottom: 1px solid #fdde11">
+            <h4 class="title" style="color: #fdde11">
+              Basic Information <small class="text-muted">(Required)</small>
+            </h4>
           </div>
           <div class="wg-box-body">
             <div class="row mb-20">
               <div class="col-md-2">
-                <div class="image no-bg rounded-circle" style="width: 120px; height: 120px; border: 2px solid #E8960F;">
-                  <img src="{{ profile_picture }}" class="rounded-circle w-100 h-100" id="profile-picture-preview" alt="Profile Picture">
+                <div
+                  class="image no-bg rounded-circle"
+                  style="width: 120px; height: 120px; border: 2px solid #fdde11"
+                >
+                  <img
+                    src="{{ profile_picture }}"
+                    class="rounded-circle w-100 h-100"
+                    id="profile-picture-preview"
+                    alt="Profile Picture"
+                  />
                 </div>
               </div>
               <div class="col-md-10">
                 <div class="form-group mb-20">
-                  <label class="body-title mb-10" style="color: #E8960F;">Upload a new profile picture</label>
+                  <label class="body-title mb-10" style="color: #fdde11"
+                    >Upload a new profile picture</label
+                  >
                   <div class="input-group">
                     {{ form.profile_picture }}
-                    <button class="btn" type="button" id="clear-image" style="background-color: #E8960F; color: white;">Clear</button>
+                    <button
+                      class="btn"
+                      type="button"
+                      id="clear-image"
+                      style="background-color: #fdde11; color: white"
+                    >
+                      Clear
+                    </button>
                   </div>
-                  <small class="text-muted">JPEG or PNG, recommended size 300x300 pixels</small>
+                  <small class="text-muted"
+                    >JPEG or PNG, recommended size 300x300 pixels</small
+                  >
                 </div>
               </div>
             </div>
 
             <div class="row">
               <div class="col-md-6 mb-20">
-                <label class="body-title mb-10" style="color: #E8960F;">Full Name <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" value="{{ request.user.name }}" readonly style="border-color: #E8960F;">
+                <label class="body-title mb-10" style="color: #fdde11"
+                  >Full Name <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  value="{{ request.user.name }}"
+                  readonly
+                  style="border-color: #fdde11"
+                />
               </div>
 
               <div class="col-md-6 mb-20">
-                <label for="{{ form.phone_number.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">Phone Number <span class="text-danger">*</span></label>
-                {{ form.phone_number }}
-                {% if form.phone_number.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.phone_number.errors.0 }}
-                  </div>
+                <label
+                  for="{{ form.phone_number.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                  >Phone Number <span class="text-danger">*</span></label
+                >
+                {{ form.phone_number }} {% if form.phone_number.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.phone_number.errors.0 }}
+                </div>
                 {% endif %}
               </div>
 
               <div class="col-12 mb-20">
-                <label for="{{ form.address.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">Address <span class="text-danger">*</span></label>
-                {{ form.address }}
-                {% if form.address.errors %}
-                  <div class="invalid-feedback d-block">
-                    {{ form.address.errors.0 }}
-                  </div>
+                <label
+                  for="{{ form.address.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                  >Address <span class="text-danger">*</span></label
+                >
+                {{ form.address }} {% if form.address.errors %}
+                <div class="invalid-feedback d-block">
+                  {{ form.address.errors.0 }}
+                </div>
                 {% endif %}
               </div>
             </div>
@@ -76,43 +120,83 @@
 
         <!-- Preferences Section -->
         <div class="wg-box mb-27">
-          <div class="wg-box-header" style="border-bottom: 1px solid #E8960F;">
-            <h4 class="title" style="color: #E8960F;">Preferences <small class="text-muted">(Optional)</small></h4>
+          <div class="wg-box-header" style="border-bottom: 1px solid #fdde11">
+            <h4 class="title" style="color: #fdde11">
+              Preferences <small class="text-muted">(Optional)</small>
+            </h4>
           </div>
           <div class="wg-box-body">
-            <p class="text-muted mb-20">These preferences help us personalize your experience. You can update them anytime.</p>
+            <p class="text-muted mb-20">
+              These preferences help us personalize your experience. You can
+              update them anytime.
+            </p>
 
             <div class="row">
               <div class="col-md-6 mb-20">
-                <label for="{{ form.preferred_location.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">Preferred Location</label>
+                <label
+                  for="{{ form.preferred_location.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                  >Preferred Location</label
+                >
                 {{ form.preferred_location }}
               </div>
 
               <div class="col-md-6 mb-20">
-                <label for="{{ form.preferred_property_type.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">Preferred Property Type</label>
+                <label
+                  for="{{ form.preferred_property_type.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                  >Preferred Property Type</label
+                >
                 {{ form.preferred_property_type }}
               </div>
 
               <div class="col-md-6 mb-20">
-                <label for="{{ form.min_budget.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">Minimum Budget</label>
+                <label
+                  for="{{ form.min_budget.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                  >Minimum Budget</label
+                >
                 <div class="input-group">
-                  <span class="input-group-text" style="background-color: #E8960F; color: white;">$</span>
+                  <span
+                    class="input-group-text"
+                    style="background-color: #fdde11; color: white"
+                    >$</span
+                  >
                   {{ form.min_budget }}
                 </div>
               </div>
 
               <div class="col-md-6 mb-20">
-                <label for="{{ form.max_budget.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">Maximum Budget</label>
+                <label
+                  for="{{ form.max_budget.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                  >Maximum Budget</label
+                >
                 <div class="input-group">
-                  <span class="input-group-text" style="background-color: #E8960F; color: white;">$</span>
+                  <span
+                    class="input-group-text"
+                    style="background-color: #fdde11; color: white"
+                    >$</span
+                  >
                   {{ form.max_budget }}
                 </div>
               </div>
 
               <div class="col-12 mb-20">
-                <label for="{{ form.preferred_features.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">Preferred Features</label>
+                <label
+                  for="{{ form.preferred_features.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                  >Preferred Features</label
+                >
                 {{ form.preferred_features }}
-                <small class="text-muted">Select multiple features by holding Ctrl/Cmd</small>
+                <small class="text-muted"
+                  >Select multiple features by holding Ctrl/Cmd</small
+                >
               </div>
             </div>
           </div>
@@ -120,39 +204,67 @@
 
         <!-- Social Media Section -->
         <div class="wg-box mb-27">
-          <div class="wg-box-header" style="border-bottom: 1px solid #E8960F;">
-            <h4 class="title" style="color: #E8960F;">Social Media <small class="text-muted">(Optional)</small></h4>
+          <div class="wg-box-header" style="border-bottom: 1px solid #fdde11">
+            <h4 class="title" style="color: #fdde11">
+              Social Media <small class="text-muted">(Optional)</small>
+            </h4>
           </div>
           <div class="wg-box-body">
-            <p class="text-muted mb-20">Add links to personalize your profile even more.</p>
+            <p class="text-muted mb-20">
+              Add links to personalize your profile even more.
+            </p>
 
             <div class="row">
               <div class="col-md-4 mb-20">
-                <label for="{{ social_media_form.facebook.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">
+                <label
+                  for="{{ social_media_form.facebook.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                >
                   <i class="icon-facebook me-1"></i> Facebook
                 </label>
                 <div class="input-group">
-                  <span class="input-group-text" style="background-color: #E8960F; color: white;">https://</span>
+                  <span
+                    class="input-group-text"
+                    style="background-color: #fdde11; color: white"
+                    >https://</span
+                  >
                   {{ social_media_form.facebook }}
                 </div>
               </div>
 
               <div class="col-md-4 mb-20">
-                <label for="{{ social_media_form.twitter.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">
+                <label
+                  for="{{ social_media_form.twitter.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                >
                   <i class="icon-twitter me-1"></i> Twitter
                 </label>
                 <div class="input-group">
-                  <span class="input-group-text" style="background-color: #E8960F; color: white;">https://</span>
+                  <span
+                    class="input-group-text"
+                    style="background-color: #fdde11; color: white"
+                    >https://</span
+                  >
                   {{ social_media_form.twitter }}
                 </div>
               </div>
 
               <div class="col-md-4 mb-20">
-                <label for="{{ social_media_form.linkedin.id_for_label }}" class="body-title mb-10" style="color: #E8960F;">
+                <label
+                  for="{{ social_media_form.linkedin.id_for_label }}"
+                  class="body-title mb-10"
+                  style="color: #fdde11"
+                >
                   <i class="icon-linkedin me-1"></i> LinkedIn
                 </label>
                 <div class="input-group">
-                  <span class="input-group-text" style="background-color: #E8960F; color: white;">https://</span>
+                  <span
+                    class="input-group-text"
+                    style="background-color: #fdde11; color: white"
+                    >https://</span
+                  >
                   {{ social_media_form.linkedin }}
                 </div>
               </div>
@@ -163,7 +275,11 @@
         <!-- Submit Button -->
         <div class="wg-box">
           <div class="wg-box-body text-end">
-            <button type="submit" class="btn btn-lg" style="background-color: #E8960F; color: white;">
+            <button
+              type="submit"
+              class="btn btn-lg"
+              style="background-color: #fdde11; color: white"
+            >
               <i class="icon-save me-2"></i> Save Changes
             </button>
           </div>
@@ -177,50 +293,63 @@
   <!-- bottom-page -->
   <div class="bottom-page">
     <div class="body-text">Copyright © 2025 REM. Design with</div>
-    <i class="icon-heart" style="color: #E8960F;"></i>
-    <div class="body-text">by <a href="#" style="color: #E8960F;">REM</a> All rights reserved.</div>
+    <i class="icon-heart" style="color: #fdde11"></i>
+    <div class="body-text">
+      by <a href="#" style="color: #fdde11">REM</a> All rights reserved.
+    </div>
   </div>
   <!-- /bottom-page -->
 </div>
 <!-- /main-content -->
 
-{% endblock %}
-
-{% block extra_js %}
+{% endblock %} {% block extra_js %}
 <script>
   // Profile picture preview
-  document.getElementById('{{ form.profile_picture.id_for_label }}').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById('profile-picture-preview').src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+  document
+    .getElementById("{{ form.profile_picture.id_for_label }}")
+    .addEventListener("change", function (event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById("profile-picture-preview").src =
+            e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
 
   // Clear image button
-  document.getElementById('clear-image').addEventListener('click', function() {
-    document.getElementById('{{ form.profile_picture.id_for_label }}').value = '';
-    document.getElementById('profile-picture-preview').src = '{{ profile_picture }}';
+  document.getElementById("clear-image").addEventListener("click", function () {
+    document.getElementById("{{ form.profile_picture.id_for_label }}").value =
+      "";
+    document.getElementById("profile-picture-preview").src =
+      "{{ profile_picture }}";
   });
 
   // Form validation
-  (function() {
-    'use strict';
-    window.addEventListener('load', function() {
-      var forms = document.getElementsByClassName('needs-validation');
-      var validation = Array.prototype.filter.call(forms, function(form) {
-        form.addEventListener('submit', function(event) {
-          if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-          form.classList.add('was-validated');
-        }, false);
-      });
-    }, false);
+  (function () {
+    "use strict";
+    window.addEventListener(
+      "load",
+      function () {
+        var forms = document.getElementsByClassName("needs-validation");
+        var validation = Array.prototype.filter.call(forms, function (form) {
+          form.addEventListener(
+            "submit",
+            function (event) {
+              if (form.checkValidity() === false) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+              form.classList.add("was-validated");
+            },
+            false
+          );
+        });
+      },
+      false
+    );
   })();
 </script>
 {% endblock %}
