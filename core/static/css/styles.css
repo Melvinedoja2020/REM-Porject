@@ -7010,7 +7010,81 @@ tr {
 /* * {
     box-shadow: 0 0 0 1px red !important;
 } */
+/* Fix footer overflow */
+#footer {
+    overflow-x: hidden;
+    max-width: 100%;
+}
 
+.footer-top, .footer-main, .footer-bottom {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* Fix the contact items layout */
+.wrap-contact-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 100%;
+}
+
+.contact-item {
+    flex: 1;
+    min-width: 200px;
+    max-width: 100%;
+}
+
+/* Mobile-specific footer fixes */
+@media (max-width: 768px) {
+    #footer .tf-container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .footer-top {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .wrap-contact-item {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .contact-item {
+        min-width: 100%;
+        justify-content: center;
+    }
+
+    /* Ensure footer columns don't overflow */
+    .footer-col-block {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .footer-menu-list ul {
+        padding-left: 0;
+        margin-left: 0;
+    }
+}
+
+/* More aggressive mobile fix if needed */
+@media (max-width: 480px) {
+    .footer-top {
+        padding: 0 10px;
+    }
+
+    .contact-item {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contact-item .content {
+        text-align: center;
+    }
+}
 /*------------ themes-color ---------------- */
 .theme-color-1 {
   --Primary: #06a788;
