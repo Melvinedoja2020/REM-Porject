@@ -7017,6 +7017,8 @@ tr {
   --Primary: #fdde11;
   --Sub-primary-1: rgba(253, 231, 229, 1);
   --Sub-primary-2: rgba(242, 105, 92, 0.16);
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .theme-color-3 {
