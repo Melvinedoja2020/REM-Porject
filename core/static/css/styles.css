@@ -200,6 +200,18 @@ html {
 body {
   background: var(--White);
   line-height: 1;
+  overflow-x: hidden;
+  width: 100%;
+}
+@media (max-width: 768px) {
+    .tf-container.xl {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .header-inner-wrap {
+        flex-wrap: wrap;
+    }
 }
 
 article,
