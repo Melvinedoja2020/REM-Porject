@@ -7010,12 +7010,14 @@ tr {
 /* * {
     box-shadow: 0 0 0 1px red !important;
 } */
-/* Footer Styles - Matches Your Design & Prevents Scrolling */
+
+/* Footer Styles - Exact Match to Screenshot Colors */
 #footer {
-    background: #2c3e50; /* Dark blue-gray from your design */
-    color: white;
+    background: #2c2e33; /* Exact background color from screenshot */
+    color: #ffffff; /* White text for contrast */
     overflow-x: hidden;
     max-width: 100%;
+    border-top: 1px solid #3a3d44; /* Darker border for subtle separation */
 }
 
 /* Footer Top - Logo + Contact */
@@ -7024,7 +7026,7 @@ tr {
     justify-content: space-between;
     align-items: center;
     padding: 30px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid #3a3d44; /* Darker border */
     flex-wrap: wrap;
     gap: 20px;
     max-width: 100%;
@@ -7033,7 +7035,7 @@ tr {
 #logo_footer {
     height: 50px;
     width: auto;
-    filter: brightness(0) invert(1);
+    /* Removed the filter to keep original logo colors */
 }
 
 .wrap-contact-item {
@@ -7048,19 +7050,20 @@ tr {
     align-items: center;
     gap: 12px;
     padding: 12px 20px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
     border-radius: 8px;
     max-width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .contact-item .icons {
     font-size: 20px;
-    color: #3498db;
+    color: #ffffff; /* White icons */
 }
 
 .contact-item .content .title.text-1 {
     font-size: 14px;
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
     margin-bottom: 4px;
     font-weight: 500;
 }
@@ -7068,15 +7071,16 @@ tr {
 .contact-item .content h6 {
     margin: 0;
     font-size: 15px;
+    color: #ffffff; /* White text */
 }
 
 .contact-item .content a {
-    color: white;
+    color: #ffffff; /* White text */
     text-decoration: none;
 }
 
 .contact-item .content a:hover {
-    color: #3498db;
+    color: #3498db; /* Blue hover from screenshot */
 }
 
 /* Footer Main - About Us & Quick Links */
@@ -7090,7 +7094,7 @@ tr {
 }
 
 .footer-col-block .title.lh-30 {
-    color: white;
+    color: #ffffff; /* White titles */
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 20px;
@@ -7109,14 +7113,14 @@ tr {
 }
 
 .footer-menu-list ul.tf-collapse-content li a {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
     text-decoration: none;
     font-size: 14px;
     transition: color 0.3s ease;
 }
 
 .footer-menu-list ul.tf-collapse-content li a:hover {
-    color: #3498db;
+    color: #3498db; /* Blue hover color */
 }
 
 /* Footer Bottom */
@@ -7125,7 +7129,7 @@ tr {
     justify-content: space-between;
     align-items: center;
     padding: 25px 0;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid #3a3d44; /* Darker border */
     flex-wrap: wrap;
     gap: 20px;
     max-width: 100%;
@@ -7133,13 +7137,13 @@ tr {
 
 .footer-bottom p {
     margin: 0;
-    opacity: 0.8;
+    color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
     font-size: 14px;
     max-width: 100%;
 }
 
 .footer-bottom .fw-7 {
-    color: #3498db;
+    color: #ffffff; /* White for company name */
     font-weight: 700;
 }
 
@@ -7152,8 +7156,7 @@ tr {
 
 .wrap-social .text-3.fw-6.text_white {
     font-size: 14px;
-    opacity: 0.8;
-    color: white !important;
+    color: rgba(255, 255, 255, 0.8) !important; /* Semi-transparent white */
     font-weight: 600;
 }
 
@@ -7172,15 +7175,18 @@ tr {
     justify-content: center;
     width: 35px;
     height: 35px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
     border-radius: 50%;
-    color: white;
+    color: rgba(255, 255, 255, 0.8); /* Semi-transparent white icons */
     text-decoration: none;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .tf-social li a:hover {
-    background: #3498db;
+    background: #3498db; /* Blue background on hover */
+    color: white;
+    border-color: #3498db;
 }
 
 /* Mobile Responsive - Critical for Preventing Scroll */
@@ -7284,6 +7290,7 @@ tr {
     box-sizing: border-box;
     max-width: 100%;
 }
+
 /*------------ themes-color ---------------- */
 .theme-color-1 {
   --Primary: #06a788;
