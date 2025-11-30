@@ -2251,6 +2251,20 @@ a:hover {
   width: 150px;
 }
 
+.logo_header {
+    height: 180px;
+    width: auto;
+    object-fit: contain;
+    max-width: 200px; /* Prevents extremely wide logos */
+}
+
+/* For mobile devices */
+@media (max-width: 768px) {
+    .logo_header {
+        height: 40px;
+    }
+}
+
 .inner-mobile-nav .top-nav-mobile .mobile-nav-close {
   cursor: pointer;
   display: -webkit-box;
