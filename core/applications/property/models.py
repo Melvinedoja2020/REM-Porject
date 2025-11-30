@@ -51,7 +51,7 @@ class Property(TitleTimeBasedModel):
         choices=PropertyListingType.choices,
         default=PropertyListingType.RENT,
     )
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    price = models.DecimalField(max_digits=20, decimal_places=2)
     location = models.CharField(max_length=255)
     bedrooms = models.PositiveIntegerField()
     bathrooms = models.PositiveIntegerField()

@@ -2,7 +2,6 @@
 {% load static %}
 {% block content %}
 
-
 <!-- main-content -->
 <div class="main-content">
   <!-- main-content-wrap -->
@@ -36,13 +35,20 @@
       <!-- form-add-product -->
       <form method="post" enctype="multipart/form-data" class="tf-section-2 form-add-product">
         {% csrf_token %}
-        {{ form.errors }}
+        {% comment %} {{ form.errors }} {% endcomment %}
 
         <!-- First Section -->
         <div class="wg-box">
           <fieldset class="name">
             <div class="body-title mb-10">{{ form.title.label }} <span class="tf-color-1">*</span></div>
             {{ form.title }}
+            {% if form.title.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.title.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
             <div class="text-tiny">Do not exceed 20 characters when entering the property name.</div>
           </fieldset>
 
@@ -52,6 +58,13 @@
               <div class="body-title mb-10">{{ form.property_type.label }} <span class="tf-color-1">*</span></div>
               <div class="select">
                 {{ form.property_type }}
+                {% if form.property_type.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.property_type.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
                 {% comment %} <div class="property-type-hint text-tiny mt-5">
                   Can't find your type?
                   <a href="#" class="tf-color js-show-new-type">Add custom type</a>
@@ -63,6 +76,13 @@
               <div class="body-title mb-10">{{ form.price.label }} <span class="tf-color-1">*</span></div>
               <div class="select">
                 {{ form.price }}
+                {% if form.price.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.price.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
             </fieldset>
           </div>
@@ -74,6 +94,13 @@
               {{ form.new_property_type }}
               <button type="button" class="tf-button js-cancel-new-type" style="margin-left: 10px;">Cancel</button>
             </div>
+            {% if form.new_property_type.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.new_property_type.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
             <div class="text-tiny">Example: "Vacation Home", "Co-working Space"</div>
           </fieldset>
 
@@ -81,12 +108,26 @@
             <div class="body-title mb-10">{{ form.location.label }} <span class="tf-color-1">*</span></div>
             <div class="select">
               {{ form.location }}
+              {% if form.location.errors %}
+                <div class="invalid-feedback d-block">
+                  {% for error in form.location.errors %}
+                    {{ error }}
+                  {% endfor %}
+                </div>
+              {% endif %}
             </div>
           </fieldset>
 
           <fieldset class="description">
             <div class="body-title mb-10">{{ form.description.label }} <span class="tf-color-1">*</span></div>
             {{ form.description }}
+            {% if form.description.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.description.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
             <div class="text-tiny">Do not exceed 100 characters when entering the product description.</div>
           </fieldset>
         </div>
@@ -96,6 +137,13 @@
           <fieldset class="name">
             <div class="body-title mb-10">{{ form.cover_image.label }} <span class="tf-color-1">*</span></div>
             {{ form.cover_image }}
+            {% if form.cover_image.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.cover_image.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
             <div class="text-tiny">This will be the main image users will see.</div>
           </fieldset>
           <fieldset>
@@ -113,6 +161,13 @@
                 </label>
               </div>
             </div>
+            {% if form.images.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.images.errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
             <div class="body-text">
               You need to add at least 4 images. Pay attention to the quality of the pictures you add, comply with
               background color standards. Pictures must be in certain dimensions.
@@ -124,6 +179,13 @@
               <div class="body-title mb-10">{{ form.bedrooms.label }}</div>
               <div class="select mb-10">
                 {{ form.bedrooms }}
+                {% if form.bedrooms.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.bedrooms.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
             </fieldset>
 
@@ -131,6 +193,13 @@
               <div class="body-title mb-10">{{ form.bathrooms.label }}</div>
               <div class="select">
                 {{ form.bathrooms }}
+                {% if form.bathrooms.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.bathrooms.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
             </fieldset>
           </div>
@@ -140,6 +209,13 @@
               <div class="body-title mb-10">{{ form.sqft.label }}</div>
               <div class="select mb-10">
                 {{ form.sqft }}
+                {% if form.sqft.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.sqft.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
             </fieldset>
 
@@ -147,6 +223,13 @@
               <div class="body-title mb-10">{{ form.is_available.label }}</div>
               <div class="select">
                 {{ form.is_available }}
+                {% if form.is_available.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.is_available.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
             </fieldset>
           </div>
@@ -156,6 +239,13 @@
               <div class="body-title mb-10">{{ form.amenities.label }}</div>
               <div class="select">
                 {{ form.amenities }}
+                {% if form.amenities.errors %}
+                  <div class="invalid-feedback d-block">
+                    {% for error in form.amenities.errors %}
+                      {{ error }}
+                    {% endfor %}
+                  </div>
+                {% endif %}
               </div>
             </fieldset>
           </div>
@@ -192,6 +282,18 @@
           border-radius: 4px;
         }
 
+        /* Add red border to fields with errors */
+        .is-invalid {
+          border-color: #dc3545 !important;
+        }
+
+        /* Style form fields when they have errors */
+        input:invalid,
+        select:invalid,
+        textarea:invalid {
+          border-color: #dc3545;
+        }
+
       </style>
 
       <script>
@@ -226,11 +328,17 @@
             newTypeField.style.display = 'block';
             propertyTypeSelect.disabled = true;
           }
+
+          // Add Bootstrap validation classes to fields with errors
+          const errorFields = document.querySelectorAll('.invalid-feedback');
+          errorFields.forEach(function(feedback) {
+            const formControl = feedback.previousElementSibling;
+            if (formControl && (formControl.tagName === 'INPUT' || formControl.tagName === 'SELECT' || formControl.tagName === 'TEXTAREA')) {
+              formControl.classList.add('is-invalid');
+            }
+          });
         });
 
       </script>
 
-
-
-
-      {% endblock content %}
+{% endblock content %}

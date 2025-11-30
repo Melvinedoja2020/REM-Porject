@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db.models.signals import post_save
@@ -5,10 +7,13 @@ from django.dispatch import receiver
 from django.template.loader import render_to_string
 
 from core.applications.notifications.models import Notification
-from core.applications.property.models import Lead
+from core.applications.property.models import Amenity, Lead
 from core.applications.property.models import PropertyViewing
 from core.helper.enums import NotificationType
+from django.db.models.signals import post_migrate
 
+
+logger = logging.getLogger(__name__)
 
 @receiver(post_save, sender=PropertyViewing)
 def handle_viewing_status_change(sender, instance, created, **kwargs):
@@ -115,3 +120,33 @@ def handle_new_lead(sender, instance, created, **kwargs):
 
             logger = logging.getLogger(__name__)
             logger.error(f"Failed to process lead signal: {e!s}", exc_info=True)
+
+
+DEFAULT_AMENITIES = [
+    "WiFi",
+    "24/7 Power",
+    "Water Supply",
+    "Waste Disposal",
+    "Prepaid Meter",
+    "Air Conditioning",
+    "Wardrobe",
+    "Kitchen",
+    "Private Bathroom",
+    "Balcony",
+    "Security",
+    "CCTV Surveillance",
+    "Gated Compound",
+    "Intercom",
+    "Fire Safety System",
+    "Parking Space",
+    "Green Area",
+    "Access to Cleaning Services",
+    "Laundry Area",
+]
+
+@receiver(post_migrate)
+def create_default_amenities(sender, **kwargs):
+    if sender.name.endswith("property"):  # Prevents running on other apps
+        for amenity_name in DEFAULT_AMENITIES:
+            Amenity.objects.get_or_create(name=amenity_name)
+            print(f"✓ Amenity ensured: {amenity_name}")

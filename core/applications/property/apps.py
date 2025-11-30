@@ -9,4 +9,4 @@ class PropertyConfig(AppConfig):
 
     def ready(self):
         with contextlib.suppress(ImportError):
-            pass
+            import core.applications.property.signals
