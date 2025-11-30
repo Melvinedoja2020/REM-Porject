@@ -7007,9 +7007,9 @@ tr {
 }
 
 /* Temporary debug to find what's causing overflow */
-* {
+/* * {
     box-shadow: 0 0 0 1px red !important;
-}
+} */
 
 /*------------ themes-color ---------------- */
 .theme-color-1 {
