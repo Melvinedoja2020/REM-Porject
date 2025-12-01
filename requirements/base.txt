@@ -27,7 +27,7 @@ channels[daphne]==4.1.0
 channels-redis==4.2.0
 
 pyotp==2.9.0 # https://github.com/pyotp/pyotp
-django-filter==24.3
+django-filter==25.1
 django-encrypted-model-fields==0.6.5
 pycryptodome==3.19.0
 qrcode==7.4.2 # https://github.com/lincolnloop/python-qrcode
