@@ -3,8 +3,8 @@ from django.utils import timezone
 from core.applications.notifications.models import Announcement
 from core.applications.notifications.models import Notification
 from core.applications.property.models import FavoriteProperty, Lead, Property, PropertyViewing
-from core.helper.enums import ICON_CLASSES, IMAGE_PATHS
-from core.helper.enums import PropertyTypeChoices
+from core.helpers.enums import ICON_CLASSES, IMAGE_PATHS
+from core.helpers.enums import PropertyTypeChoices
 from django.db.models import Count, Sum
 
 

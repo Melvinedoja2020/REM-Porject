@@ -9,7 +9,7 @@ from django.urls import reverse
 from core.applications.notifications.models import Notification
 from core.applications.notifications.models import NotificationPreference
 from core.applications.property.models import PropertySubscription
-from core.helper.enums import NotificationType
+from core.helpers.enums import NotificationType
 
 logger = logging.getLogger(__name__)
 

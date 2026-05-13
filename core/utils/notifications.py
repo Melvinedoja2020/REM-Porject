@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from core.applications.property.models import PropertySubscription
-from core.helper.enums import NotificationType
+from core.helpers.enums import NotificationType
 from core.utils.utils import create_notification
 from core.utils.utils import is_user_subscribed_for_property
 

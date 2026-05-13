@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.helper.utils import PropertyQuerySet
+from core.helpers.utils import PropertyQuerySet
 
 
 class PropertyManager(models.Manager.from_queryset(PropertyQuerySet)):

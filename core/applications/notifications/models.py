@@ -2,8 +2,8 @@ import auto_prefetch
 from django.db import models
 from django.utils import timezone
 
-from core.helper.enums import NotificationType
-from core.helper.models import TitleTimeBasedModel
+from core.helpers.enums import NotificationType
+from core.helpers.models import TitleTimeBasedModel
 
 
 # Messaging between users (agent <-> user)

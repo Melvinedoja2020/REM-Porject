@@ -17,7 +17,7 @@ from core.applications.notifications.forms import MessageForm
 from core.applications.notifications.forms import ReplyForm
 from core.applications.notifications.models import Message
 from core.applications.notifications.models import Notification
-from core.helper.enums import NotificationType
+from core.helpers.enums import NotificationType
 from core.utils.utils import create_notification
 
 # Create your views here.

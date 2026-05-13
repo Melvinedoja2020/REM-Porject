@@ -19,8 +19,8 @@ from core.applications.users.models import AgentProfile
 from core.applications.users.models import SocialMediaLinks
 from core.applications.users.models import User
 from core.applications.users.models import UserProfile
-from core.helper.enums import UserRoleChoice
-from core.helper.mixins import RoleRequiredMixin
+from core.helpers.enums import UserRoleChoice
+from core.helpers.mixins import RoleRequiredMixin
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):

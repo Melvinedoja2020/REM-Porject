@@ -1,4 +1,4 @@
-from core.helper.enums import SubscriptionPlan
+from core.helpers.enums import SubscriptionPlan
 from django.core.exceptions import ValidationError
 
 

@@ -24,9 +24,9 @@ from core.applications.property.models import FavoriteProperty
 from core.applications.property.models import Property
 from core.applications.property.models import PropertyImage
 from core.applications.users.models import AgentProfile
-from core.helper.enums import PropertyListingType
-from core.helper.enums import PropertyTypeChoices
-from core.helper.mixins import PropertySearchMixin
+from core.helpers.enums import PropertyListingType
+from core.helpers.enums import PropertyTypeChoices
+from core.helpers.mixins import PropertySearchMixin
 from django.http import HttpResponse
 from django.core.mail import EmailMessage, BadHeaderError
 

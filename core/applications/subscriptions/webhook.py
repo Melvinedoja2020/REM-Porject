@@ -3,7 +3,7 @@ import json, hmac, hashlib, logging
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseForbidden
 from django.conf import settings
-from core.helper.utils import handle_paystack_payment
+from core.helpers.utils import handle_paystack_payment
 
 logger = logging.getLogger(__name__)
 

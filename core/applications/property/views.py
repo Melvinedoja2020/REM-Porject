@@ -41,11 +41,11 @@ from core.applications.property.models import PropertyType
 from core.applications.property.models import PropertyViewing
 from core.applications.subscriptions.features import FEATURE_LIMITS
 from core.applications.subscriptions.models import FeaturedListing
-from core.helper.enums import Lead_Status_Choices, SubscriptionPlan
-from core.helper.enums import LeadStatus
-from core.helper.enums import PropertyListingType
-from core.helper.enums import UserRoleChoice
-from core.helper.mixins import AgentApprovalRequiredMixin
+from core.helpers.enums import Lead_Status_Choices, SubscriptionPlan
+from core.helpers.enums import LeadStatus
+from core.helpers.enums import PropertyListingType
+from core.helpers.enums import UserRoleChoice
+from core.helpers.mixins import AgentApprovalRequiredMixin
 from core.utils.notifications import notify_new_property_listing
 from core.utils.notifications import notify_price_change
 from core.utils.utils import process_new_lead

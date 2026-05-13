@@ -15,7 +15,7 @@ from django.forms import TextInput
 from django.forms import URLInput
 from django.utils.translation import gettext_lazy as _
 
-from core.helper.enums import UserRoleChoice
+from core.helpers.enums import UserRoleChoice
 
 from .models import AgentProfile
 from .models import SocialMediaLinks

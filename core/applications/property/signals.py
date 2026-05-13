@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from core.applications.notifications.models import Notification
 from core.applications.property.models import Amenity, Lead
 from core.applications.property.models import PropertyViewing
-from core.helper.enums import NotificationType
+from core.helpers.enums import NotificationType
 from django.db.models.signals import post_migrate
 
 

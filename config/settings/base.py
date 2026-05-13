@@ -1,9 +1,13 @@
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
+from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # core/
@@ -81,6 +85,14 @@ THIRD_PARTY_APPS = [
     "django.contrib.humanize",
     # "allauth.socialaccount.providers.google",
     # "allauth.socialaccount.providers.facebook",
+    "django_celery_beat",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "corsheaders",
+    "drf_spectacular",
+    "cloudinary",
+    "cloudinary_storage",
+    "channels",
 ]
 
 LOCAL_APPS = [
@@ -310,6 +322,136 @@ SOCIALACCOUNT_AUTO_SIGNUP = True
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "core.helpers.authentications.CustomJWTAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+        "rest_framework.filters.OrderingFilter",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "core.helpers.paginations.CustomPagination",
+    "PAGE_SIZE": 25,
+    # https://www.django-rest-framework.org/api-guide/exceptions/#exception-handling
+    "EXCEPTION_HANDLER": "core.helpers.custom_exceptions.custom_exception_handler",
+    # Throttling
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "50/day",
+        "user": "1000/day",
+    },
+}
+
+
+# django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
+CORS_URLS_REGEX = r"^/api/.*$"
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8081",
+    "http://localhost:3000",
+    # "https://skeema.onrender.com",
+    # "https://skeema.dev",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "real-estate-management-backend API",
+    "DESCRIPTION": "Documentation of API endpoints of real-estate-management-backend",
+    "VERSION": "1.0.0",
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
+    "SCHEMA_PATH_PREFIX": "/api/",
+    "SECURITY": [{"jwtAuth": []}],
+}
+
+API_VERSION = env("API_VERSION", default="v1")
+ASGI_APPLICATION = "config.asgi.application"
+
+
+DJOSER = {
+    "SERIALIZERS": {
+        # --- existing (unchanged) ---
+        "user_create": "core.applications.users.api.v1.serializers.CustomUserCreateSerializer",
+        "user": "core.applications.users.api.v1.serializers.CustomUserSerializer",
+        "current_user": "core.applications.users.api.v1.serializers.GetUser",
+        "password_reset_confirm": "core.applications.users.api.v1.serializers.PasswordResetConfirmSerializer",
+        "password_reset_confirm_retype": "core.applications.users.api.v1.serializers.PasswordResetConfirmRetypeSerializer",
+        "username_reset": "djoser.serializers.SendEmailResetSerializer",
+        "username_reset_confirm": "core.applications.users.api.v1.serializers.UsernameResetConfirmSerializer",
+        "username_reset_confirm_retype": "core.applications.users.api.v1.serializers.UsernameResetConfirmRetypeSerializer",
+        "activation": "core.applications.users.api.v1.serializers.ActivationSerializer",
+        "customer_signup": "core.applications.users.api.v1.serializers.CustomerSignupSerializer",
+        "agent_signup": "core.applications.users.api.v1.serializers.AgentSignupSerializer",
+    },
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "SEND_ACTIVATION_EMAIL": True,
+    "SEND_CONFIRMATION_EMAIL": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True,
+    "SET_PASSWORD_RETYPE": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "EMAIL": {
+        "activation": "core.applications.users.email.ActivationEmail",
+        "confirmation": "core.applications.users.email.ConfirmationEmail",
+        "password_reset": "core.applications.users.email.PasswordResetEmail",
+        "password_changed_confirmation": "core.applications.users.email.PasswordChangedConfirmationEmail",
+        "username_changed_confirmation": "core.applications.users.email.UsernameChangedConfirmationEmail",
+        "username_reset": "core.applications.users.email.UsernameResetEmail",
+    },
+}
+# permissions
+PERMISSIONS = {
+    "default": [IsAuthenticated],
+    "user": [IsAuthenticated],
+    "user_create": [AllowAny],
+    "user_list": [IsAuthenticated],
+    "user_delete": [IsAdminUser],
+    "get_by_email": [IsAuthenticated],
+    "activation": [AllowAny],
+    "password_reset": [AllowAny],
+    "password_reset_confirm": [AllowAny],
+    "set_password": [IsAuthenticated],
+    "set_username": [IsAuthenticated],
+    "username_reset": [AllowAny],
+    "username_reset_confirm": [AllowAny],
+    "customer_signup": [AllowAny],
+    "agent_signup": [AllowAny],
+}
+# JSON Web Token authentication
+SIMPLE_JWT = {
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "TOKEN_OBTAIN_SERIALIZER": "core.applications.users.api.v1.serializers.CustomTokenObtainPairSerializer",
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": env.list(
+                "CHANNEL_LAYERS_HOST",
+                default=[env("REDIS_URL", default="redis://redis:6379")],
+            ),
+            "capacity": 200,
+        },
+    },
+}
+
+
+# urls setup for admin invites
+FRONTEND_URL = env("FRONTEND_URL", default="http://localhost:8000")
+FIREBASE_CREDENTIALS_BASE64 = env("FIREBASE_CREDENTIALS_BASE64", default="")
+SITE_URL = env("SITE_URL", default="http://localhost:8000/")
 
 # Default property image URL
 DEFAULT_PROPERTY_IMAGE_URL = "/static/images/placeholder.jpg"

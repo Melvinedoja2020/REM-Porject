@@ -2,8 +2,8 @@
 
 import auto_prefetch
 import core.applications.users.managers
-import core.helper.media
-import core.helper.models
+import core.helpers.media
+import core.helpers.models
 import django.db.models.deletion
 import django.db.models.manager
 import django.utils.timezone
@@ -52,8 +52,8 @@ class Migration(migrations.Migration):
                 ('visible', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.CharField(default=core.helper.models.generate_uuid, editable=False, max_length=120, primary_key=True, serialize=False, unique=True)),
-                ('profile_picture', models.ImageField(blank=True, null=True, upload_to=core.helper.media.MediaHelper.get_image_upload_path)),
+                ('id', models.CharField(default=core.helpers.models.generate_uuid, editable=False, max_length=120, primary_key=True, serialize=False, unique=True)),
+                ('profile_picture', models.ImageField(blank=True, null=True, upload_to=core.helpers.media.MediaHelper.get_image_upload_path)),
                 ('agent_type', models.CharField(choices=[('Real Estate Agent', 'Real Estate Agent'), ('Property Manager', 'Property Manager')], max_length=50)),
                 ('company_name', models.CharField(blank=True, max_length=255, null=True)),
                 ('license_number', models.CharField(blank=True, max_length=50, null=True, unique=True)),
@@ -62,8 +62,8 @@ class Migration(migrations.Migration):
                 ('office_address', models.CharField(blank=True, max_length=255, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
                 ('rating', models.DecimalField(blank=True, decimal_places=2, default=0.0, max_digits=3, null=True)),
-                ('license_document', models.FileField(blank=True, null=True, upload_to=core.helper.media.MediaHelper.get_image_upload_path)),
-                ('company_registration_document', models.FileField(blank=True, null=True, upload_to=core.helper.media.MediaHelper.get_image_upload_path)),
+                ('license_document', models.FileField(blank=True, null=True, upload_to=core.helpers.media.MediaHelper.get_image_upload_path)),
+                ('company_registration_document', models.FileField(blank=True, null=True, upload_to=core.helpers.media.MediaHelper.get_image_upload_path)),
                 ('company_registration_number', models.CharField(blank=True, max_length=50, null=True, unique=True)),
                 ('verification_status', models.CharField(choices=[('pending', 'Pending'), ('verified', 'Verified'), ('rejected', 'Rejected')], default='pending', max_length=20)),
                 ('verified', models.BooleanField(default=False)),
@@ -88,7 +88,7 @@ class Migration(migrations.Migration):
                 ('visible', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.CharField(default=core.helper.models.generate_uuid, editable=False, max_length=120, primary_key=True, serialize=False, unique=True)),
+                ('id', models.CharField(default=core.helpers.models.generate_uuid, editable=False, max_length=120, primary_key=True, serialize=False, unique=True)),
                 ('facebook', models.URLField(blank=True, max_length=255, null=True)),
                 ('twitter', models.URLField(blank=True, max_length=255, null=True)),
                 ('linkedin', models.URLField(blank=True, max_length=255, null=True)),
@@ -113,8 +113,8 @@ class Migration(migrations.Migration):
                 ('visible', models.BooleanField(default=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('id', models.CharField(default=core.helper.models.generate_uuid, editable=False, max_length=120, primary_key=True, serialize=False, unique=True)),
-                ('profile_picture', models.ImageField(blank=True, null=True, upload_to=core.helper.media.MediaHelper.get_image_upload_path)),
+                ('id', models.CharField(default=core.helpers.models.generate_uuid, editable=False, max_length=120, primary_key=True, serialize=False, unique=True)),
+                ('profile_picture', models.ImageField(blank=True, null=True, upload_to=core.helpers.media.MediaHelper.get_image_upload_path)),
                 ('phone_number', models.CharField(blank=True, max_length=15, null=True)),
                 ('preferred_location', models.CharField(blank=True, max_length=255, null=True)),
                 ('preferred_property_type', models.CharField(blank=True, max_length=255, null=True)),

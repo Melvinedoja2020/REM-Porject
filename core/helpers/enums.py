@@ -1,10 +1,16 @@
 from django.db.models import TextChoices
+from django.utils.translation import gettext_lazy as _
 
 
 class UserRoleChoice(TextChoices):
     CUSTOMER = ("Prospective Buyer/Tenant", "Prospective Buyer/Tenant")
     AGENT = ("Agent", "Agent")
     # REAL_ESTATE_OWNER = ("Real Estate Owner", "Real Estate Owner")
+
+class AuthProviderChoices(TextChoices):
+    EMAIL  = "email",  _("Email")
+    PHONE  = "phone",  _("Phone")
+    GOOGLE = "google", _("Google")
 
 
 class PropertyTypeChoices(TextChoices):
@@ -47,6 +53,7 @@ class PaymentStatus(TextChoices):
 class PropertyListingType(TextChoices):
     RENT = ("Rent", "Rent")
     FOR_SALE = ("For Sale", "For Sale")
+    SHORT_LET = ("Short Let", "Short Let")
 
 
 class AgentTypeChoices(TextChoices):

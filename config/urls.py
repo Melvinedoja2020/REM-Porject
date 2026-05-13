@@ -7,6 +7,10 @@ from django.urls import include
 from django.urls import path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
+from drf_spectacular.views import SpectacularAPIView
+from drf_spectacular.views import SpectacularSwaggerView
+from rest_framework.authtoken.views import obtain_auth_token
+
 
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
@@ -24,6 +28,24 @@ urlpatterns = [
     # ...
     # Media files
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
+]
+
+## --- API v1 ---
+urlpatterns += [
+    path("api/v1/", include("core.applications.users.api.v1.routers")),
+    path("api/v1/", include("core.applications.users.api.v1.jwt")),
+    # Add other API v1 endpoints here
+]
+
+## --- Shared API endpoints ---
+urlpatterns += [
+    path("api/auth-token/", obtain_auth_token),
+    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="api-schema"),
+        name="api-docs",
+    ),
 ]
 if settings.DEBUG:
     # Static file serving when using Gunicorn + Uvicorn for local web socket development

@@ -7,13 +7,13 @@ from datetime import timedelta
 
 from core.applications.subscriptions.features import FEATURE_LIMITS
 from core.applications.subscriptions.services.paystack import PaystackAPI
-from core.helper.enums import PaymentStatus, SubscriptionPlan
-from core.helper.models import UIDTimeBasedModel
+from core.helpers.enums import PaymentStatus, SubscriptionPlan
+from core.helpers.models import UIDTimeBasedModel
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 from django.urls import reverse
 
-from core.helper.utils import generate_payment_reference
+from core.helpers.utils import generate_payment_reference
 
 
 # -------------------------------

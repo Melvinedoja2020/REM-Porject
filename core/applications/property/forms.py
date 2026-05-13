@@ -11,7 +11,7 @@ from core.applications.property.models import PropertyType
 from core.applications.property.models import PropertyViewing
 from core.applications.subscriptions.features import FEATURE_LIMITS
 from core.applications.subscriptions.models import FeaturedListing
-from core.helper.enums import PropertyTypeChoices, SubscriptionPlan
+from core.helpers.enums import PropertyTypeChoices, SubscriptionPlan
 
 
 class PropertyForm(forms.ModelForm):

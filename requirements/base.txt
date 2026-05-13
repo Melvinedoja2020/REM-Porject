@@ -7,6 +7,11 @@ hiredis==3.1.0  # https://github.com/redis/hiredis-py
 uvicorn[standard]==0.34.0  # https://github.com/encode/uvicorn
 uvicorn-worker==0.3.0  # https://github.com/Kludex/uvicorn-worker
 
+# 🔥 Added (Celery stack)
+celery==5.4.0
+django-celery-beat==2.7.0
+flower==2.0.1
+
 # Django
 # ------------------------------------------------------------------------------
 django==5.0.13  # pyup: < 5.1  # https://www.djangoproject.com/
@@ -17,27 +22,38 @@ django-crispy-forms==2.3  # https://github.com/django-crispy-forms/django-crispy
 crispy-bootstrap5==2024.10  # https://github.com/django-crispy-forms/crispy-bootstrap5
 django-redis==5.4.0  # https://github.com/jazzband/django-redis
 
-#  Django Admin
+# 🔥 Added (DRF stack)
+djangorestframework==3.16.0
+django-cors-headers==4.7.0
+drf-spectacular==0.28.0
+
+# 🔥 Added (Auth helpers)
+djoser==2.2.3
+social-auth-app-django==5.4.2
+
+# Django Admin
 django-import-export==4.1.1  # https://github.com/django-import-export/django-import-export
 django-leaflet==0.30.1  # https://django-leaflet.readthedocs.io/en/latest/
-
 
 # Channels
 channels[daphne]==4.1.0
 channels-redis==4.2.0
 
-pyotp==2.9.0 # https://github.com/pyotp/pyotp
+# 🔥 Added (MQTT)
+paho-mqtt==2.1.0
+
+pyotp==2.9.0  # https://github.com/pyotp/pyotp
 django-filter==24.3
 django-encrypted-model-fields==0.6.5
 pycryptodome==3.19.0
-qrcode==7.4.2 # https://github.com/lincolnloop/python-qrcode
-djangorestframework-gis==1.0 # https://github.com/openwisp/django-rest-framework-gis
+qrcode==7.4.2  # https://github.com/lincolnloop/python-qrcode
+djangorestframework-gis==1.0  # https://github.com/openwisp/django-rest-framework-gis
 # factory-boy==3.3.0  # https://github.com/FactoryBoy/factory_boy
 pydantic==2.6.0
-xhtml2pdf==0.2.16 # https://github.com/xhtml2pdf/xhtml2pdf
-exponent-server-sdk==2.1.0 # https://github.com/expo/exponent-server-sdk-python
-geopy==2.4.1 # https://github.com/geopy/geopy
-ulid-py==1.1.0 # https://github.com/ahawker/ulid
+xhtml2pdf==0.2.16  # https://github.com/xhtml2pdf/xhtml2pdf
+exponent-server-sdk==2.1.0  # https://github.com/expo/exponent-server-sdk-python
+geopy==2.4.1  # https://github.com/geopy/geopy
+ulid-py==1.1.0  # https://github.com/ahawker/ulid
 python-bidi==0.4.2  # https://github.com/MeirKriheli/python-bidi
 django-unfold==0.33.0  # https://unfoldadmin.com/
 django-simple-history==3.7.0  # https://django-simple-history.readthedocs.io/en/stable/
@@ -45,8 +61,10 @@ reportlab==4.0.9  # https://github.com/reportlab/reportlab
 
 django-auto-prefetch==1.9.0
 PyJWT==2.10.1
-django-model-utils==5.0.0
 fido2==1.1.2
 paystackapi==2.1.3
 python-flutterwave==1.2.2
 django-jazzmin==3.0.1
+
+# 🔥 Added (Firebase)
+firebase-admin==7.1.0
