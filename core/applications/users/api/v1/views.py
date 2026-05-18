@@ -30,6 +30,9 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.settings import api_settings
 
+from core.applications.users.api.v1.schema.auth_schema import JWT_LOGIN_SCHEMA
+from core.applications.users.api.v1.schema.auth_schema import JWT_REFRESH_SCHEMA
+from core.applications.users.api.v1.schema.auth_schema import JWT_VERIFY_SCHEMA
 from core.applications.users.models import User
 from core.applications.users.token import default_token_generator
 from core.helpers.custom_exceptions import CustomError
@@ -84,7 +87,7 @@ class TokenViewBase(generics.GenericAPIView):
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
-
+@JWT_LOGIN_SCHEMA
 class TokenObtainPairView(TokenViewBase):
     """
     Takes a credential (email or phone) + password and returns an
@@ -110,14 +113,14 @@ class TokenRefreshSlidingView(TokenViewBase):
 
 token_refresh_sliding = TokenRefreshSlidingView.as_view()
 
-
+@JWT_REFRESH_SCHEMA
 class TokenRefreshView(TokenViewBase):
     _serializer_class = api_settings.TOKEN_REFRESH_SERIALIZER
 
 
 token_refresh = TokenRefreshView.as_view()
 
-
+@JWT_VERIFY_SCHEMA
 class TokenVerifyView(TokenViewBase):
     _serializer_class = api_settings.TOKEN_VERIFY_SERIALIZER
 

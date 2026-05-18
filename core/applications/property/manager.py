@@ -1,11 +1,21 @@
 from django.db import models
 
-from core.helpers.utils import PropertyQuerySet
+from core.applications.property.querysets.property_queryset import (
+    AmenityQuerySet,
+    FavoritePropertyQuerySet,
+)
+from core.applications.property.querysets.property_queryset import LeadQuerySet
+from core.applications.property.querysets.property_queryset import PropertyQuerySet
+from core.applications.property.querysets.property_queryset import (
+    PropertySubscriptionQuerySet,
+)
+from core.applications.property.querysets.property_queryset import (
+    PropertyViewingQuerySet,
+)
 
-
-class PropertyManager(models.Manager.from_queryset(PropertyQuerySet)):
-    """Manager for Property model with custom queryset methods."""
-
-    def get_queryset(self):
-        """Use featured-first ordering by default."""
-        return super().get_queryset().featured_first()
+PropertyManager = models.Manager.from_queryset(PropertyQuerySet)
+LeadManager = models.Manager.from_queryset(LeadQuerySet)
+PropertyViewingManager = models.Manager.from_queryset(PropertyViewingQuerySet)
+FavoritePropertyManager = models.Manager.from_queryset(FavoritePropertyQuerySet)
+PropertySubscriptionManager = models.Manager.from_queryset(PropertySubscriptionQuerySet)
+AmenityManager = models.Manager.from_queryset(AmenityQuerySet)

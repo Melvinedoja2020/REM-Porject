@@ -4,16 +4,16 @@ from django.core.exceptions import ValidationError
 
 FEATURE_LIMITS = {
     SubscriptionPlan.FREE: {
-        "properties": 1,  # free users can only list 1 property
-        "featured_listings": 0,  # cannot feature properties
+        "properties": None,  # free users can only list 1 property
+        "featured_listings": None,  # cannot feature properties
     },
     SubscriptionPlan.BASIC: {
-        "properties": 5,
-        "featured_listings": 1,
+        "properties": None,
+        "featured_listings": None,
     },
     SubscriptionPlan.PREMIUM: {
-        "properties": 50,
-        "featured_listings": 5,
+        "properties": None,
+        "featured_listings": None,
     },
     SubscriptionPlan.ENTERPRISE: {
         "properties": None,  # unlimited

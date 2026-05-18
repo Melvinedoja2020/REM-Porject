@@ -8,7 +8,12 @@ from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.text import slugify
 
+from core.applications.property.manager import AmenityManager
+from core.applications.property.manager import FavoritePropertyManager
+from core.applications.property.manager import LeadManager
 from core.applications.property.manager import PropertyManager
+from core.applications.property.manager import PropertySubscriptionManager
+from core.applications.property.manager import PropertyViewingManager
 from core.applications.subscriptions.features import FEATURE_LIMITS
 from core.helpers.enums import Lead_Status_Choices
 from core.helpers.enums import LeadStatus
@@ -21,11 +26,15 @@ from core.helpers.models import TimeBasedModel
 from core.helpers.models import TitleTimeBasedModel
 
 User = get_user_model()
+
+
+
+
 class PropertyType(TitleTimeBasedModel):
     """
     Lookup table for property categories rendered in the
-    "Browse by Category" section of the home page (For Sale, For Rent,
-    Short-let, etc.).
+    "Browse by Category" section of the home page.
+    (For Sale, For Rent, Short-let, …)
     """
 
     class Meta(auto_prefetch.Model.Meta):
@@ -43,6 +52,7 @@ class Amenity(TimeBasedModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
 
+    objects = AmenityManager()
     class Meta(auto_prefetch.Model.Meta):
         ordering = ["name"]
         verbose_name = "Amenity"
@@ -52,16 +62,24 @@ class Amenity(TimeBasedModel):
         return self.name
 
 
-# ---------------------------------------------------------------------------
-# Core Property Model
-# ---------------------------------------------------------------------------
 
 
 class Property(TitleTimeBasedModel):
     """
-    The main Property model, representing a real estate listing.  Each row is
-    a unique property that can be listed for sale or rent by an agent,
-    and contacted by users via leads and viewings.
+    Central listing model.  Supports all three listing types visible
+    in the designs: For Sale, For Rent, and Short-let (nightly pricing).
+
+    Design cross-reference
+    ----------------------
+    Home page featured cards : title, cover_image, price, location,
+                               property_listing, bedrooms, bathrooms,
+                               sqft, is_available
+    Listing page filters     : property_type, property_listing, price,
+                               bedrooms, bathrooms, amenities
+    Property detail          : all fields + agent + amenities + gallery
+    Category grid            : property_listing → category_counts()
+    Mobile card              : card fields + agent avatar
+    Short-let detail         : price_suffix → '/night'
     """
 
     agent = auto_prefetch.ForeignKey(
@@ -75,7 +93,6 @@ class Property(TitleTimeBasedModel):
         blank=True,
     )
     slug = models.SlugField(max_length=255, unique=True, blank=True)
-
     description = models.TextField()
     property_type = models.CharField(
         max_length=50,
@@ -89,30 +106,19 @@ class Property(TitleTimeBasedModel):
         choices=PropertyListingType.choices,
         default=PropertyListingType.RENT,
     )
-
-    # ---- pricing -----------------------------------------------------------
-    # For RENT/SALE this is an annual/total figure; for SHORT_LET it is
-    # per-night.  The `price_suffix` property surfaces the correct label
-    # so the detail page can display "$4,500 /night" vs "$43,000 /year".
+    # For RENT / SALE: annual or total figure.
+    # For SHORT_LET: per-night rate.
+    # price_suffix and price_display expose the right label automatically.
     price = models.DecimalField(max_digits=20, decimal_places=2)
-
-    # ---- location ----------------------------------------------------------
     location = models.CharField(max_length=255)
-
-    # ---- specs (shown as icon-badges on cards and detail page) -------------
     bedrooms = models.PositiveIntegerField()
     bathrooms = models.PositiveIntegerField()
-    sqft = models.PositiveIntegerField(help_text="Size in square feet")
-
-    # ---- relations ---------------------------------------------------------
+    sqft = models.PositiveIntegerField(help_text="Size in square feet.")
     amenities = models.ManyToManyField(
         "property.Amenity",
         blank=True,
         related_name="properties",
     )
-
-    # ---- availability ------------------------------------------------------
-    # Drives the "Available" / "Not Available" badge on listing cards.
     is_available = models.BooleanField(default=True)
 
     objects = PropertyManager()
@@ -134,34 +140,21 @@ class Property(TitleTimeBasedModel):
         """
         if not self.pk:
             self._enforce_plan_limit()
-
         if not self.slug:
             self.slug = self._generate_unique_slug()
-
         super().save(*args, **kwargs)
 
     def _enforce_plan_limit(self) -> None:
-        """
-        Checks the agent's current subscription plan and raises a ValidationError
-        """
         subscription = getattr(self.agent, "current_subscription", None)
         plan = subscription.plan if subscription else SubscriptionPlan.FREE
         limit = FEATURE_LIMITS.get(plan, {}).get("properties")
         if limit is not None and self.agent.properties.count() >= limit:
-            msg = (
+            raise ValidationError(
                 f"You have reached your property limit ({limit}) for the "
                 f"{plan} plan. Please upgrade your subscription."
             )
-            raise ValidationError(
-                msg,
-            )
 
     def _generate_unique_slug(self) -> str:
-        """
-        Generates a URL-friendly slug from the title, ensuring uniqueness by
-        appending a counter if needed.
-        """
-
         base_slug = slugify(self.title)
         slug, counter = base_slug, 1
         while Property.objects.filter(slug=slug).exists():
@@ -169,53 +162,50 @@ class Property(TitleTimeBasedModel):
             counter += 1
         return slug
 
-    # ---- computed display helpers (used by serializers / templates) --------
+    # ---- price display -----------------------------------------------------
 
     @property
     def formatted_price(self) -> str:
-        """e.g.  '$43,000.00'"""
+        """e.g. '$43,000.00'"""
         return f"${self.price:,.2f}"
 
     @property
     def price_suffix(self) -> str:
         """
-        Returns the cadence label shown after the price on the detail page:
-          Short-let  → '/night'
-          Rent       → '/year'
-          Sale       → ''  (no suffix needed)
+        Cadence label shown after the price on the detail page.
+          SHORT_LET → '/night'
+          RENT      → '/year'
+          SALE      → ''
         """
-        if self.property_listing == PropertyListingType.SHORT_LET:
-            return "/night"
-        if self.property_listing == PropertyListingType.RENT:
-            return "/year"
-        return ""
+        mapping = {
+            PropertyListingType.SHORT_LET: "/night",
+            PropertyListingType.RENT: "/year",
+        }
+        return mapping.get(self.property_listing, "")
 
     @property
     def price_display(self) -> str:
-        """Full display string e.g.  '$4,500 /night' or '$250,000'."""
-        suffix = self.price_suffix
-        return f"{self.formatted_price} {suffix}".strip()
+        """Full string e.g. '$4,500 /night' or '$250,000'."""
+        return f"{self.formatted_price} {self.price_suffix}".strip()
 
     @property
     def availability_label(self) -> str:
         return "Available" if self.is_available else "Not Available"
 
-    @property
-    def amenities_list(self) -> list[str]:
-        """Flat list of amenity names for serializers."""
-        return list(self.amenities.values_list("name", flat=True))
-
     # ---- image helpers -----------------------------------------------------
 
     def get_main_image(self):
         """
-        Returns the cover ImageField (or the first gallery image).
-        Falls back to None when no image exists at all.
+        Returns the cover ImageField when set, otherwise the first ordered
+        gallery image.  Falls back to None.
+
+        Note: when called inside a serializer that uses with_card_relations(),
+        ``self.images.all()`` resolves from the prefetch cache — no DB hit.
         """
         if self.cover_image:
             return self.cover_image
-        first = self.images.first()
-        return first.image if first else None
+        first = self.images.all()[:1]
+        return first[0].image if first else None
 
     @property
     def main_image_url(self) -> str:
@@ -224,17 +214,22 @@ class Property(TitleTimeBasedModel):
 
     @property
     def main_image_preview(self):
-        """HTML thumbnail — useful in the Django admin list display."""
+        """HTML thumbnail for Django admin list display."""
         return format_html(
             '<img src="{}" width="120" height="80" style="object-fit:cover;" />',
             self.main_image_url,
         )
 
-    # ---- feature flags -----------------------------------------------------
+    # ---- feature / favourite helpers ---------------------------------------
 
     @property
     def is_featured(self) -> bool:
-        """True when an active FeaturedListing exists for this property."""
+        """
+        True when an active FeaturedListing exists.
+        On querysets that called with_featured_annotation() the annotated
+        ``is_featured_now`` field is cheaper; this property is the fallback
+        for single-object access.
+        """
         return self.featured_listings.filter(
             is_active=True,
             end_date__gte=timezone.now(),
@@ -242,25 +237,20 @@ class Property(TitleTimeBasedModel):
 
     def is_favorited_by(self, user) -> bool:
         """
-        Instance method (not a property) so the user can be passed
-        explicitly — avoids the broken `@property` + `self, user` signature
-        that existed in the original.
+        Pass the user explicitly rather than storing on the instance —
+        avoids the broken ``@property`` + ``self, user`` anti-pattern.
+        Use the ``is_favorited`` queryset annotation for list views.
         """
         if not user or not user.is_authenticated:
             return False
         return self.favorited_by.filter(user=user).exists()
 
 
-# ---------------------------------------------------------------------------
-# Gallery
-# ---------------------------------------------------------------------------
-
-
 class PropertyImage(TimeBasedModel):
     """
-    Additional gallery images displayed in the property detail hero area.
-    The listing uses `Property.get_main_image()` which falls back to the
-    first row here when no cover_image is set.
+    Ordered gallery images for the property detail hero carousel.
+    ``Property.get_main_image()`` falls back to the first row here
+    when no cover_image is set on the parent.
     """
 
     property = auto_prefetch.ForeignKey(
@@ -283,15 +273,42 @@ class PropertyImage(TimeBasedModel):
         return f"Image for {self.property.title}"
 
 
-# ---------------------------------------------------------------------------
-# Subscriptions & Favourites
-# ---------------------------------------------------------------------------
+class FavoriteProperty(TimeBasedModel):
+    """
+    Join table between a user and a bookmarked property.
+    Toggled via the favorite endpoint; rendered in the user's saved list.
+    """
+
+    user = auto_prefetch.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="favorites",
+    )
+    property = auto_prefetch.ForeignKey(
+        "property.Property",
+        on_delete=models.CASCADE,
+        related_name="favorited_by",
+    )
+
+    objects = FavoritePropertyManager()
+
+    class Meta(auto_prefetch.Model.Meta):
+        unique_together = ("user", "property")
+        ordering = ["-created_at"]
+        verbose_name = "Favorite Property"
+        verbose_name_plural = "Favorite Properties"
+
+    def __str__(self) -> str:
+        return f"{self.user.email} ♥ {self.property.title}"
+
+
 
 
 class PropertySubscription(TimeBasedModel):
     """
-    Allows a user to subscribe to new-listing alerts for a given
-    location / property type combination.
+    Subscribes a user to new-listing notifications for a given
+    location / property-type combination.
+    Null values act as wildcards (any location / any type).
     """
 
     user = auto_prefetch.ForeignKey(
@@ -307,6 +324,8 @@ class PropertySubscription(TimeBasedModel):
         null=True,
     )
 
+    objects = PropertySubscriptionManager()
+
     class Meta(auto_prefetch.Model.Meta):
         unique_together = ("user", "location", "property_type")
         verbose_name = "Property Subscription"
@@ -318,46 +337,19 @@ class PropertySubscription(TimeBasedModel):
         return f"{self.user} → {ptype} in {loc}"
 
 
-class FavoriteProperty(TimeBasedModel):
-    """
-    Many-to-many join between a user and a property they have bookmarked.
-    Resolved via `Property.is_favorited_by(user)` on the detail page.
-    """
-
-    user = auto_prefetch.ForeignKey(
-        "users.User",
-        on_delete=models.CASCADE,
-        related_name="favorites",
-    )
-    property = auto_prefetch.ForeignKey(
-        "property.Property",
-        on_delete=models.CASCADE,
-        related_name="favorited_by",
-    )
-
-    class Meta(auto_prefetch.Model.Meta):
-        unique_together = ("user", "property")
-        ordering = ["-created_at"]
-        verbose_name = "Favorite Property"
-        verbose_name_plural = "Favorite Properties"
-
-    def __str__(self) -> str:
-        return f"{self.user.email} ♥ {self.property.title}"
-
-
 # ---------------------------------------------------------------------------
-# Leads & Viewings
+# Leads
 # ---------------------------------------------------------------------------
 
 
 class Lead(TimeBasedModel):
     """
-    Created when a user taps "Contact Agent" on the mobile card or
-    submits an enquiry from the property detail page.
+    Created when a user taps "Contact Agent" on a property card (mobile)
+    or submits an enquiry from the detail page.
 
-    The Lead is the parent record; PropertyViewing rows (0–many) are
-    attached to it via `viewing.lead`.  This keeps the enquiry history
-    intact even when individual viewings are cancelled.
+    One Lead per (user, property) pair — enforced by unique_together.
+    PropertyViewing rows are children of this record via ``viewing.lead``.
+    Deleting the lead does NOT cascade to viewings (SET_NULL on the child).
     """
 
     agent = auto_prefetch.ForeignKey(
@@ -370,8 +362,8 @@ class Lead(TimeBasedModel):
         on_delete=models.CASCADE,
         related_name="leads",
     )
-    # Named `property_link` to avoid shadowing the Python built-in;
-    # the `.property` alias below preserves backward compatibility.
+    # ``property_link`` avoids shadowing the Python built-in ``property``.
+    # The ``.property`` alias below maintains backward compatibility.
     property_link = auto_prefetch.ForeignKey(
         "property.Property",
         on_delete=models.CASCADE,
@@ -386,24 +378,28 @@ class Lead(TimeBasedModel):
         default=Lead_Status_Choices.NEW,
     )
 
+    objects = LeadManager()
+
     class Meta(auto_prefetch.Model.Meta):
         unique_together = [("user", "property_link")]
         ordering = ["-created_at"]
         verbose_name = "Lead"
         verbose_name_plural = "Leads"
 
-    # ---- helpers -----------------------------------------------------------
+    # ---- aliases & helpers -------------------------------------------------
 
-    @property
-    def property(self):
-        """Backward-compatible alias for `property_link`."""
-        return self.property_link
+    # @property
+    # def property(self):
+    #     """Backward-compatible alias for ``property_link``."""
+    #     return self.property_link
 
     @property
     def upcoming_viewing(self):
         """
-        Returns the next confirmed/pending viewing for this lead — used on
-        the mobile scheduling modal shown in the designs.
+        Next PENDING / CONFIRMED viewing for this lead.
+        On queryset results from LeadQuerySet.with_relations(), reading
+        ``upcoming_viewings_cache`` is preferred (zero extra queries).
+        This property is the fallback for single-object access.
         """
         return self.viewings.filter(
             status__in=[
@@ -425,20 +421,29 @@ class Lead(TimeBasedModel):
         return f"Lead #{self.id}: {self.user.email} → {self.property.title}"
 
 
+# ---------------------------------------------------------------------------
+# Property viewings
+# ---------------------------------------------------------------------------
+
+
 class PropertyViewing(TimeBasedModel):
     """
     A scheduled viewing appointment.
 
-    Design reference: the mobile "Schedule a Viewing" modal (image 5) collects
-    a date, time, and optional notes then POSTs to create one of these.
+    Design reference
+    ----------------
+    The mobile "Schedule a Viewing" modal (Image 5 in the Figma) collects
+    date, time, and optional notes, then POSTs to create one of these.
 
     Business rules
     --------------
-    * `scheduled_time` must be in the future (enforced in `clean`).
-    * No two PENDING/CONFIRMED viewings may share the same property + time slot
-      (enforced by the DB-level UniqueConstraint).
-    * When a lead FK is provided, the viewing's property must match the lead's
-      property (enforced in `clean`).
+    • ``scheduled_time`` must be in the future          (clean)
+    • No two PENDING/CONFIRMED viewings may share the
+      same property + time slot                          (UniqueConstraint)
+    • When a lead FK is provided the viewing's property
+      must match the lead's property                     (clean)
+    • Deleting a Lead does NOT delete its viewings;
+      ``lead`` becomes NULL                              (SET_NULL)
     """
 
     user = auto_prefetch.ForeignKey(
@@ -453,7 +458,7 @@ class PropertyViewing(TimeBasedModel):
     )
     lead = auto_prefetch.ForeignKey(
         "property.Lead",
-        on_delete=models.SET_NULL,       # Viewing survives lead deletion
+        on_delete=models.SET_NULL,
         related_name="viewings",
         null=True,
         blank=True,
@@ -466,6 +471,8 @@ class PropertyViewing(TimeBasedModel):
     )
     notes = models.TextField(blank=True)
     cancellation_reason = models.TextField(blank=True)
+
+    objects = PropertyViewingManager()
 
     class Meta(auto_prefetch.Model.Meta):
         ordering = ["-scheduled_time"]
@@ -485,7 +492,9 @@ class PropertyViewing(TimeBasedModel):
         if self.scheduled_time and self.scheduled_time < timezone.now():
             raise ValidationError("Viewing time cannot be in the past.")
         if self.lead_id and self.lead.property_link_id != self.property_id:
-            raise ValidationError("Viewing property must match the lead's property.")
+            raise ValidationError(
+                "Viewing property must match the lead's property."
+            )
 
     def __str__(self) -> str:
         ts = self.scheduled_time.strftime("%Y-%m-%d %H:%M")

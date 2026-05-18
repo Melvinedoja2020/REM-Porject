@@ -118,34 +118,3 @@ def handle_paystack_payment(
         logger.info("Processed Paystack payment %s successfully", reference)
 
     return payment
-
-
-from django.db import models
-from django.db.models import Exists, OuterRef
-from django.utils import timezone
-
-
-class PropertyQuerySet(models.QuerySet):
-    """Custom queryset for Property with helpers for featured listings."""
-
-    def with_featured_flag(self):
-        """Annotate each property with a boolean flag indicating if it's featured."""
-        from core.applications.subscriptions.models import FeaturedListing
-        now = timezone.now()
-        return self.annotate(
-            is_featured_flag=Exists(
-                FeaturedListing.objects.filter(
-                    property=OuterRef("pk"),
-                    is_active=True,
-                    end_date__gte=now,
-                )
-            )
-        )
-
-    def featured_first(self):
-        """Order properties so featured ones appear first."""
-        return self.with_featured_flag().order_by("-is_featured_flag", "-created_at")
-
-    def available(self):
-        """Filter for available properties."""
-        return self.filter(is_available=True)

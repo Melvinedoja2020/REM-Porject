@@ -34,8 +34,7 @@ urlpatterns = [
 urlpatterns += [
     path("api/v1/", include("core.applications.users.api.v1.routers")),
     path("api/v1/", include("core.applications.users.api.v1.jwt")),
-    # Add other API v1 endpoints here
-]
+    path("api/v1/", include("core.applications.property.api.routers")),]
 
 ## --- Shared API endpoints ---
 urlpatterns += [
