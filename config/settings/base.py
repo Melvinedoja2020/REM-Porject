@@ -90,8 +90,8 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
-    "cloudinary",
-    "cloudinary_storage",
+    # "cloudinary",
+    # "cloudinary_storage",
     "channels",
 ]
 
