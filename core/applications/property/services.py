@@ -21,29 +21,71 @@ User = get_user_model()
 
 
 
+# _LISTING_TYPE_META: dict[str, dict[str, str]] = {
+#     PropertyListingType.FOR_SALE:      {"label": "For Sale",   "icon": "home"},
+#     PropertyListingType.RENT:      {"label": "For Rent",   "icon": "key"},
+#     PropertyListingType.SHORT_LET: {"label": "Short Let",  "icon": "calendar"},
+# }
+
+
 _LISTING_TYPE_META: dict[str, dict[str, str]] = {
-    PropertyListingType.FOR_SALE:      {"label": "For Sale",   "icon": "home"},
-    PropertyListingType.RENT:      {"label": "For Rent",   "icon": "key"},
-    PropertyListingType.SHORT_LET: {"label": "Short Let",  "icon": "calendar"},
+    PropertyListingType.FOR_SALE: {
+        "label":       "For Sale",
+        "icon":        "home",
+        "description": "Browse properties available for sale across Africa.",
+    },
+    PropertyListingType.RENT: {
+        "label":       "For Rent",
+        "icon":        "key",
+        "description": "Find short and long-term rental properties for you.",
+    },
+    PropertyListingType.SHORT_LET: {
+        "label":       "Short Let",
+        "icon":        "calendar",
+        "description": "Discover flexible short-let accommodation near you.",
+    },
 }
 
-
+_PRICE_RANGE_OPTIONS: dict[str, list[dict]] = {
+    PropertyListingType.FOR_SALE: [
+        {"label": "Any price",                    "price_min": None,        "price_max": None},
+        {"label": "Under ₦10,000,000",             "price_min": None,        "price_max": 10_000_000},
+        {"label": "₦10,000,000 – ₦30,000,000",    "price_min": 10_000_000,  "price_max": 30_000_000},
+        {"label": "₦30,000,000 – ₦50,000,000",    "price_min": 30_000_000,  "price_max": 50_000_000},
+        {"label": "₦50,000,000 – ₦100,000,000",   "price_min": 50_000_000,  "price_max": 100_000_000},
+        {"label": "₦100,000,000 – ₦200,000,000",  "price_min": 100_000_000, "price_max": 200_000_000},
+        {"label": "Above ₦200,000,000",            "price_min": 200_000_000, "price_max": None},
+    ],
+    PropertyListingType.RENT: [
+        {"label": "Any price",              "price_min": None,        "price_max": None},
+        {"label": "Under ₦100,000/month",   "price_min": None,        "price_max": 100_000},
+        {"label": "Under ₦200,000/month",   "price_min": None,        "price_max": 200_000},
+        {"label": "Under ₦500,000/month",   "price_min": None,        "price_max": 500_000},
+        {"label": "Under ₦1,000,000/month", "price_min": None,        "price_max": 1_000_000},
+        {"label": "Above ₦1,000,000/month", "price_min": 1_000_000,   "price_max": None},
+    ],
+    PropertyListingType.SHORT_LET: [
+        {"label": "Any price",            "price_min": None,      "price_max": None},
+        {"label": "Under ₦50,000/night",  "price_min": None,      "price_max": 50_000},
+        {"label": "Under ₦100,000/night", "price_min": None,      "price_max": 100_000},
+        {"label": "Under ₦200,000/night", "price_min": None,      "price_max": 200_000},
+        {"label": "Under ₦500,000/night", "price_min": None,      "price_max": 500_000},
+        {"label": "Above ₦500,000/night", "price_min": 500_000,   "price_max": None},
+    ],
+}
 
 
 
 def get_home_page_data(*, user=None) -> dict[str, Any]:
     """
-    Returns all data needed to render the home page in a single service call.
+    Returns a dict of data for the home page.
+    The featured properties queryset is limited to 6 for performance
+    and to match the home page design.
+    Categories are annotated with counts of visible properties in each listing type
+    for the category filter cards on the home page.
+    The search_config dict provides the frontend with the necessary data to
+    render the search form dropdowns without hard-coding listing types or price bands.
 
-    Payload
-    -------
-      featured_properties  Up to 6 active featured listings (card shape).
-      categories           One entry per listing type with property count.
-
-    The featured queryset fires exactly 4 SQL statements regardless of
-    result size (main query + images prefetch + amenities prefetch +
-    featured_listings prefetch).
-    The category counts are one additional GROUP BY query.
     """
     featured = list(
         Property.objects
@@ -51,6 +93,7 @@ def get_home_page_data(*, user=None) -> dict[str, Any]:
         .available()
         .featured_active()
         .with_card_relations()
+        .with_featured_annotation()
         .with_favorite_annotation(user=user)
         [:6]
     )
@@ -60,19 +103,27 @@ def get_home_page_data(*, user=None) -> dict[str, Any]:
     categories = [
         {
             "listing_type": listing_type,
-            "label": meta["label"],
-            "icon": meta["icon"],
-            "count": raw_counts.get(listing_type, 0),
+            "label":        meta["label"],
+            "icon":         meta["icon"],
+            "description":  meta["description"],   # ← was missing
+            "count":        raw_counts.get(listing_type, 0),
         }
         for listing_type, meta in _LISTING_TYPE_META.items()
     ]
 
-    return {
-        "featured_properties": featured,
-        "categories": categories,
+    search_config = {
+        "listing_types": [
+            {"value": lt, "label": meta["label"]}
+            for lt, meta in _LISTING_TYPE_META.items()
+        ],
+        "price_ranges": _PRICE_RANGE_OPTIONS,
     }
 
-
+    return {
+        "featured_properties": featured,
+        "categories":          categories,
+        "search_config":       search_config,
+    }
 
 def get_property_list(
     *,

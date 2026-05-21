@@ -6,7 +6,7 @@ from core.applications.property.models import FavoriteProperty
 from core.applications.property.models import Lead
 from core.applications.property.models import Property
 from core.applications.property.models import PropertyImage
-from core.applications.property.models import PropertySubscription
+from core.applications.property.models import PropertySubscription, FeaturedListing
 from core.applications.property.models import PropertyType
 
 # Register your models here.
@@ -82,3 +82,8 @@ class LeadAdmin(admin.ModelAdmin):
     search_fields = ["property_link", "user__username"]
     ordering = ["-created_at"]
     list_filter = ["status", "property_link"]
+
+@admin.register(FeaturedListing)
+class FeaturedListingAdmin(admin.ModelAdmin):
+    list_display = ["property", "is_active", "end_date"]
+    search_fields = ["property__title"]

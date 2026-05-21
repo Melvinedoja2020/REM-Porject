@@ -120,6 +120,7 @@ class Property(TitleTimeBasedModel):
         related_name="properties",
     )
     is_available = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
 
     objects = PropertyManager()
 
@@ -223,7 +224,7 @@ class Property(TitleTimeBasedModel):
     # ---- feature / favourite helpers ---------------------------------------
 
     @property
-    def is_featured(self) -> bool:
+    def featured_status(self) -> bool:
         """
         True when an active FeaturedListing exists.
         On querysets that called with_featured_annotation() the annotated
@@ -499,3 +500,9 @@ class PropertyViewing(TimeBasedModel):
     def __str__(self) -> str:
         ts = self.scheduled_time.strftime("%Y-%m-%d %H:%M")
         return f"Viewing — {self.property.title} @ {ts}"
+
+
+class FeaturedListing(TimeBasedModel):
+    property = auto_prefetch.ForeignKey("Property", models.CASCADE, related_name="property_featured_listings")
+    is_active = models.BooleanField(default=True)
+    end_date = models.DateTimeField()

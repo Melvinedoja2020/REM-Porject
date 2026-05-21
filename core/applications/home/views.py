@@ -2,11 +2,13 @@ from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import BadHeaderError
 from django.core.mail import EmailMessage
 from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import Http404
+from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -27,8 +29,6 @@ from core.applications.users.models import AgentProfile
 from core.helpers.enums import PropertyListingType
 from core.helpers.enums import PropertyTypeChoices
 from core.helpers.mixins import PropertySearchMixin
-from django.http import HttpResponse
-from django.core.mail import EmailMessage, BadHeaderError
 
 # Create your views here.
 

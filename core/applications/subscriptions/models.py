@@ -267,7 +267,7 @@ class FeaturedListing(UIDTimeBasedModel):
     property = auto_prefetch.ForeignKey(
         "property.Property",
         on_delete=models.CASCADE,
-        related_name="featured_listings",
+        related_name="subscription_featured_listings",
     )
     agent = auto_prefetch.ForeignKey(
         "users.AgentProfile",

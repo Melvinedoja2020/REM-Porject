@@ -296,26 +296,61 @@ class CategorySummarySerializer(serializers.Serializer):
     Powers the three category cards on the home page:
       For Sale | For Rent | Short Let
 
-    Counts come from a single GROUP BY query in the service layer —
-    this serializer only shapes the already-computed dict.
+    Counts come from a single GROUP BY query in the service layer.
+    description is the short text line shown under the label on each card.
     """
-
     listing_type = serializers.CharField()
+    label        = serializers.CharField()
+    icon         = serializers.CharField()
+    description  = serializers.CharField()
+    count        = serializers.IntegerField()
+
+class PriceRangeOptionSerializer(serializers.Serializer):
+    """
+    One option in the Price Range dropdown.
+    price_min / price_max are null for "Any price" and open-ended bands.
+    """
+    label     = serializers.CharField()
+    price_min = serializers.DecimalField(
+        max_digits=14, decimal_places=2, allow_null=True
+    )
+    price_max = serializers.DecimalField(
+        max_digits=14, decimal_places=2, allow_null=True
+    )
+
+class ListingTypeOptionSerializer(serializers.Serializer):
+    """One option in the Type dropdown (For Sale / For Rent / Short Let)."""
+    value = serializers.CharField()
     label = serializers.CharField()
-    count = serializers.IntegerField()
-    icon = serializers.CharField()
 
 
+class SearchConfigSerializer(serializers.Serializer):
+    """
+    Static configuration for the hero search form.
+    Returned with every home page load so the frontend never hard-codes
+    listing type values or price band copy.
 
+    listing_types  → drives the Type dropdown
+    price_ranges   → dict keyed by listing_type value, each a list of bands.
+                     The frontend swaps the active list when Type changes.
+    """
+    listing_types = ListingTypeOptionSerializer(many=True)
+    price_ranges  = serializers.DictField(
+        child=PriceRangeOptionSerializer(many=True)
+    )
 
 
 class HomePageSerializer(serializers.Serializer):
     """
     Single response envelope — the home page needs only one API call.
-    """
 
+    featured_properties  Up to 6 featured property cards
+    categories           For Sale / For Rent / Short Let summary cards
+    search_config        Dropdown options for the hero search form
+    """
     featured_properties = PropertyCardSerializer(many=True)
-    categories = CategorySummarySerializer(many=True)
+    categories          = CategorySummarySerializer(many=True)
+    search_config       = SearchConfigSerializer()
 
 
 

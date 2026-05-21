@@ -47,10 +47,10 @@ class PropertyQuerySet(auto_prefetch.QuerySet):
     def available(self) -> "PropertyQuerySet":
         return self.filter(is_available=True)
 
-    def featured_active(self) -> "PropertyQuerySet":
+    def featured_active(self):
         return self.filter(
-            featured_listings__is_active=True,
-            featured_listings__end_date__gte=Now(),
+            property_featured_listings__is_active=True,
+            property_featured_listings__end_date__gte=Now(),
         ).distinct()
 
     # -------------------------
@@ -75,7 +75,7 @@ class PropertyQuerySet(auto_prefetch.QuerySet):
                     "amenities",
                     queryset=property_models.Amenity.objects.alphabetical(),
                 ),
-                "featured_listings",
+                "property_featured_listings",
             )
         )
 
@@ -211,6 +211,12 @@ class PropertyQuerySet(auto_prefetch.QuerySet):
         )
         return {row["property_listing"]: row["count"] for row in qs}
 
+    def featured_first(self) -> "PropertyQuerySet":
+        return (
+            self.with_featured_annotation()
+            .order_by("-is_featured_now", "-created_at")
+        )
+
 
 # ---------------------------------------------------------------------------
 # LEADS
@@ -336,7 +342,7 @@ class FavoritePropertyQuerySet(auto_prefetch.QuerySet):
                     "property__amenities",
                     queryset=property_models.Amenity.objects.alphabetical(),
                 ),
-                "property__featured_listings",
+                "property__property_featured_listings",
             )
             .order_by("-created_at")
         )
