@@ -33,10 +33,13 @@ from rest_framework_simplejwt.settings import api_settings
 from core.applications.users.api.v1.schema.auth_schema import JWT_LOGIN_SCHEMA
 from core.applications.users.api.v1.schema.auth_schema import JWT_REFRESH_SCHEMA
 from core.applications.users.api.v1.schema.auth_schema import JWT_VERIFY_SCHEMA
+from core.applications.users.api.v1.schema.users import user_schema
 from core.applications.users.models import User
 from core.applications.users.token import default_token_generator
 from core.helpers.custom_exceptions import CustomError
 
+from .serializers import AgentDocumentVerificationSerializer
+from .serializers import AgentProfessionalDetailsSerializer
 from .serializers import UserSerializer
 
 # setup logging
@@ -139,7 +142,7 @@ token_blacklist = TokenBlacklistView.as_view()
 # UserViewSet
 # ---------------------------------------------------------------------------
 
-
+@user_schema
 @extend_schema(tags=["User"])
 class UserViewSet(ModelViewSet):
     serializer_class = settings.SERIALIZERS.user
@@ -213,8 +216,12 @@ class UserViewSet(ModelViewSet):
         # elif self.action == "agent_signup":
         #     self.permission_classes = settings.PERMISSIONS.agent_signup
         # return super().get_permissions()
-        elif self.action in ("customer_signup", "agent_signup"):
+        elif self.action in (
+            "customer_signup", "agent_signup",
+            "agent_professional_details", "agent_document_verification"
+        ):
             self.permission_classes = [AllowAny]
+
         return super().get_permissions()
 
     # ------------------------------------------------------------------
@@ -302,11 +309,16 @@ class UserViewSet(ModelViewSet):
         return Response(result, status=status.HTTP_201_CREATED)
 
     # ------------------------------------------------------------------
-    # NEW: agent_signup
-    # ------------------------------------------------------------------
 
-    @action(["post"], detail=False)
+
+    @action(["post"], detail=False, url_path="agent_signup")
     def agent_signup(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Agent signup flow:
+        1. Create user with is_active=False
+        2. Send activation email
+        3. After activation, agent fills professional details (screen 2)
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         result = serializer.create(serializer.validated_data)
@@ -318,7 +330,6 @@ class UserViewSet(ModelViewSet):
             user=user,
             request=request,
         )
-
         self._send_activation_email(request, user)
 
         return Response(result, status=status.HTTP_201_CREATED)
@@ -361,10 +372,59 @@ class UserViewSet(ModelViewSet):
                 "Unable to send the activation email. Please contact support."
             )
 
-    # ------------------------------------------------------------------
-    # All original methods below — unchanged exactly as provided
-    # ------------------------------------------------------------------
+    @action(["patch"], detail=False, url_path="agent_professional_details")
+    def agent_professional_details(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Screen 2 of agent onboarding — professional details.
+        Called after email activation. Requires onboarding token for authentication.
+        """
+        serializer = AgentProfessionalDetailsSerializer(
+            data=request.data,
+            context=self.get_serializer_context(),
+        )
+        serializer.is_valid(raise_exception=True)
 
+        # Agent profile was stashed on context by OnboardingTokenMixin
+        agent_profile = serializer.context["agent_profile"]
+        serializer.update(agent_profile, serializer.validated_data)
+
+        return Response(
+            {
+                "next_step": "document_verification",
+                "message": "Professional details saved successfully.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+    @action(["patch"], detail=False, url_path="agent_document_verification")
+    def agent_document_verification(self, request: Request, *args, **kwargs) -> Response:
+        """
+        Screen 3 — Document uploads.
+
+        Multipart form data.
+        Resolves agent via onboarding_token.
+        Sets verification_status = SUBMITTED on success.
+        """
+        serializer = AgentDocumentVerificationSerializer(
+            data=request.data,
+            context=self.get_serializer_context(),
+        )
+        serializer.is_valid(raise_exception=True)
+
+        agent_profile = serializer.context["agent_profile"]
+        serializer.update(agent_profile, serializer.validated_data)
+
+        return Response(
+            {
+                "next_step": "complete",
+                "message": (
+                    "Documents submitted successfully. "
+                    "Your account is under review."
+                ),
+            },
+            status=status.HTTP_200_OK,
+        )
     # @create_schema
     def perform_create(self, serializer, *args, **kwargs):
         """

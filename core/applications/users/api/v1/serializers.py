@@ -1,4 +1,5 @@
 import contextlib
+import logging
 from typing import Literal
 
 from django.contrib.auth import user_logged_in
@@ -6,6 +7,7 @@ from django.contrib.auth.models import update_last_login
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
 from django.db import transaction
+from core.applications.users.utils.onboarding_token import OnboardingToken
 from djoser.compat import get_user_email
 from djoser.conf import settings
 from djoser.serializers import UserCreateSerializer
@@ -22,8 +24,12 @@ from core.applications.users.token import default_token_generator
 from core.helpers.custom_exceptions import CustomError
 from core.helpers.enums import AgentTypeChoices
 from core.helpers.enums import AuthProviderChoices
+from core.helpers.enums import GenderChoices
 from core.helpers.enums import UserRoleChoice
+from core.helpers.enums import VerificationStatusChoices
 from core.helpers.interface import BaseModelNoDefs
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Device / OS schemas  (unchanged)
@@ -176,75 +182,85 @@ class UserSerializer:
         def get_full_name(self, obj: User) -> str:
             return obj.get_full_name()
 
+#----------------------------------------------
+# dedicated serializers for schema
+# ---------------------------------------------
+class GenericMessageSerializer(serializers.Serializer):
+    message = serializers.CharField()
 
-# ---------------------------------------------------------------------------
-# Customer signup  (NEW)
-# ---------------------------------------------------------------------------
+
+class AgentProfessionalDetailsResponseSerializer(serializers.Serializer):
+    next_step = serializers.CharField()
+    message = serializers.CharField()
+
+
+class AgentDocumentVerificationResponseSerializer(serializers.Serializer):
+    next_step = serializers.CharField()
+    message = serializers.CharField()
+
+class OnboardingTokenMixin:
+    """
+    Mixin for screens 2 & 3.
+    Validates the onboarding_token and resolves the AgentProfile instance.
+    Subclasses get self._agent_profile after calling validate().
+    """
+
+    onboarding_token = serializers.CharField(
+        write_only=True,
+        help_text="Signed token returned from agent_signup (screen 1).",
+    )
+
+    def validate_onboarding_token(self, value: str) -> str:
+        """Verify token and attach agent_profile to serializer context."""
+        data = OnboardingToken.verify(value)  # raises on invalid/expired
+
+        try:
+            agent_profile = AgentProfile.objects.select_related("user").get(
+                user_id=data["user_id"],
+            )
+        except AgentProfile.DoesNotExist:
+            msg = "Agent profile not found. Please complete screen 1 first."
+            raise serializers.ValidationError(
+                msg,
+            )
+
+        # Stash on context so the view can access without a second DB hit
+        self.context["agent_profile"] = agent_profile
+        return value
 
 
 class CustomerSignupSerializer(serializers.Serializer):
     """
-    Register a Buyer / Renter.
-    Wired via DJOSER['SERIALIZERS']['customer_signup'].
-
-    Auth provider flows
-    -------------------
-    email  → first_name, last_name, email, password, re_password
-    phone  → first_name, last_name, phone_number, email, password, re_password
-             (email still required so djoser ActivationEmail can be sent)
-    google → first_name, last_name, google_token
-             (user created active — no email needed)
-
-    In all non-Google flows the account is created inactive and the
-    djoser ActivationEmail is dispatched by the view using the same
-    settings.EMAIL.activation path that the rest of the app uses.
-
-    Response
-    --------
-    {
-        "access":                "<jwt>",
-        "refresh":               "<jwt>",
-        "user":                  { UserSerializer.Info },
-        "registration_complete": bool
-    }
+    Register a Customer.
+    Supports multiple auth provider flows (email, phone, google) via the
+    auth_provider field, which determines required fields and validation logic.
     """
 
-    # --- Identity ---
     first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
+    last_name  = serializers.CharField(max_length=150)
 
-    # --- Flow selector ---
+
     auth_provider = serializers.ChoiceField(
         choices=AuthProviderChoices.choices,
         default=AuthProviderChoices.EMAIL,
+        required=False,
     )
 
-    # --- Email (required for email flow; also used for phone flow
-    #     so the activation email has a destination) ---
     email = serializers.EmailField(
         required=False,
         allow_blank=True,
-        help_text=(
-            "Required for email flow. "
-            "For phone flow, provide so the activation email can be sent."
-        ),
+        help_text="Required for email/phone flows.",
     )
-
-    # --- Phone (required for phone flow) ---
     phone_number = serializers.CharField(
         required=False,
         allow_blank=True,
-        help_text="Required for phone flow. E.164 format, e.g. +2348012345678.",
+        help_text="Required for phone flow. E.164 format e.g. +2348012345678.",
     )
-
-    # --- Google ---
     google_token = serializers.CharField(
         required=False,
         allow_blank=True,
         write_only=True,
     )
-
-    # --- Password ---
     password = serializers.CharField(
         style={"input_type": "password"},
         write_only=True,
@@ -256,22 +272,21 @@ class CustomerSignupSerializer(serializers.Serializer):
         required=False,
     )
 
-    # ------------------------------------------------------------------
-    # Field-level validation
-    # ------------------------------------------------------------------
+
 
     def validate_email(self, value: str) -> str:
+        """Ensure email is unique if provided."""
         if not value:
             return value
         value = value.strip().lower()
         if User.objects.filter(email=value).exists():
-            msg = "An account with this email already exists."
             raise serializers.ValidationError(
-                msg,
+                "An account with this email already exists."
             )
         return value
 
     def validate_phone_number(self, value: str) -> str:
+        """Ensure phone number is unique if provided."""
         if not value:
             return value
         if User.objects.filter(phone_number=value).exists():
@@ -281,54 +296,42 @@ class CustomerSignupSerializer(serializers.Serializer):
             )
         return value
 
-    # ------------------------------------------------------------------
-    # Cross-field validation
-    # ------------------------------------------------------------------
+
+
+    def _validate_password_fields(self, attrs: dict, errors: dict) -> None:
+        """Shared password validation for email and phone flows."""
+        pw    = attrs.get("password", "")
+        re_pw = attrs.get("re_password", "")
+        if not pw:
+            errors["password"] = "Password is required."
+        elif not re_pw:
+            errors["re_password"] = "Please confirm your password."
+        elif pw != re_pw:
+            errors["re_password"] = "Passwords do not match."
+        else:
+            try:
+                validate_password(pw)
+            except django_exceptions.ValidationError as exc:
+                errors["password"] = exc.messages[0]
 
     def validate(self, attrs: dict) -> dict:
+        """Cross-field validation based on auth_provider."""
         provider = attrs.get("auth_provider", AuthProviderChoices.EMAIL)
-        errors = {}
+        errors: dict = {}
 
         if provider == AuthProviderChoices.EMAIL:
             if not attrs.get("email"):
                 errors["email"] = "Email is required."
-
-            pw = attrs.get("password", "")
-            re_pw = attrs.get("re_password", "")
-            if not pw:
-                errors["password"] = "Password is required."
-            elif not re_pw:
-                errors["re_password"] = "Please confirm your password."
-            elif pw != re_pw:
-                errors["re_password"] = "Passwords do not match."
-            else:
-                try:
-                    validate_password(pw)
-                except django_exceptions.ValidationError as exc:
-                    errors["password"] = exc.messages[0]
+            self._validate_password_fields(attrs, errors)
 
         elif provider == AuthProviderChoices.PHONE:
             if not attrs.get("phone_number"):
                 errors["phone_number"] = "Phone number is required."
-            # Email still needed so djoser can send the activation link
             if not attrs.get("email"):
                 errors["email"] = (
                     "Email is required so we can send your activation link."
                 )
-
-            pw = attrs.get("password", "")
-            re_pw = attrs.get("re_password", "")
-            if not pw:
-                errors["password"] = "Password is required."
-            elif not re_pw:
-                errors["re_password"] = "Please confirm your password."
-            elif pw != re_pw:
-                errors["re_password"] = "Passwords do not match."
-            else:
-                try:
-                    validate_password(pw)
-                except django_exceptions.ValidationError as exc:
-                    errors["password"] = exc.messages[0]
+            self._validate_password_fields(attrs, errors)
 
         elif provider == AuthProviderChoices.GOOGLE:
             if not attrs.get("google_token"):
@@ -336,50 +339,32 @@ class CustomerSignupSerializer(serializers.Serializer):
 
         if errors:
             raise serializers.ValidationError(errors)
-
         return attrs
 
     # ------------------------------------------------------------------
-    # Creation
+    # Helpers
     # ------------------------------------------------------------------
 
-    @transaction.atomic
-    def create(self, validated_data: dict) -> dict:
-        provider = validated_data["auth_provider"]
-        first_name = validated_data["first_name"].strip()
-        last_name = validated_data["last_name"].strip()
-
-        if provider == AuthProviderChoices.GOOGLE:
-            user = self._create_via_google(
-                token=validated_data["google_token"],
-                first_name=first_name,
-                last_name=last_name,
-                role=UserRoleChoice.CUSTOMER,
-            )
-        else:
-            user = User(
-                email=validated_data.get("email") or None,
-                phone_number=validated_data.get("phone_number") or None,
-                first_name_field=first_name,
-                last_name_field=last_name,
-                role=UserRoleChoice.CUSTOMER,
-                auth_provider=provider,
-                is_active=False,  # activated via djoser email link
-            )
-            user.set_password(validated_data["password"])
-            user.save()
-
-        # Create UserProfile atomically — idempotent so safe on retries
-        UserProfile.objects.get_or_create(
-            user=user,
-            defaults={"phone_number": user.phone_number},
+    def _build_user(self, validated_data: dict, role: str) -> User:
+        """Construct, save and return a new inactive User."""
+        user = User(
+            email=validated_data.get("email") or None,
+            phone_number=validated_data.get("phone_number") or None,
+            first_name_field=validated_data["first_name"].strip(),
+            last_name_field=validated_data["last_name"].strip(),
+            role=role,
+            auth_provider=validated_data["auth_provider"],
+            is_active=False,
         )
-
-        return {
-            "user": UserSerializer.Info(instance=user).data,
-            "registration_complete": user.is_active,
-            "message": "Account created successfully. Please check your email to activate your account.",
-        }
+        user.set_password(validated_data["password"])
+        try:
+            user.save()
+        except Exception as exc:
+            logger.exception("Failed to create user: %s", exc)
+            raise serializers.ValidationError(
+                {"non_field_errors": "Account creation failed. Please try again."}
+            )
+        return user
 
     @staticmethod
     def _create_via_google(
@@ -388,96 +373,212 @@ class CustomerSignupSerializer(serializers.Serializer):
         last_name: str,
         role: str,
     ) -> User:
-        """
-        Verify a Google ID token and return (or create) the matching User.
-
-        TODO: replace stub with real verification once Google client ID
-        is configured:
-
-            from google.oauth2 import id_token
-            from google.auth.transport import requests as g_requests
-            from django.conf import settings as django_settings
-
-            idinfo = id_token.verify_oauth2_token(
-                token,
-                g_requests.Request(),
-                django_settings.GOOGLE_CLIENT_ID,
-            )
-            email = idinfo["email"]
-        """
+        """Stub — replace with real Google ID token verification."""
         raise serializers.ValidationError(
             {"google_token": "Google sign-in is not yet configured on this server."}
         )
 
-
-# ---------------------------------------------------------------------------
-# Agent signup  (NEW)
-# ---------------------------------------------------------------------------
-
-
-class AgentSignupSerializer(CustomerSignupSerializer):
-    """
-    Register an Agent / Landlord.
-    Wired via DJOSER['SERIALIZERS']['agent_signup'].
-
-    Extends CustomerSignupSerializer with agent_type.
-    Same email activation flow — djoser ActivationEmail is sent by the view.
-
-    Document uploads (license_document, company_registration_document)
-    are handled via PATCH /agent-profile/{id}/ after account creation
-    to keep the signup form simple.
-    """
-
-    agent_type = serializers.ChoiceField(
-        choices=AgentTypeChoices.choices,
-        help_text="Agent classification — determines required profile fields.",
-    )
+    # ------------------------------------------------------------------
+    # Creation
+    # ------------------------------------------------------------------
 
     @transaction.atomic
     def create(self, validated_data: dict) -> dict:
-        # Pop agent_type before passing to parent logic
-        agent_type = validated_data.pop("agent_type")
         provider = validated_data["auth_provider"]
-        first_name = validated_data["first_name"].strip()
-        last_name = validated_data["last_name"].strip()
 
         if provider == AuthProviderChoices.GOOGLE:
             user = self._create_via_google(
                 token=validated_data["google_token"],
-                first_name=first_name,
-                last_name=last_name,
-                role=UserRoleChoice.AGENT,
+                first_name=validated_data["first_name"].strip(),
+                last_name=validated_data["last_name"].strip(),
+                role=UserRoleChoice.CUSTOMER,
             )
         else:
-            user = User(
-                email=validated_data.get("email") or None,
-                phone_number=validated_data.get("phone_number") or None,
-                first_name_field=first_name,
-                last_name_field=last_name,
-                role=UserRoleChoice.AGENT,
-                auth_provider=provider,
-                is_active=False,
-            )
-            user.set_password(validated_data["password"])
-            user.save()
+            user = self._build_user(validated_data, role=UserRoleChoice.CUSTOMER)
 
-        AgentProfile.objects.get_or_create(
+        _, profile_created = UserProfile.objects.get_or_create(
             user=user,
-            defaults={"agent_type": agent_type},
+            defaults={"phone_number": user.phone_number},
         )
+        logger.info("UserProfile created=%s for user=%s", profile_created, user.pk)
 
         return {
             "user": UserSerializer.Info(instance=user).data,
             "registration_complete": user.is_active,
-            "message": "Account created successfully. Please check your email to activate your account.",
+            "next_step": "email_activation",
+            "message": (
+                "Account created successfully. "
+                "Please check your email to activate your account."
+            ),
         }
 
 
-# ---------------------------------------------------------------------------
-# Legacy djoser create serializer  (unchanged)
-# ---------------------------------------------------------------------------
 
+class AgentSignupSerializer(CustomerSignupSerializer):
+    """
+    Register an Agent.
+    Inherits all fields and validation from CustomerSignupSerializer,
+    but creates an AgentProfile and returns an onboarding_token for the next steps.
+    """
 
+    gender = serializers.ChoiceField(
+        choices=GenderChoices.choices,
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+    )
+    date_of_birth = serializers.DateField(
+        required=False,
+        allow_null=True,
+    )
+
+    @transaction.atomic
+    def create(self, validated_data: dict) -> dict:
+        gender        = validated_data.pop("gender", None)
+        date_of_birth = validated_data.pop("date_of_birth", None)
+        provider      = validated_data["auth_provider"]
+
+        if provider == AuthProviderChoices.GOOGLE:
+            user = self._create_via_google(
+                token=validated_data["google_token"],
+                first_name=validated_data["first_name"].strip(),
+                last_name=validated_data["last_name"].strip(),
+                role=UserRoleChoice.AGENT,
+            )
+        else:
+            user = self._build_user(validated_data, role=UserRoleChoice.AGENT)
+
+        profile, created = AgentProfile.objects.update_or_create(
+            user=user,
+            defaults={
+                "gender": gender,
+                "date_of_birth": date_of_birth,
+                "verified": False,
+                "verification_status": VerificationStatusChoices.PENDING,
+            },
+        )
+        logger.info(
+            "AgentProfile created=%s id=%s for user=%s",
+            created, profile.pk, user.pk,
+        )
+
+        # Generate signed onboarding token — valid 24 hrs
+        onboarding_token = OnboardingToken.generate(user)
+
+        return {
+            "user": UserSerializer.Info(instance=user).data,
+            "onboarding_token": onboarding_token,
+            "registration_complete": user.is_active,
+            "next_step": "professional_details",
+            "message": (
+                "Account created successfully. "
+                "Please check your email to activate your account."
+            ),
+        }
+
+# ---------------------------------------------------------------------------
+class AgentProfessionalDetailsSerializer(
+    OnboardingTokenMixin, serializers.ModelSerializer
+):
+    """
+    Update serializer for AgentProfile professional details (screen 2).
+    Expects a valid onboarding_token to identify the AgentProfile to update.
+        Validates required fields based on agent_type.
+    """
+
+    onboarding_token = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = AgentProfile
+        fields = [
+            "onboarding_token",
+            "agent_type",
+            "office_address",
+            "years_of_experience",
+            "license_number",
+            "office_location",
+        ]
+        extra_kwargs = {
+            "agent_type":           {"required": True},
+            "office_address":       {"required": False, "allow_null": True},
+            "years_of_experience":  {"required": False, "allow_null": True},
+            "license_number":       {"required": False, "allow_null": True},
+            "office_location":      {"required": False, "allow_null": True},
+        }
+
+    def validate(self, attrs: dict) -> dict:
+        """
+        Validate required fields based on agent_type.
+        For REAL_ESTATE_AGENT, license_number is required.
+        For PROPERTY_MANAGER, license_number is optional.
+        """
+
+        if (
+            attrs.get("agent_type") == AgentTypeChoices.REAL_ESTATE_AGENT
+            and not attrs.get("license_number")
+        ):
+            raise serializers.ValidationError(
+                {"license_number": "License number is required for real estate agents."}
+            )
+        return attrs
+
+    def update(self, instance: AgentProfile, validated_data: dict) -> AgentProfile:
+        """Update the AgentProfile with professional details."""
+        validated_data.pop("onboarding_token", None)
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        instance.save()
+        logger.info(
+            "AgentProfile professional details updated for user=%s",
+            instance.user.pk,
+        )
+        return instance
+class AgentDocumentVerificationSerializer(
+    OnboardingTokenMixin, serializers.ModelSerializer
+):
+    """
+    Update serializer for AgentProfile document upload and verification (screen 3).
+    Expects a valid onboarding_token to identify the AgentProfile to update.
+    Allows uploading license_document and profile_picture,
+    and marks the profile as SUBMITTED for admin review.
+    """
+
+    onboarding_token = serializers.CharField(write_only=True)
+    profile_picture  = serializers.ImageField(
+        required=False,
+        allow_null=True,
+        help_text="Clear selfie photo of the agent.",
+    )
+
+    class Meta:
+        model = AgentProfile
+        fields = [
+            "onboarding_token",
+            "license_document",
+            "profile_picture",
+        ]
+        extra_kwargs = {
+            "license_document": {"required": False, "allow_null": True},
+        }
+
+    def update(self, instance: AgentProfile, validated_data: dict) -> AgentProfile:
+        validated_data.pop("onboarding_token", None)
+
+        # profile_picture lives on BaseProfile — handle separately
+        profile_picture = validated_data.pop("profile_picture", None)
+        if profile_picture:
+            instance.profile_picture = profile_picture
+
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+
+        # Mark submitted — admin takes over from here
+        instance.verification_status = VerificationStatusChoices.SUBMITTED
+        instance.save()
+        logger.info(
+            "AgentProfile documents submitted for user=%s", instance.user.pk
+        )
+        return instance
 class CustomUserCreateSerializer(UserCreateSerializer):
     """
     Kept for DJOSER['SERIALIZERS']['user_create'] config key.

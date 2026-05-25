@@ -8,11 +8,13 @@ from django.db.models import CASCADE
 from django.db.models import SET_NULL
 from django.db.models import BooleanField
 from django.db.models import CharField
+from django.db.models import DateField
 from django.db.models import DecimalField
 from django.db.models import EmailField
 from django.db.models import FileField
 from django.db.models import ImageField
 from django.db.models import JSONField
+from django.db.models import PositiveIntegerField
 from django.db.models import TextField
 from django.db.models import URLField
 from django.urls import reverse
@@ -20,6 +22,7 @@ from django.utils.translation import gettext_lazy as _
 
 from core.helpers.enums import AgentTypeChoices
 from core.helpers.enums import AuthProviderChoices
+from core.helpers.enums import GenderChoices
 from core.helpers.enums import UserRoleChoice
 from core.helpers.enums import VerificationStatusChoices
 from core.helpers.media import MediaHelper
@@ -283,6 +286,18 @@ class AgentProfile(BaseProfile):
         on_delete=CASCADE,
         related_name="agent_profile",
     )
+    gender = CharField(
+        _("Gender"),
+        max_length=20,
+        choices=GenderChoices.choices,
+        blank=True,
+        null=True,
+    )
+    date_of_birth = DateField(
+        _("Date of Birth"),
+        blank=True,
+        null=True,
+    )
 
     # ------------------------------------------------------------------
     # Agent classification
@@ -292,7 +307,6 @@ class AgentProfile(BaseProfile):
         max_length=50,
         choices=AgentTypeChoices.choices,
     )
-
     # ------------------------------------------------------------------
     # Business details
     # ------------------------------------------------------------------
@@ -329,6 +343,11 @@ class AgentProfile(BaseProfile):
     )
     company_registration_document = FileField(
         upload_to=MediaHelper.get_image_upload_path,
+        blank=True,
+        null=True,
+    )
+    years_of_experience = PositiveIntegerField(
+        _("Years of Experience"),
         blank=True,
         null=True,
     )

@@ -65,6 +65,7 @@ class VerificationStatusChoices(TextChoices):
     PENDING = "pending", "Pending"
     VERIFIED = "verified", "Verified"
     REJECTED = "rejected", "Rejected"
+    SUBMITTED = "submitted", "Submitted"
 
 
 class NotificationType(TextChoices):
@@ -130,3 +131,8 @@ class PaymentStatus(TextChoices):
     PENDING = ("Pending", "Pending")
     PAID = ("Paid", "Paid")
     FAILED = ("Failed", "Failed")
+
+
+class GenderChoices(TextChoices):
+    MALE = "male", _("Male")
+    FEMALE = "female", _("Female")
