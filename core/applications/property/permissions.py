@@ -1,68 +1,126 @@
 from __future__ import annotations
 
 from rest_framework.permissions import SAFE_METHODS
-from rest_framework.permissions import AllowAny
 from rest_framework.permissions import BasePermission
-from rest_framework.permissions import IsAuthenticated
+
+from core.helpers.enums import VerificationStatusChoices
+
+# ---------------------------------------------------------------------------
+# Agent helpers
+# ---------------------------------------------------------------------------
 
 
+def _agent_profile(user):
+    """
+    Safely returns the user's AgentProfile or None.
+    """
+    return getattr(user, "agent_profile", None)
+
+
+def _is_authenticated(user) -> bool:
+    """
+    Returns True when the user exists and is authenticated.
+    """
+    return bool(user and user.is_authenticated)
 
 
 def _is_agent(user) -> bool:
-    """True when the user is authenticated and has a non-null AgentProfile."""
+    """
+    Returns True when the authenticated user has an AgentProfile.
+    """
     return bool(
-        user
-        and user.is_authenticated
-        and getattr(user, "agent_profile", None) is not None
+        _is_authenticated(user)
+        and _agent_profile(user) is not None
+    )
+
+
+def _is_verified_agent(user) -> bool:
+    """
+    Returns True when the authenticated user:
+    - has an AgentProfile
+    - and the profile verification status is VERIFIED
+    """
+    profile = _agent_profile(user)
+
+    return bool(
+        profile
+        and profile.verification_status
+        == VerificationStatusChoices.VERIFIED
     )
 
 
 def _agent_pk(user) -> str | None:
-    """Returns str(agent.pk) or None — safe even when no profile exists."""
-    profile = getattr(user, "agent_profile", None)
+    """
+    Returns the authenticated agent profile PK as a string.
+
+    Returns None when the user has no AgentProfile.
+    """
+    profile = _agent_profile(user)
     return str(profile.pk) if profile else None
+
+
+# ---------------------------------------------------------------------------
+# Object ownership helpers
+# ---------------------------------------------------------------------------
 
 
 def _owner_id(obj) -> str | None:
     """
     Resolves the owning user PK from an object.
-    Tries ``obj.user_id`` first (avoids a JOIN), then ``obj.user.pk``.
+
+    Optimized to use ``obj.user_id`` first to avoid unnecessary joins,
+    then falls back to ``obj.user.pk``.
     """
-    uid = getattr(obj, "user_id", None)
-    if uid is None:
+    user_id = getattr(obj, "user_id", None)
+
+    if user_id is None:
         user = getattr(obj, "user", None)
-        uid = getattr(user, "pk", None)
-    return str(uid) if uid is not None else None
+        user_id = getattr(user, "pk", None)
+
+    return str(user_id) if user_id is not None else None
 
 
 def _object_agent_id(obj) -> str | None:
     """
-    Resolves the agent PK from an object.
-    Tries ``obj.agent_id`` first, then ``obj.agent.pk``.
+    Resolves the direct agent PK from an object.
+
+    Optimized to use ``obj.agent_id`` first, then ``obj.agent.pk``.
     """
-    aid = getattr(obj, "agent_id", None)
-    if aid is None:
+    agent_id = getattr(obj, "agent_id", None)
+
+    if agent_id is None:
         agent = getattr(obj, "agent", None)
-        aid = getattr(agent, "pk", None)
-    return str(aid) if aid is not None else None
+        agent_id = getattr(agent, "pk", None)
+
+    return str(agent_id) if agent_id is not None else None
 
 
 def _property_agent_id(obj) -> str | None:
     """
-    Resolves the agent PK that owns the *property* linked to an object.
-    Works for Lead (obj.property_link.agent_id) and PropertyViewing
-    (obj.property.agent_id).  Both relations must be select_related by
-    the queryset before this is called.
+    Resolves the agent PK that owns the property linked to an object.
+
+    Supports:
+    - Lead -> property_link -> agent
+    - PropertyViewing -> property -> agent
+
+    Related objects should be select_related before permission checks
+    to avoid additional queries.
     """
-    # Lead  → property_link → agent_id
-    prop = getattr(obj, "property_link", None) or getattr(obj, "property", None)
-    if prop is None:
+    property_obj = (
+        getattr(obj, "property_link", None)
+        or getattr(obj, "property", None)
+    )
+
+    if property_obj is None:
         return None
-    aid = getattr(prop, "agent_id", None)
-    if aid is None:
-        agent = getattr(prop, "agent", None)
-        aid = getattr(agent, "pk", None)
-    return str(aid) if aid is not None else None
+
+    agent_id = getattr(property_obj, "agent_id", None)
+
+    if agent_id is None:
+        agent = getattr(property_obj, "agent", None)
+        agent_id = getattr(agent, "pk", None)
+
+    return str(agent_id) if agent_id is not None else None
 
 
 # ---------------------------------------------------------------------------
@@ -73,13 +131,6 @@ def _property_agent_id(obj) -> str | None:
 class IsAgentUser(BasePermission):
     """
     Grants access only to authenticated users with an AgentProfile.
-
-    Used as a standalone permission on views where the entire endpoint
-    is agent-only (e.g. AgentPropertyListView).
-
-    Object-level: always True when request-level passes, because agent
-    identity is the only requirement — object ownership is checked
-    separately by IsPropertyOwnerAgent where needed.
     """
 
     message = "You must have an agent profile to perform this action."
@@ -91,24 +142,44 @@ class IsAgentUser(BasePermission):
         return _is_agent(request.user)
 
 
-class IsPropertyOwnerAgent(BasePermission):
+class IsVerifiedAgent(BasePermission):
     """
-    Object-level permission.
-    Grants write access only to the agent who owns the property.
-
-    Request-level: requires authentication + an agent profile.
-    Object-level:  obj.agent_id must match request.user.agent_profile.pk.
-
-    Used on PropertyViewSet for update / partial_update / destroy.
+    Grants access only to verified agent accounts.
     """
 
-    message = "Only the agent who listed this property may modify it."
+    message = "Your agent account must be verified."
 
     def has_permission(self, request, view) -> bool:
-        return _is_agent(request.user)
+        return _is_verified_agent(request.user)
 
     def has_object_permission(self, request, view, obj) -> bool:
-        return _object_agent_id(obj) == _agent_pk(request.user)
+        return _is_verified_agent(request.user)
+
+
+class IsPropertyOwnerAgent(BasePermission):
+    """
+    Object-level permission that grants access only to the verified
+    agent who owns the property.
+
+    Used for:
+    - update
+    - partial_update
+    - destroy
+    """
+
+    message = (
+        "Only the verified agent who listed this property "
+        "may modify it."
+    )
+
+    def has_permission(self, request, view) -> bool:
+        return _is_verified_agent(request.user)
+
+    def has_object_permission(self, request, view, obj) -> bool:
+        return (
+            _is_verified_agent(request.user)
+            and _object_agent_id(obj) == _agent_pk(request.user)
+        )
 
 
 class IsLeadOwnerOrPropertyAgent(BasePermission):

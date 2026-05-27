@@ -60,28 +60,22 @@ class PropertyImageSerializer(AbsoluteURLMixin, serializers.ModelSerializer):
 
 class AgentSummarySerializer(AbsoluteURLMixin, serializers.Serializer):
     """
-    Compact agent card shown on the property detail page and mobile cards.
-
-    IMPORTANT: ``obj`` is an ``AgentProfile`` instance.
-    ``agent__user`` and ``agent`` must be covered by select_related in the
-    calling queryset (``with_card_relations()`` handles this).
-    No method here may call the database.
+    Compact agent summary for display on property cards.
     """
 
     id = serializers.CharField(source="pk")
     full_name = serializers.SerializerMethodField()
     avatar_url = serializers.SerializerMethodField()
-    phone = serializers.CharField(source="phone_number", default="")
+    phone = serializers.CharField(source="office_phone_no", default="")
     email = serializers.SerializerMethodField()
-    # ``properties`` is prefetched by with_card_relations() so .count()
-    # resolves from the in-memory cache.
+    agent_type = serializers.CharField(read_only=True)
+    company_name = serializers.CharField(read_only=True)
+    verified = serializers.BooleanField(read_only=True)
+    rating = serializers.DecimalField(max_digits=3, decimal_places=2, read_only=True)
+    years_of_experience = serializers.IntegerField(read_only=True)
     total_listings = serializers.SerializerMethodField()
 
     def get_full_name(self, obj) -> str:
-        """
-        Builds the agent's full name from the related User record, falling
-        back to email if no name is available.
-        """
         user = getattr(obj, "user", None)
         if not user:
             return ""
@@ -93,15 +87,11 @@ class AgentSummarySerializer(AbsoluteURLMixin, serializers.Serializer):
         return user.email if user else ""
 
     def get_avatar_url(self, obj) -> str | None:
-        """
-        Builds the absolute URL for the agent's avatar, if set.
-        """
-        avatar = getattr(obj, "avatar", None)
-        return self._absolute_url(avatar.url) if avatar else None
+        image = getattr(obj, "profile_picture", None)
+        return self._absolute_url(image.url) if image else None
 
     def get_total_listings(self, obj) -> int:
         return obj.properties.count()
-
 
 
 
@@ -248,26 +238,28 @@ class PropertyDetailSerializer(AbsoluteURLMixin, serializers.ModelSerializer):
         return PropertyCardSerializer(similar, many=True, context=self.context).data
 
 
-
+class PropertyImageWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyImage
+        fields = ("image", "order")
+        extra_kwargs = {
+            "order": {"required": False}
+        }
 
 
 class PropertyWriteSerializer(serializers.ModelSerializer):
-    """
-    Validates agent listing payloads for create and update.
-
-    ``agent`` is never accepted from the client — it is injected by the
-    service layer from ``request.user.agent_profile``.
-
-    ``amenity_ids`` is write-only; the service layer calls ``.set()`` on
-    the M2M relation after the instance is saved.
-    """
-
     amenity_ids = serializers.PrimaryKeyRelatedField(
         queryset=Amenity.objects.all(),
         many=True,
         write_only=True,
         source="amenities",
         required=False,
+    )
+    images = PropertyImageWriteSerializer(
+        many=True,
+        write_only=True,
+        required=False,
+        # source="images",
     )
 
     class Meta:
@@ -285,7 +277,17 @@ class PropertyWriteSerializer(serializers.ModelSerializer):
             "cover_image",
             "is_available",
             "amenity_ids",
+            "images",
         )
+
+    def validate_images(self, value):
+        """
+        Optional guard: cap gallery size so agents can't upload 50 images.
+        """
+        if len(value) > 10:
+            msg = "You can upload a maximum of 10 gallery images."
+            raise serializers.ValidationError(msg)
+        return value
 
 
 

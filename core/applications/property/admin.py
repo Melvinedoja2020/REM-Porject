@@ -3,10 +3,11 @@ from django.utils.html import format_html
 
 from core.applications.property.models import Amenity
 from core.applications.property.models import FavoriteProperty
+from core.applications.property.models import FeaturedListing
 from core.applications.property.models import Lead
 from core.applications.property.models import Property
 from core.applications.property.models import PropertyImage
-from core.applications.property.models import PropertySubscription, FeaturedListing
+from core.applications.property.models import PropertySubscription
 from core.applications.property.models import PropertyType
 
 # Register your models here.
@@ -20,7 +21,7 @@ class PropertyImageInline(admin.TabularInline):
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     inlines = [PropertyImageInline]
-    list_display = ["title", "price", "location", "is_available"]
+    list_display = ["id", "title", "price", "location", "is_available"]
     search_fields = ["title", "location"]
     list_filter = ["is_available", "property_type"]
     ordering = ["-created_at"]
@@ -41,28 +42,28 @@ class PropertyAdmin(admin.ModelAdmin):
 
 @admin.register(PropertyImage)
 class PropertyImageAdmin(admin.ModelAdmin):
-    list_display = ["property", "image"]
+    list_display = ["id", "property", "image"]
     search_fields = ["property__title"]
     ordering = ["-created_at"]
 
 
 @admin.register(Amenity)
 class AmenityAdmin(admin.ModelAdmin):
-    list_display = ["name"]
+    list_display = ["id", "name"]
     search_fields = ["name"]
     ordering = ["-created_at"]
 
 
 @admin.register(PropertyType)
 class PropertyTypeAdmin(admin.ModelAdmin):
-    list_display = ["title"]
+    list_display = ["id", "title"]
     search_fields = ["title"]
     ordering = ["-created_at"]
 
 
 @admin.register(FavoriteProperty)
 class FavoritePropertyAdmin(admin.ModelAdmin):
-    list_display = ["user", "property"]
+    list_display = ["id", "user", "property"]
     search_fields = ["user__username", "property__title"]
     ordering = ["-created_at"]
     list_filter = ["user"]
@@ -70,7 +71,7 @@ class FavoritePropertyAdmin(admin.ModelAdmin):
 
 @admin.register(PropertySubscription)
 class PropertySubscriptionAdmin(admin.ModelAdmin):
-    list_display = ["user", "location", "property_type"]
+    list_display = ["id", "user", "location", "property_type"]
     search_fields = ["user__username", "location", "property_type"]
     ordering = ["-created_at"]
     list_filter = ["user", "property_type"]
@@ -78,12 +79,12 @@ class PropertySubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
-    list_display = ["property_link", "user", "status"]
+    list_display = ["id", "property_link", "user", "status"]
     search_fields = ["property_link", "user__username"]
     ordering = ["-created_at"]
     list_filter = ["status", "property_link"]
 
 @admin.register(FeaturedListing)
 class FeaturedListingAdmin(admin.ModelAdmin):
-    list_display = ["property", "is_active", "end_date"]
+    list_display = ["id", "property", "is_active", "end_date"]
     search_fields = ["property__title"]

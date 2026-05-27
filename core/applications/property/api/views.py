@@ -8,6 +8,8 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework.mixins import DestroyModelMixin
 from rest_framework.mixins import ListModelMixin
 from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.parsers import FormParser
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -21,7 +23,7 @@ from rest_framework.viewsets import ViewSet
 from core.applications.property import services
 from core.applications.property.api.schema.home_schema import HomePageViewSchema
 from core.applications.property.api.schema.property_schemas import PropertyViewSetSchema
-from core.applications.property.api.serializers import AmenitySerializer
+from core.applications.property.api.serializers import AgentSummarySerializer, AmenitySerializer
 from core.applications.property.api.serializers import FavoritePropertySerializer
 from core.applications.property.api.serializers import FavoriteToggleSerializer
 from core.applications.property.api.serializers import HomePageSerializer
@@ -43,6 +45,7 @@ from core.applications.property.permissions import IsLeadOwnerOrPropertyAgent
 from core.applications.property.permissions import IsLeadPropertyAgent
 from core.applications.property.permissions import IsObjectOwner
 from core.applications.property.permissions import IsPropertyOwnerAgent
+from core.applications.property.permissions import IsVerifiedAgent
 from core.applications.property.permissions import IsViewingOwnerOrPropertyAgent
 
 
@@ -129,17 +132,18 @@ class PropertyViewSet(ModelViewSet):
     CRUD operations on Property, plus listing and extra actions.
 
     """
-
+    parser_classes = [MultiPartParser, FormParser]
     lookup_field = "slug"
 
     permission_classes_by_action = {
         "list": [AllowAny],
         "retrieve": [AllowAny],
         "similar": [AllowAny],
-        "create": [IsAgentUser],
+        "create": [IsVerifiedAgent],
         "update": [IsPropertyOwnerAgent],
         "partial_update": [IsPropertyOwnerAgent],
         "destroy": [IsPropertyOwnerAgent],
+        "agent_info": [IsAuthenticated],
     }
 
     serializer_class_by_action = {
@@ -149,6 +153,7 @@ class PropertyViewSet(ModelViewSet):
         "create": PropertyWriteSerializer,
         "update": PropertyWriteSerializer,
         "partial_update": PropertyWriteSerializer,
+        "agent_info": AgentSummarySerializer,
     }
 
 
@@ -327,6 +332,24 @@ class PropertyViewSet(ModelViewSet):
         serializer = self.get_serializer(similar, many=True)
         return Response(serializer.data)
 
+    @action(
+        detail=True, methods=["get"],
+        url_path="agent", permission_classes=[IsAuthenticated]
+    )
+    def agent_info(self, request: Request, slug=None) -> Response:
+        """Return the agent profile for the agent who listed this property."""
+        prop = get_object_or_404(
+            Property.objects.visible().select_related(
+                "agent",
+                "agent__user",
+            ).prefetch_related("agent__properties"),
+            slug=slug,
+        )
+        serializer = AgentSummarySerializer(
+            prop.agent,
+            context=self.get_serializer_context(),
+        )
+        return Response(serializer.data)
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------

@@ -8,7 +8,7 @@ from django.utils import timezone
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import PermissionDenied
 
-from core.applications.property.models import Amenity
+from core.applications.property.models import Amenity, PropertyImage
 from core.applications.property.models import FavoriteProperty
 from core.applications.property.models import Lead
 from core.applications.property.models import Property
@@ -218,33 +218,52 @@ def get_property_detail(
 
 def create_property(*, agent, validated_data: dict) -> Property:
     """
-    Creates a new property listing on behalf of an agent.
-
-    Amenities are popped from ``validated_data`` and set via the M2M
-    relation after the instance is saved.  ``Property.save()`` enforces
-    plan-based listing limits and generates the slug — both via
-    ``full_clean()`` which is called before commit.
+    Creates a new property listing owned by the authenticated agent.
+     ``validated_data`` is the deserialised output of ``PropertyCreateSerializer``:
+      • All the Property fields except agent (resolved from the authenticated user
+        and never supplied by the client)
+      • ``amenities`` — list of Amenity PKs (optional)
+      • ``images``    — list of dicts with keys "image" (InMemoryUploadedFile) and
+                        "order" (int) (optional)
     """
+
     amenities = validated_data.pop("amenities", [])
+    images_data = validated_data.pop("images", [])
+
     with transaction.atomic():
         prop = Property(agent=agent, **validated_data)
         prop.full_clean()
         prop.save()
         if amenities:
             prop.amenities.set(amenities)
+        if images_data:
+            PropertyImage.objects.bulk_create([
+                PropertyImage(property=prop, **img)
+                for img in images_data
+            ])
     return prop
 
 
 def update_property(*, instance: Property, agent, validated_data: dict) -> Property:
     """
-    Updates an existing property listing.
-    Only the owning agent may update — enforced here as a service-layer
-    guard in addition to the view-level object permission.
+    Updates a property listing.  Only the owning agent may update.
+     ``validated_data`` is the deserialised output of ``PropertyUpdateSerializer``:
+      • Any updatable Property fields (agent is read-only and not included)
+      • ``amenities`` — list of Amenity PKs (optional)
+      • ``images``    — list of dicts with keys "image" (InMemoryUploadedFile)
+      and "order" (int) (optional)
+    The update strategy for amenities and images is to replace the existing set
+    with the submitted set.  For images, this means deleting all existing records and
+    inserting new ones
+    since the client may update the order or replace the image file itself.
     """
+
     if str(instance.agent_id) != str(agent.pk):
         raise PermissionDenied("You do not own this property.")
 
     amenities = validated_data.pop("amenities", None)
+    images_data = validated_data.pop("images", None)
+
     with transaction.atomic():
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -252,8 +271,14 @@ def update_property(*, instance: Property, agent, validated_data: dict) -> Prope
         instance.save()
         if amenities is not None:
             instance.amenities.set(amenities)
+        if images_data is not None:
+            # Replace strategy: wipe existing gallery, insert fresh
+            instance.images.all().delete()
+            PropertyImage.objects.bulk_create([
+                PropertyImage(property=instance, **img)
+                for img in images_data
+            ])
     return instance
-
 
 def delete_property(*, instance: Property, agent) -> None:
     """

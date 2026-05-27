@@ -3,6 +3,7 @@ from drf_spectacular.utils import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
 
+from core.applications.property.api.serializers import AgentSummarySerializer
 from core.applications.property.api.serializers import PropertyCardSerializer
 from core.applications.property.api.serializers import PropertyDetailSerializer
 from core.applications.property.api.serializers import PropertyWriteSerializer
@@ -37,7 +38,7 @@ Supports extensive filtering, search, and ordering.
             OpenApiParameter("search", OpenApiTypes.STR),
             OpenApiParameter("ordering", OpenApiTypes.STR),
         ],
-        responses=PropertyCardSerializer(many=True),
+        responses={200: PropertyCardSerializer(many=True)},
         tags=["Properties"],
     ),
 
@@ -56,7 +57,7 @@ Includes:
 - Agent info
 - Similar properties (pre-fetched, no extra query)
         """,
-        responses=PropertyDetailSerializer,
+        responses={200: PropertyDetailSerializer()},
         tags=["Properties"],
     ),
 
@@ -72,8 +73,8 @@ Create a new property listing.
 - Agent is inferred from authenticated user
 - Returns full property detail after creation
         """,
-        request=PropertyWriteSerializer,
-        responses=PropertyDetailSerializer,
+        request={"multipart/form-data": PropertyWriteSerializer()},
+        responses={201: PropertyDetailSerializer()},
         tags=["Properties"],
     ),
 
@@ -87,11 +88,14 @@ Fully update a property.
 
 - Only the owning agent can update
         """,
-        request=PropertyWriteSerializer,
-        responses=PropertyDetailSerializer,
+        request={"multipart/form-data": PropertyWriteSerializer()},
+        responses={200: PropertyDetailSerializer()},
         tags=["Properties"],
     ),
 
+    # ------------------------------------------------------------------
+    # PARTIAL UPDATE
+    # ------------------------------------------------------------------
     partial_update=extend_schema(
         summary="Partially Update Property",
         description="""
@@ -99,8 +103,8 @@ Partially update a property.
 
 - Only the owning agent can update
         """,
-        request=PropertyWriteSerializer,
-        responses=PropertyDetailSerializer,
+        request={"multipart/form-data": PropertyWriteSerializer()},
+        responses={200: PropertyDetailSerializer()},
         tags=["Properties"],
     ),
 
@@ -132,7 +136,30 @@ Used for:
 - "You may also like" section
 - Recommendation strips
         """,
-        responses=PropertyCardSerializer(many=True),
+        responses={200: PropertyCardSerializer(many=True)},
+        tags=["Properties"],
+    ),
+
+    # ------------------------------------------------------------------
+    # CUSTOM ACTION: AGENT INFO
+    # ------------------------------------------------------------------
+    agent_info=extend_schema(
+        summary="Get Property Agent",
+        description="""
+Retrieve the profile of the agent who listed a specific property.
+
+- Requires authentication
+- Returns compact agent card with contact details and trust signals
+- Used on the property detail page to surface agent information
+
+Includes:
+- Full name and avatar
+- Contact details (email, phone)
+- Agent type and company name
+- Verification status and rating
+- Total active listings count
+        """,
+        responses={200: AgentSummarySerializer()},
         tags=["Properties"],
     ),
 )

@@ -2,12 +2,12 @@ import contextlib
 import logging
 from typing import Literal
 
+from django.contrib.auth import authenticate
 from django.contrib.auth import user_logged_in
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions as django_exceptions
 from django.db import transaction
-from core.applications.users.utils.onboarding_token import OnboardingToken
 from djoser.compat import get_user_email
 from djoser.conf import settings
 from djoser.serializers import UserCreateSerializer
@@ -21,6 +21,7 @@ from core.applications.users.models import AgentProfile
 from core.applications.users.models import User
 from core.applications.users.models import UserProfile
 from core.applications.users.token import default_token_generator
+from core.applications.users.utils.onboarding_token import OnboardingToken
 from core.helpers.custom_exceptions import CustomError
 from core.helpers.enums import AgentTypeChoices
 from core.helpers.enums import AuthProviderChoices
@@ -794,97 +795,50 @@ class UsernameResetConfirmRetypeSerializer(
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """
-    Extends simplejwt's TokenObtainPairSerializer to accept login via
-    email address OR phone number via a single ``credential`` field.
+    email = serializers.EmailField()
+    password = serializers.CharField()
 
-    Wired via SIMPLE_JWT['TOKEN_OBTAIN_SERIALIZER'].
+    def get_setup_info(self, user: User):
+        return {"user_info": user.accounts_dict, "is_verified": user.is_verified}
 
-    Inactive account handling
-    -------------------------
-    - email provider  → resends djoser ActivationEmail automatically
-    - phone provider  → same: resends to the email on the account
-    - google provider → should never be inactive; surfaces a generic error
-
-    Response (shape preserved from original)
-    -----------------------------------------
-    {
-        "refresh":               "<jwt>",
-        "access":                "<jwt>",
-        "setup_info":            { UserSerializer.Info },
-        "registration_complete": bool
-    }
-    """
-
-    # Replace parent's email-only field with a generic credential field
-    email = None  # type: ignore[assignment]
-    credential = serializers.CharField(
-        help_text="Email address or phone number used during signup."
-    )
-    password = serializers.CharField(style={"input_type": "password"})
-
-    def _resolve_user(self, credential: str) -> User | None:
-        """Return the User whose email or phone matches credential."""
-        from django.db.models import Q
-
-        return User.objects.filter(
-            Q(email=credential) | Q(phone_number=credential)
-        ).first()
-
-    def validate(self, attrs: dict) -> dict:
-        credential = attrs.get("credential", "").strip()
-        password = attrs.get("password", "")
-
-        user = self._resolve_user(credential)
-
-        if not user:
-            raise AuthenticationFailed(
-                "No account found with these credentials. Please check and try again."
-            )
-
-        # Inactive → resend djoser activation email and surface a clear message
-        if not user.is_active:
-            if user.email:
-                context = {"user": user}
-                to = [get_user_email(user)]
-                with contextlib.suppress(Exception):
-                    settings.EMAIL.activation(
-                        self.context["request"], context
-                    ).send(to)
-            raise PermissionDenied(
-                "Your account is not yet verified. "
-                "Please check your email and click the activation link."
-            )
-
-        if not user.check_password(password):
-            raise AuthenticationFailed("Incorrect password. Please try again.")
-
-        if not api_settings.USER_AUTHENTICATION_RULE(user):
-            raise AuthenticationFailed(
-                "Login failed. Your account may have been suspended."
-            )
-
-        self.user = user
-
-        from rest_framework_simplejwt.tokens import RefreshToken
-
-        refresh = RefreshToken.for_user(user)
-        data = {
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-            # setup_info key preserved for backwards compatibility
-            "setup_info": UserSerializer.Info(instance=user).data,
-            "registration_complete": user.is_active,
+    def validate(self, attrs):
+        authenticate_kwargs = {
+            self.username_field: attrs[self.username_field],
+            "password": attrs["password"],
         }
+        with contextlib.suppress(KeyError):
+            authenticate_kwargs["request"] = self.context["request"]
 
+        self.user: User = authenticate(**authenticate_kwargs)
+        if not self.user:
+            if user := User.objects.filter(email=attrs["email"]).first():
+                if not user.is_active:
+                    context = {"user": user}
+                    to = [get_user_email(user)]
+                    settings.EMAIL.activation(self.context["request"], context).send(to)
+                    msg = "Your account is not yet verified, kindly check yur email and proceed to verification"  # noqa: E501
+                    raise PermissionDenied(
+                        msg,
+                    )
+                if not api_settings.USER_AUTHENTICATION_RULE(self.user):
+                    raise AuthenticationFailed(
+                        detail="Login failed. Please check your email and password and try again.",
+                    )
+
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+        data["setup_info"] = None
+        data["registration_complete"] = None
+        data["setup_info"] = UserSerializer.Info(instance=self.user).data
+        data["registration_complete"] = all([self.user.is_active])
         if api_settings.UPDATE_LAST_LOGIN:
-            update_last_login(None, user)
-
-        if not user.is_superuser:
+            update_last_login(None, self.user)
+        if not self.user.is_superuser:
             user_logged_in.send(
-                sender=user.__class__,
+                sender=self.user.__class__,
                 token=data["access"],
-                user=user,
+                user=self.user,
             )
-
         return data
