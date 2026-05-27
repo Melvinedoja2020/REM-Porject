@@ -5,8 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class UserRoleChoice(TextChoices):
     CUSTOMER = ("Prospective Buyer/Tenant", "Prospective Buyer/Tenant")
     AGENT = ("Agent", "Agent")
-    # REAL_ESTATE_OWNER = ("Real Estate Owner", "Real Estate Owner")
-
+    ADMIN = ("Admin", "Admin")
 class AuthProviderChoices(TextChoices):
     EMAIL  = "email",  _("Email")
     PHONE  = "phone",  _("Phone")
@@ -66,6 +65,7 @@ class VerificationStatusChoices(TextChoices):
     VERIFIED = "verified", "Verified"
     REJECTED = "rejected", "Rejected"
     SUBMITTED = "submitted", "Submitted"
+    REVOKED = "revoked", "Revoked"
 
 
 class NotificationType(TextChoices):

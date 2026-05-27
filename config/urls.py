@@ -36,6 +36,12 @@ urlpatterns += [
     path("api/v1/", include("core.applications.users.api.v1.jwt")),
     path("api/v1/", include("core.applications.property.api.routers")),]
 
+
+## --- API v2 ---
+urlpatterns += [
+    path("api/v2/", include("core.applications.users.api.v2.routers")),
+]
+
 ## --- Shared API endpoints ---
 urlpatterns += [
     path("api/auth-token/", obtain_auth_token),

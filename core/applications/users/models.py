@@ -157,6 +157,10 @@ class User(AbstractUser):
         return self.role == UserRoleChoice.AGENT.value
 
     @property
+    def is_admin(self) -> bool:
+        return self.role == UserRoleChoice.ADMIN
+
+    @property
     def agent_profile_or_none(self):
         """Return the AgentProfile if it exists, else None."""
         return getattr(self, "agent_profile", None)

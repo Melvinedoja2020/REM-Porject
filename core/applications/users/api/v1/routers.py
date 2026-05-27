@@ -9,10 +9,7 @@ PREFIX = "users"
 
 API_VERSION = settings.API_VERSION
 
-if settings.DEBUG:
-    router = DefaultRouter()
-else:
-    router = SimpleRouter()
+router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 router.register("users", UserViewSet, basename="users")
 

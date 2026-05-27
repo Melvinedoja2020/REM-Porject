@@ -34,6 +34,7 @@ class UserAdmin(auth_admin.UserAdmin):
                     "is_superuser",
                     "groups",
                     "user_permissions",
+                    "role",
                 ),
             },
         ),
@@ -62,7 +63,7 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(AgentProfile)
 class AgentProfileAdmin(admin.ModelAdmin):
-    list_display = ["user", "office_phone_no", "office_address"]
+    list_display = ["user", "verified", "verification_status", "office_phone_no", "office_address"]
     search_fields = ["user__name"]
     list_filter = ["verified"]
     actions = ["approve_agents"]
