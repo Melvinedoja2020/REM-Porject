@@ -8,14 +8,17 @@ from django.utils import timezone
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import PermissionDenied
 
-from core.applications.property.models import Amenity, PropertyImage
+from core.applications.property.models import Amenity
 from core.applications.property.models import FavoriteProperty
 from core.applications.property.models import Lead
 from core.applications.property.models import Property
+from core.applications.property.models import PropertyImage
 from core.applications.property.models import PropertySubscription
 from core.applications.property.models import PropertyViewing
+from core.applications.subscriptions.features import check_limit
 from core.helpers.enums import PropertyListingType
 from core.helpers.enums import PropertyViewingChoices
+from core.helpers.enums import SubscriptionPlan
 
 User = get_user_model()
 
@@ -219,30 +222,41 @@ def get_property_detail(
 def create_property(*, agent, validated_data: dict) -> Property:
     """
     Creates a new property listing owned by the authenticated agent.
-     ``validated_data`` is the deserialised output of ``PropertyCreateSerializer``:
-      • All the Property fields except agent (resolved from the authenticated user
-        and never supplied by the client)
-      • ``amenities`` — list of Amenity PKs (optional)
-      • ``images``    — list of dicts with keys "image" (InMemoryUploadedFile) and
-                        "order" (int) (optional)
+        ``validated_data`` is the deserialised output of ``PropertyCreateSerializer``:
+        • All required and optional Property fields (agent is read-only and not included)
+        • ``amenities`` — list of Amenity PKs (optional)
+        • ``images``    — list of dicts with keys "image" (InMemoryUploadedFile) and "order" (int) (optional)
     """
 
     amenities = validated_data.pop("amenities", [])
     images_data = validated_data.pop("images", [])
 
+
+    check_limit(
+        plan=agent.current_subscription.plan if agent.current_subscription else SubscriptionPlan.FREE,
+        feature="properties",
+        current_count=Property.objects.filter(agent=agent).count(),
+        label="property listings",
+    )
+
     with transaction.atomic():
         prop = Property(agent=agent, **validated_data)
+
+        # validation (field + model-level constraints only)
         prop.full_clean()
+
         prop.save()
+
         if amenities:
             prop.amenities.set(amenities)
+
         if images_data:
             PropertyImage.objects.bulk_create([
                 PropertyImage(property=prop, **img)
                 for img in images_data
             ])
-    return prop
 
+    return prop
 
 def update_property(*, instance: Property, agent, validated_data: dict) -> Property:
     """

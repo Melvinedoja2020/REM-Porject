@@ -3,7 +3,6 @@ from django.utils.html import format_html
 
 from core.applications.property.models import Amenity
 from core.applications.property.models import FavoriteProperty
-from core.applications.property.models import FeaturedListing
 from core.applications.property.models import Lead
 from core.applications.property.models import Property
 from core.applications.property.models import PropertyImage
@@ -83,8 +82,3 @@ class LeadAdmin(admin.ModelAdmin):
     search_fields = ["property_link", "user__username"]
     ordering = ["-created_at"]
     list_filter = ["status", "property_link"]
-
-@admin.register(FeaturedListing)
-class FeaturedListingAdmin(admin.ModelAdmin):
-    list_display = ["id", "property", "is_active", "end_date"]
-    search_fields = ["property__title"]

@@ -1,24 +1,22 @@
-import auto_prefetch
 import uuid
-from django.conf import settings
-from django.db import models
-from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal
+
+import auto_prefetch
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.urls import reverse
+from django.utils import timezone
 
 from core.applications.subscriptions.features import FEATURE_LIMITS
 from core.applications.subscriptions.services.paystack import PaystackAPI
-from core.helpers.enums import PaymentStatus, SubscriptionPlan
+from core.helpers.enums import PaymentStatus
+from core.helpers.enums import SubscriptionPlan
 from core.helpers.models import UIDTimeBasedModel
-from django.core.exceptions import ValidationError
-from decimal import Decimal
-from django.urls import reverse
-
 from core.helpers.utils import generate_payment_reference
 
 
-# -------------------------------
-# RENTAL TRANSACTION & COMMISSION
-# -------------------------------
 class RentalTransaction(UIDTimeBasedModel):
     """
     Represents a rental transaction between an agent and a buyer.
@@ -122,10 +120,6 @@ class AgentCommission(UIDTimeBasedModel):
         return self.status == "paid"
 
 
-# -------------------------------
-# SUBSCRIPTION PLAN & FEATURED ADS
-# -------------------------------
-
 
 class AgentSubscription(UIDTimeBasedModel):
     """
@@ -160,27 +154,30 @@ class AgentSubscription(UIDTimeBasedModel):
 
     def save(self, *args, **kwargs):
         """
-        Automatically set duration:
-        - Trial: 30 days (or configurable later)
-        - Paid: use PlanConfig.duration_days
+        Auto-calculate end_date based on plan and trial status if not set.
         """
         if not self.end_date:
             if self.is_trial:
                 self.end_date = self.start_date + timedelta(days=30)
+            elif self.plan == SubscriptionPlan.FREE:
+                pass  # FREE tier — end_date stays None, never expires
             else:
                 try:
                     plan_cfg = PlanConfig.get_plan(self.plan)
-                    self.end_date = self.start_date + timedelta(
-                        days=plan_cfg.duration_days
-                    )
+                    self.end_date = self.start_date + timedelta(days=plan_cfg.duration_days)
                 except PlanConfig.DoesNotExist:
-                    # fallback safety
                     self.end_date = self.start_date + timedelta(days=365)
         super().save(*args, **kwargs)
 
-    def is_valid(self):
-        """Check if subscription is still valid."""
-        return self.is_active and timezone.now() <= self.end_date
+
+    def is_valid(self) -> bool:
+        """Check if subscription is currently valid (active and not expired)."""
+        if not self.is_active:
+            return False
+        if self.end_date is None:
+            return True  # FREE tier — no expiry date means always valid
+        return timezone.now() <= self.end_date
+
 
     @property
     def is_expired(self):
@@ -295,23 +292,20 @@ class FeaturedListing(UIDTimeBasedModel):
         return f"Boosted: {self.property} by {self.agent.user.get_full_name()}"
 
     def save(self, *args, **kwargs):
-        """
-        Enforce featured listing limits based on agent's subscription plan.
-        """
-        if not self.pk:  # new featured listing
+        if not self.pk:
+            from core.applications.subscriptions.features import check_limit
+
             subscription = getattr(self.agent, "current_subscription", None)
             plan = subscription.plan if subscription else SubscriptionPlan.FREE
 
-            active_boosts = self.agent.featured_properties.filter(
-                is_active=True
-            ).count()
-            limit = FEATURE_LIMITS.get(plan, {}).get("featured_listings")
+            check_limit(
+                plan=plan,
+                feature="featured_listings",
+                current_count=self.agent.featured_properties.filter(is_active=True).count(),
+                label="featured listings",
+            )
 
-            if limit is not None and active_boosts >= limit:
-                raise ValidationError(
-                    f"You have reached your featured listing limit ({limit}) "
-                    f"for the {plan} plan. Please upgrade your subscription."
-                )
+        super().save(*args, **kwargs)
 
         super().save(*args, **kwargs)
 

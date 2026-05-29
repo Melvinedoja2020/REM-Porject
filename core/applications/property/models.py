@@ -136,24 +136,14 @@ class Property(TitleTimeBasedModel):
 
     def save(self, *args, **kwargs) -> None:
         """
-        1. Enforce per-plan property limits on first save.
-        2. Auto-generate a unique slug from the title when absent.
+        Handles only persistence concerns:
+        - slug generation
         """
-        if not self.pk:
-            self._enforce_plan_limit()
+
         if not self.slug:
             self.slug = self._generate_unique_slug()
-        super().save(*args, **kwargs)
 
-    def _enforce_plan_limit(self) -> None:
-        subscription = getattr(self.agent, "current_subscription", None)
-        plan = subscription.plan if subscription else SubscriptionPlan.FREE
-        limit = FEATURE_LIMITS.get(plan, {}).get("properties")
-        if limit is not None and self.agent.properties.count() >= limit:
-            raise ValidationError(
-                f"You have reached your property limit ({limit}) for the "
-                f"{plan} plan. Please upgrade your subscription."
-            )
+        super().save(*args, **kwargs)
 
     def _generate_unique_slug(self) -> str:
         base_slug = slugify(self.title)
@@ -225,13 +215,8 @@ class Property(TitleTimeBasedModel):
 
     @property
     def featured_status(self) -> bool:
-        """
-        True when an active FeaturedListing exists.
-        On querysets that called with_featured_annotation() the annotated
-        ``is_featured_now`` field is cheaper; this property is the fallback
-        for single-object access.
-        """
-        return self.featured_listings.filter(
+        """Checks if the property has an active featured listing."""
+        return self.subscription_featured_listings.filter(
             is_active=True,
             end_date__gte=timezone.now(),
         ).exists()
@@ -500,9 +485,3 @@ class PropertyViewing(TimeBasedModel):
     def __str__(self) -> str:
         ts = self.scheduled_time.strftime("%Y-%m-%d %H:%M")
         return f"Viewing — {self.property.title} @ {ts}"
-
-
-class FeaturedListing(TimeBasedModel):
-    property = auto_prefetch.ForeignKey("Property", models.CASCADE, related_name="property_featured_listings")
-    is_active = models.BooleanField(default=True)
-    end_date = models.DateTimeField()

@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from core.applications.notifications.models import NotificationPreference
 from core.applications.property.models import User
 from core.applications.users.models import AgentProfile
+from core.helpers.enums import SubscriptionPlan
 
 
 @receiver(post_migrate)
@@ -44,3 +45,33 @@ def notify_agent_approval(sender, instance, created, **kwargs):
 def create_user_notification_pref(sender, instance, created, **kwargs):
     if created:
         NotificationPreference.objects.get_or_create(user=instance)
+
+@receiver(post_save, sender=AgentProfile)
+def assign_free_subscription(sender, instance, created, **kwargs):
+    """
+    Automatically assigns a FREE tier subscription when an AgentProfile
+    is first created.
+
+    - FREE tier never expires (end_date=None)
+    - No trial — agents start on FREE and upgrade when ready
+    - Skips if a subscription already exists (defensive guard)
+    """
+    if not created:
+        return
+
+    from core.applications.subscriptions.models import AgentSubscription
+
+    # Defensive guard — never create duplicate subscriptions
+    if instance.subscriptions.exists():
+        return
+
+    subscription = AgentSubscription.objects.create(
+        agent=instance,
+        plan=SubscriptionPlan.FREE,
+        is_active=True,
+        is_trial=False,
+        amount_paid=0,
+        end_date=None,  # FREE tier never expires
+    )
+
+    instance.set_current_subscription(subscription)

@@ -48,10 +48,24 @@ class PropertyQuerySet(auto_prefetch.QuerySet):
         return self.filter(is_available=True)
 
     def featured_active(self):
+        """Filter properties that have an active featured listing."""
         return self.filter(
             property_featured_listings__is_active=True,
             property_featured_listings__end_date__gte=Now(),
         ).distinct()
+
+    def with_featured_annotation(self) -> "PropertyQuerySet":
+        """
+        Annotate each property with `is_featured_now` boolean
+        based on active featured listings.
+        """
+        from core.applications.subscriptions.models import FeaturedListing
+        subquery = FeaturedListing.objects.filter(
+            property=OuterRef("pk"),
+            is_active=True,
+            end_date__gte=Now(),
+        )
+        return self.annotate(is_featured_now=Exists(subquery))
 
     # -------------------------
     # Prefetch bundles

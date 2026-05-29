@@ -6,10 +6,10 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import exception_handler
 
-from core.helpers.service_errors import ServiceError
 from core.helpers.service_errors import ServiceNotFoundError
 from core.helpers.service_errors import ServicePermissionError
 from core.helpers.service_errors import ServiceValidationError
+from core.helpers.service_errors import SubscriptionLimitError
 
 
 class CustomError:
@@ -147,6 +147,10 @@ SERVICE_ERROR_MAP = (
     (ServicePermissionError, lambda exc: PermissionDenied(str(exc))),
     (ServiceValidationError, lambda exc: ValidationError(exc.errors)),
     (ServiceNotFoundError, lambda exc: NotFound(str(exc))),
+    (SubscriptionLimitError, lambda exc: ValidationError({
+        "detail": str(exc),
+        "code": getattr(exc, "code", "limit_reached"),
+    })),
 )
 
 
