@@ -14,20 +14,20 @@ _FEATURE_LABELS: dict[str, str] = {
 
 FEATURE_LIMITS: dict[str, dict[str, int | None]] = {
     SubscriptionPlan.FREE.value: {
-        "properties":          1,     # one listing only
-        "featured_listings":   0,     # boosting disabled
+        "properties":          10,     # one listing only
+        "featured_listings":   5,     # boosting disabled
         "images_per_property": 3,     # minimal gallery
         "leads_per_month":     10,    # limited enquiries
     },
     SubscriptionPlan.BASIC.value: {
-        "properties":          5,
-        "featured_listings":   1,     # one active boost at a time
+        "properties":          20,
+        "featured_listings":   10,     # one active boost at a time
         "images_per_property": 8,
         "leads_per_month":     50,
     },
     SubscriptionPlan.PREMIUM.value: {
-        "properties":          20,
-        "featured_listings":   5,
+        "properties":          50,
+        "featured_listings":   20,
         "images_per_property": 15,
         "leads_per_month":     200,
     },
