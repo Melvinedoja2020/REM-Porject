@@ -50,8 +50,8 @@ class PropertyQuerySet(auto_prefetch.QuerySet):
     def featured_active(self):
         """Filter properties that have an active featured listing."""
         return self.filter(
-            property_featured_listings__is_active=True,
-            property_featured_listings__end_date__gte=Now(),
+            subscription_featured_listings__is_active=True,
+            subscription_featured_listings__end_date__gte=Now(),
         ).distinct()
 
     def with_featured_annotation(self) -> "PropertyQuerySet":
@@ -89,7 +89,7 @@ class PropertyQuerySet(auto_prefetch.QuerySet):
                     "amenities",
                     queryset=property_models.Amenity.objects.alphabetical(),
                 ),
-                "property_featured_listings",
+                "subscription_featured_listings",
             )
         )
 
@@ -116,14 +116,14 @@ class PropertyQuerySet(auto_prefetch.QuerySet):
             is_favorited=Value(False, output_field=BooleanField())
         )
 
-    def with_featured_annotation(self) -> "PropertyQuerySet":
-        """Annotate each property with `is_featured_now` boolean based on active featured listings."""
-        subquery = property_models.FeaturedListing.objects.filter(
-            property=OuterRef("pk"),
-            is_active=True,
-            end_date__gte=Now(),
-        )
-        return self.annotate(is_featured_now=Exists(subquery))
+    # def with_featured_annotation(self) -> "PropertyQuerySet":
+    #     """Annotate each property with `is_featured_now` boolean based on active featured listings."""
+    #     subquery = property_models.FeaturedListing.objects.filter(
+    #         property=OuterRef("pk"),
+    #         is_active=True,
+    #         end_date__gte=Now(),
+    #     )
+    #     return self.annotate(is_featured_now=Exists(subquery))
 
     def with_listing_counts(self) -> "PropertyQuerySet":
         return self.annotate(
@@ -356,7 +356,7 @@ class FavoritePropertyQuerySet(auto_prefetch.QuerySet):
                     "property__amenities",
                     queryset=property_models.Amenity.objects.alphabetical(),
                 ),
-                "property__property_featured_listings",
+                "property__subscription_featured_listings",
             )
             .order_by("-created_at")
         )

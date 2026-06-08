@@ -9,6 +9,7 @@ from core.applications.property.models import PropertyImage
 from core.applications.property.models import PropertySubscription
 from core.applications.property.models import PropertyType
 
+
 # Register your models here.
 
 

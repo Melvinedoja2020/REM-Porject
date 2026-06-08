@@ -9,6 +9,7 @@ from core.applications.property.models import Property
 from core.applications.property.models import PropertyImage
 from core.applications.property.models import PropertySubscription
 from core.applications.property.models import PropertyViewing
+from core.applications.subscriptions.models import FeaturedListing
 
 # ---------------------------------------------------------------------------
 # Shared mixin
@@ -599,3 +600,69 @@ class LeadStatusUpdateSerializer(serializers.Serializer):
         super().__init__(*args, **kwargs)
         from core.helpers.enums import Lead_Status_Choices
         self.fields["status"].choices = Lead_Status_Choices.choices
+
+
+
+class FeaturedListingSerializer(AbsoluteURLMixin, serializers.ModelSerializer):
+    """
+    Output serializer for a boosted/featured property listing.
+
+    Returned by:
+      - POST /property/{slug}/boost/     → after successful boost
+      - GET  /property/{slug}/boost-status/ → inside BoostStatusSerializer
+
+    All fields resolve from select_related cache — no extra DB hits.
+    Requires ``FeaturedListingQuerySet.with_relations()`` on the queryset.
+    """
+
+    property_title = serializers.CharField(
+        source="property.title",
+        read_only=True,
+    )
+    property_slug = serializers.CharField(
+        source="property.slug",
+        read_only=True,
+    )
+    agent_name = serializers.SerializerMethodField()
+    is_currently_active = serializers.SerializerMethodField()
+    remaining_days = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FeaturedListing
+        fields = (
+            "id",
+            "property_id",
+            "property_title",
+            "property_slug",
+            "agent_name",
+            "boost_duration",
+            "start_date",
+            "end_date",
+            "is_active",
+            "is_currently_active",
+            "remaining_days",
+        )
+        read_only_fields = fields
+
+    def get_agent_name(self, obj) -> str:
+        return obj.agent.user.get_full_name()
+
+    def get_is_currently_active(self, obj) -> bool:
+        return obj.is_currently_active()
+
+    def get_remaining_days(self, obj) -> int | None:
+        if not obj.end_date:
+            return None
+        from django.utils import timezone
+        return max((obj.end_date - timezone.now()).days, 0)
+
+
+class BoostStatusSerializer(serializers.Serializer):
+    """
+    Response for GET /property/{slug}/boost-status/
+
+    Shows whether a property is currently boosted and the boost details.
+    Public endpoint — no authentication required.
+    """
+    is_boosted = serializers.BooleanField()
+    boost = FeaturedListingSerializer(allow_null=True)

@@ -1,6 +1,6 @@
 # Register your models here.
 from django.contrib import admin
-from .models import PlanConfig, AgentSubscription, Payment
+from .models import PlanConfig, AgentSubscription, Payment, FeaturedListing
 
 
 @admin.register(PlanConfig)
@@ -40,3 +40,12 @@ class PaymentAdmin(admin.ModelAdmin):
     list_filter = ("status",)
     search_fields = ("agent__user__email", "reference")
     ordering = ("-created_at",)
+
+
+
+@admin.register(FeaturedListing)
+class FeaturedListingAdmin(admin.ModelAdmin):
+    list_display = ("property", "agent", "start_date", "end_date", "is_active")
+    list_filter = ("is_active",)
+    search_fields = ("property__title", "agent__user__email")
+    ordering = ("-start_date",)

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from core.helpers.paginations import CustomPagination
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -23,9 +24,12 @@ from rest_framework.viewsets import ViewSet
 from core.applications.property import services
 from core.applications.property.api.schema.home_schema import HomePageViewSchema
 from core.applications.property.api.schema.property_schemas import PropertyViewSetSchema
-from core.applications.property.api.serializers import AgentSummarySerializer, AmenitySerializer
+from core.applications.property.api.serializers import AgentSummarySerializer
+from core.applications.property.api.serializers import AmenitySerializer
+from core.applications.property.api.serializers import BoostStatusSerializer
 from core.applications.property.api.serializers import FavoritePropertySerializer
 from core.applications.property.api.serializers import FavoriteToggleSerializer
+from core.applications.property.api.serializers import FeaturedListingSerializer
 from core.applications.property.api.serializers import HomePageSerializer
 from core.applications.property.api.serializers import LeadCreateSerializer
 from core.applications.property.api.serializers import LeadSerializer
@@ -47,6 +51,9 @@ from core.applications.property.permissions import IsObjectOwner
 from core.applications.property.permissions import IsPropertyOwnerAgent
 from core.applications.property.permissions import IsVerifiedAgent
 from core.applications.property.permissions import IsViewingOwnerOrPropertyAgent
+from core.applications.subscriptions.models import FeaturedListing
+from core.applications.subscriptions.services.boost import boost_property
+from core.applications.subscriptions.services.boost import unboost_property
 
 
 def _ctx(request: Request) -> dict:
@@ -88,19 +95,26 @@ def _parse_bool(value: str | None) -> bool | None:
 
 @HomePageViewSchema
 class HomePageView(ViewSet):
-    """
-    GET /
-    Aggregates featured properties + category cards in one network call.
-    Fully public — no authentication required.
-    """
-
     permission_classes = [AllowAny]
 
     def list(self, request: Request) -> Response:
         user = request.user if request.user.is_authenticated else None
         data = services.get_home_page_data(user=user)
-        serializer = HomePageSerializer(data, context=_ctx(request))
-        return Response(serializer.data)
+
+        paginator = CustomPagination()
+        paginated_qs = paginator.paginate_queryset(
+            data["featured_properties"], request
+        )
+
+        serializer = HomePageSerializer(
+            {
+                **data,
+                "featured_properties": paginated_qs,
+            },
+            context=_ctx(request),
+        )
+
+        return paginator.get_paginated_response(serializer.data)
 
 
 class AgentPropertyListView(ListModelMixin, GenericViewSet):
@@ -130,38 +144,42 @@ class AgentPropertyListView(ListModelMixin, GenericViewSet):
 class PropertyViewSet(ModelViewSet):
     """
     CRUD operations on Property, plus listing and extra actions.
-
     """
     parser_classes = [MultiPartParser, FormParser]
     lookup_field = "slug"
 
     permission_classes_by_action = {
-        "list": [AllowAny],
-        "retrieve": [AllowAny],
-        "similar": [AllowAny],
-        "create": [IsVerifiedAgent],
-        "update": [IsPropertyOwnerAgent],
+        # Public
+        "list":         [AllowAny],
+        "retrieve":     [AllowAny],
+        "similar":      [AllowAny],
+        "boost_status": [AllowAny],
+        # Authenticated
+        "agent_info":   [IsAuthenticated],
+        # Verified agent only
+        "create":       [IsVerifiedAgent],
+        # Property owner only
+        "update":       [IsPropertyOwnerAgent],
         "partial_update": [IsPropertyOwnerAgent],
-        "destroy": [IsPropertyOwnerAgent],
-        "agent_info": [IsAuthenticated],
+        "destroy":      [IsPropertyOwnerAgent],
+        "boost":        [IsPropertyOwnerAgent],
+        "unboost":      [IsPropertyOwnerAgent],
     }
 
     serializer_class_by_action = {
-        "list": PropertyCardSerializer,
-        "similar": PropertyCardSerializer,
-        "retrieve": PropertyDetailSerializer,
-        "create": PropertyWriteSerializer,
-        "update": PropertyWriteSerializer,
+        "list":         PropertyCardSerializer,
+        "similar":      PropertyCardSerializer,
+        "retrieve":     PropertyDetailSerializer,
+        "create":       PropertyWriteSerializer,
+        "update":       PropertyWriteSerializer,
         "partial_update": PropertyWriteSerializer,
-        "agent_info": AgentSummarySerializer,
+        "agent_info":   AgentSummarySerializer,
+        "boost":        FeaturedListingSerializer,
+        "unboost":      FeaturedListingSerializer,
+        "boost_status": BoostStatusSerializer,
     }
 
-
     def get_permissions(self):
-        """
-        Resolve permissions based on action using a mapping.
-        Defaults to IsAuthenticated if action is not explicitly defined.
-        """
         permission_classes = self.permission_classes_by_action.get(
             self.action,
             [IsAuthenticated],
@@ -169,31 +187,18 @@ class PropertyViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
-        """
-        Resolve serializer class dynamically based on action.
-        Falls back to PropertyCardSerializer.
-        """
         return self.serializer_class_by_action.get(
             self.action,
             PropertyCardSerializer,
         )
 
     def get_serializer_context(self):
-        """Extend serializer context with request-scoped helpers."""
         return {
             **super().get_serializer_context(),
             **_ctx(self.request),
         }
 
     def get_queryset(self):
-        """
-        Returns filtered queryset for list endpoints.
-
-        Notes
-        -----
-        - `retrieve` does not rely on queryset (handled manually).
-        - Business logic delegated to service layer.
-        """
         if self.action == "retrieve":
             return Property.objects.none()
 
@@ -224,37 +229,29 @@ class PropertyViewSet(ModelViewSet):
         )
 
     # ------------------------------------------------------------------
-    # CRUD operations
+    # CRUD
     # ------------------------------------------------------------------
 
     def list(self, request: Request, *args, **kwargs) -> Response:
         """Paginated property card list."""
         queryset = self.get_queryset()
         page = self.paginate_queryset(queryset)
-
         serializer = self.get_serializer(
             page if page is not None else queryset,
             many=True,
         )
-
         if page is not None:
             return self.get_paginated_response(serializer.data)
-
         return Response(serializer.data)
 
     def retrieve(self, request: Request, *args, **kwargs) -> Response:
-        """
-        Retrieve a property with pre-fetched similar properties.
-        """
+        """Retrieve a property with pre-fetched similar properties."""
         user = request.user if request.user.is_authenticated else None
-
         prop, similar = services.get_property_detail(
             slug=kwargs["slug"],
             user=user,
         )
-
         self.check_object_permissions(request, prop)
-
         serializer = self.get_serializer(
             prop,
             context={
@@ -262,60 +259,50 @@ class PropertyViewSet(ModelViewSet):
                 "similar_properties": similar,
             },
         )
-
         return Response(serializer.data)
 
     def create(self, request: Request, *args, **kwargs) -> Response:
         """Create a new property listing."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         prop = services.create_property(
             agent=request.user.agent_profile,
             validated_data=dict(serializer.validated_data),
         )
-
         output = PropertyDetailSerializer(
             prop,
             context=self.get_serializer_context(),
         )
-
         return Response(output.data, status=status.HTTP_201_CREATED)
 
     def update(self, request: Request, *args, **kwargs) -> Response:
         """Update a property (PUT/PATCH)."""
         partial = kwargs.pop("partial", False)
         instance = self._get_owned_property()
-
         serializer = self.get_serializer(
             instance,
             data=request.data,
             partial=partial,
         )
         serializer.is_valid(raise_exception=True)
-
         prop = services.update_property(
             instance=instance,
             agent=request.user.agent_profile,
             validated_data=dict(serializer.validated_data),
         )
-
         output = PropertyDetailSerializer(
             prop,
             context=self.get_serializer_context(),
         )
-
         return Response(output.data)
 
     def destroy(self, request: Request, *args, **kwargs) -> Response:
         """Delete a property."""
         instance = self._get_owned_property()
-
         services.delete_property(
             instance=instance,
             agent=request.user.agent_profile,
         )
-
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     # ------------------------------------------------------------------
@@ -326,23 +313,23 @@ class PropertyViewSet(ModelViewSet):
     def similar(self, request: Request, slug=None) -> Response:
         """Return similar properties."""
         user = request.user if request.user.is_authenticated else None
-
         _, similar = services.get_property_detail(slug=slug, user=user)
-
         serializer = self.get_serializer(similar, many=True)
         return Response(serializer.data)
 
     @action(
-        detail=True, methods=["get"],
-        url_path="agent", permission_classes=[IsAuthenticated]
+        detail=True,
+        methods=["get"],
+        url_path="agent",
+        permission_classes=[IsAuthenticated],
     )
     def agent_info(self, request: Request, slug=None) -> Response:
         """Return the agent profile for the agent who listed this property."""
         prop = get_object_or_404(
-            Property.objects.visible().select_related(
-                "agent",
-                "agent__user",
-            ).prefetch_related("agent__properties"),
+            Property.objects
+            .visible()
+            .select_related("agent", "agent__user")
+            .prefetch_related("agent__properties"),
             slug=slug,
         )
         serializer = AgentSummarySerializer(
@@ -350,22 +337,111 @@ class PropertyViewSet(ModelViewSet):
             context=self.get_serializer_context(),
         )
         return Response(serializer.data)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="boost",
+        permission_classes=[IsPropertyOwnerAgent],
+    )
+    def boost(self, request: Request, slug=None) -> Response:
+        """
+        Feature/boost a property within the agent's subscription allowance.
+        POST /api/v1/property/{slug}/boost/
+
+        - Only the owning agent can boost their property
+        - Boost duration is determined by agent's subscription plan
+        - FREE tier agents cannot boost properties
+        """
+        prop = self._get_owned_property()
+
+        featured = boost_property(
+            agent=request.user.agent_profile,
+            property_id=str(prop.pk),
+        )
+
+        # Reload with full relations for serializer — avoids N+1
+        featured = (
+            FeaturedListing.objects
+            .with_relations()
+            .get(pk=featured.pk)
+        )
+
+        serializer = FeaturedListingSerializer(
+            featured,
+            context=self.get_serializer_context(),
+        )
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(
+        detail=True,
+        methods=["delete"],
+        url_path="unboost",
+        permission_classes=[IsPropertyOwnerAgent],
+    )
+    def unboost(self, request: Request, slug=None) -> Response:
+        """
+        Remove a featured boost from a property.
+        DELETE /api/v1/property/{slug}/unboost/
+
+        - Only the owning agent can unboost their property
+        - Property is removed from featured listings immediately
+        """
+        prop = self._get_owned_property()
+
+        unboost_property(
+            agent=request.user.agent_profile,
+            property_id=str(prop.pk),
+        )
+
+        return Response(
+            {"detail": "Property has been removed from featured listings."},
+            status=status.HTTP_200_OK,
+        )
+
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="boost-status",
+        permission_classes=[AllowAny],
+    )
+    def boost_status(self, request: Request, slug=None) -> Response:
+        """
+        Check the current boost status of a property.
+        GET /api/v1/property/{slug}/boost-status/
+        """
+        prop = get_object_or_404(
+            Property.objects.visible(),
+            slug=slug,
+        )
+
+        active_boost = (
+            FeaturedListing.objects
+            .active()
+            .for_property(str(prop.pk))
+            .with_relations()
+            .first()
+        )
+
+        serializer = BoostStatusSerializer({
+            "is_boosted": active_boost is not None,
+            "boost": active_boost,
+        })
+
+        return Response(serializer.data)
+
     # ------------------------------------------------------------------
     # Helpers
     # ------------------------------------------------------------------
 
     def _get_owned_property(self) -> Property:
-        """
-        Fetch property and enforce ownership permission.
-        """
+        """Fetch property and enforce ownership permission."""
         obj = get_object_or_404(
             Property.objects.visible(),
             slug=self.kwargs["slug"],
         )
         self.check_object_permissions(self.request, obj)
         return obj
-
-
 # ---------------------------------------------------------------------------
 # Amenity ViewSet  (read-only)
 # ---------------------------------------------------------------------------

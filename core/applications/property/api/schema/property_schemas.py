@@ -3,7 +3,7 @@ from drf_spectacular.utils import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
 
-from core.applications.property.api.serializers import AgentSummarySerializer
+from core.applications.property.api.serializers import AgentSummarySerializer, FeaturedListingSerializer
 from core.applications.property.api.serializers import PropertyCardSerializer
 from core.applications.property.api.serializers import PropertyDetailSerializer
 from core.applications.property.api.serializers import PropertyWriteSerializer
@@ -126,40 +126,65 @@ Delete a property listing.
     # CUSTOM ACTION: SIMILAR
     # ------------------------------------------------------------------
     similar=extend_schema(
-        summary="Get Similar Properties",
-        description="""
-Retrieve similar properties based on:
-- Listing type
-- Property type
+            summary="Get Similar Properties",
+            description="""
+    Retrieve similar properties based on:
+    - Listing type
+    - Property type
 
-Used for:
-- "You may also like" section
-- Recommendation strips
-        """,
-        responses={200: PropertyCardSerializer(many=True)},
-        tags=["Properties"],
-    ),
+    Used for:
+    - "You may also like" section
+    - Recommendation strips
+            """,
+            responses={200: PropertyCardSerializer(many=True)},
+            tags=["Properties"],
+        ),
 
     # ------------------------------------------------------------------
     # CUSTOM ACTION: AGENT INFO
     # ------------------------------------------------------------------
     agent_info=extend_schema(
-        summary="Get Property Agent",
+            summary="Get Property Agent",
+            description="""
+    Retrieve the profile of the agent who listed a specific property.
+
+    - Requires authentication
+    - Returns compact agent card with contact details and trust signals
+    - Used on the property detail page to surface agent information
+
+    Includes:
+    - Full name and avatar
+    - Contact details (email, phone)
+    - Agent type and company name
+    - Verification status and rating
+    - Total active listings count
+            """,
+            responses={200: AgentSummarySerializer()},
+            tags=["Properties"],
+        ),
+
+    boost=extend_schema(
+        summary="Boost Property",
         description="""
-Retrieve the profile of the agent who listed a specific property.
+    Feature/boost a property within the agent's subscription allowance.
 
-- Requires authentication
-- Returns compact agent card with contact details and trust signals
-- Used on the property detail page to surface agent information
+    - Only owning agent can boost
+    - Requires active subscription plan
+    - Returns the created FeaturedListing
+    """,
+        responses={201: FeaturedListingSerializer()},
+        tags=["Properties"],
+    ),
 
-Includes:
-- Full name and avatar
-- Contact details (email, phone)
-- Agent type and company name
-- Verification status and rating
-- Total active listings count
-        """,
-        responses={200: AgentSummarySerializer()},
+    unboost=extend_schema(
+        summary="Unboost Property",
+        description="""
+    Remove a property from featured listings.
+
+    - Only owning agent can unboost
+    - Removes boost immediately
+    """,
+        responses={200: OpenApiTypes.OBJECT},
         tags=["Properties"],
     ),
 )

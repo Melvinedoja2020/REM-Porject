@@ -10,6 +10,8 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core.applications.subscriptions.features import FEATURE_LIMITS
+from core.applications.subscriptions.managers import AgentSubscriptionManager
+from core.applications.subscriptions.managers import FeaturedListingManager
 from core.applications.subscriptions.services.paystack import PaystackAPI
 from core.helpers.enums import PaymentStatus
 from core.helpers.enums import SubscriptionPlan
@@ -144,6 +146,8 @@ class AgentSubscription(UIDTimeBasedModel):
     transaction_id = models.CharField(max_length=255, null=True, blank=True)
     auto_renew = models.BooleanField(default=False)
 
+    objects = AgentSubscriptionManager()
+
     class Meta(auto_prefetch.Model.Meta):
         ordering = ["-start_date"]
         verbose_name = "Agent Subscription"
@@ -258,7 +262,7 @@ class AgentSubscription(UIDTimeBasedModel):
 
 class FeaturedListing(UIDTimeBasedModel):
     """
-    Agents can pay to boost their property visibility.
+    Tracks which properties are currently featured/boosted by an agent.
     """
 
     property = auto_prefetch.ForeignKey(
@@ -273,43 +277,38 @@ class FeaturedListing(UIDTimeBasedModel):
     )
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
-    amount_paid = models.DecimalField(
-        max_digits=12, decimal_places=2, null=True, blank=True
-    )
-    transaction_id = models.CharField(max_length=255, null=True, blank=True)
     boost_duration = models.PositiveIntegerField(
-        default=7, help_text="Boost duration in days"
+        default=7,
+        help_text="Boost duration in days — mirrors plan config at time of boost.",
     )
-
     is_active = models.BooleanField(default=True)
+
+    objects = FeaturedListingManager()
 
     class Meta(auto_prefetch.Model.Meta):
         ordering = ["-start_date"]
         verbose_name = "Featured Listing"
         verbose_name_plural = "Featured Listings"
-
-    def __str__(self):
-        return f"Boosted: {self.property} by {self.agent.user.get_full_name()}"
-
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            from core.applications.subscriptions.features import check_limit
-
-            subscription = getattr(self.agent, "current_subscription", None)
-            plan = subscription.plan if subscription else SubscriptionPlan.FREE
-
-            check_limit(
-                plan=plan,
-                feature="featured_listings",
-                current_count=self.agent.featured_properties.filter(is_active=True).count(),
-                label="featured listings",
+        constraints = [
+            models.UniqueConstraint(
+                fields=["property", "agent"],
+                condition=models.Q(is_active=True),
+                name="unique_active_boost_per_property_agent",
             )
+        ]
 
-        super().save(*args, **kwargs)
+    def __str__(self) -> str:
+        return (
+            f"{self.property.title} boosted by "
+            f"{self.agent.user.get_full_name()} "
+            f"(expires {self.end_date.date() if self.end_date else 'never'})"
+        )
 
-        super().save(*args, **kwargs)
-
-    def is_currently_active(self):
+    def is_currently_active(self) -> bool:
+        """
+        Returns True if the boost is active and has not yet expired.
+        Use the ``active()`` queryset method for bulk checks — no DB hit.
+        """
         return self.is_active and (
             self.end_date is None or self.end_date >= timezone.now()
         )

@@ -90,7 +90,7 @@ def get_home_page_data(*, user=None) -> dict[str, Any]:
     render the search form dropdowns without hard-coding listing types or price bands.
 
     """
-    featured = list(
+    featured_qs = list(
         Property.objects
         .visible()
         .available()
@@ -98,7 +98,6 @@ def get_home_page_data(*, user=None) -> dict[str, Any]:
         .with_card_relations()
         .with_featured_annotation()
         .with_favorite_annotation(user=user)
-        [:6]
     )
 
     raw_counts: dict[str, int] = Property.objects.category_counts()
@@ -123,7 +122,7 @@ def get_home_page_data(*, user=None) -> dict[str, Any]:
     }
 
     return {
-        "featured_properties": featured,
+        "featured_properties": featured_qs,
         "categories":          categories,
         "search_config":       search_config,
     }
@@ -222,29 +221,37 @@ def get_property_detail(
 def create_property(*, agent, validated_data: dict) -> Property:
     """
     Creates a new property listing owned by the authenticated agent.
-        ``validated_data`` is the deserialised output of ``PropertyCreateSerializer``:
-        • All required and optional Property fields (agent is read-only and not included)
-        • ``amenities`` — list of Amenity PKs (optional)
-        • ``images``    — list of dicts with keys "image" (InMemoryUploadedFile) and "order" (int) (optional)
+
+    ``validated_data`` is the deserialised output of ``PropertyWriteSerializer``:
+      • All required and optional Property fields (agent is injected here, not from client)
+      • ``amenities``   — list of Amenity instances (optional, from amenity_ids)
+      • ``images``      — list of dicts with "image" and "order" keys (optional)
+
+    Raises:
+        SubscriptionLimitError: when the agent has reached their plan's property limit.
     """
+    from core.applications.subscriptions.features import check_limit
 
     amenities = validated_data.pop("amenities", [])
     images_data = validated_data.pop("images", [])
 
+    # Resolve plan safely — fall back to FREE if no subscription assigned
+    plan = (
+        agent.current_subscription.plan
+        if agent.current_subscription
+        else SubscriptionPlan.FREE.value  # raw string to match FEATURE_LIMITS keys
+    )
 
+    # Enforce plan limit before any DB writes
     check_limit(
-        plan=agent.current_subscription.plan if agent.current_subscription else SubscriptionPlan.FREE,
+        plan=plan,
         feature="properties",
         current_count=Property.objects.filter(agent=agent).count(),
-        label="property listings",
     )
 
     with transaction.atomic():
         prop = Property(agent=agent, **validated_data)
-
-        # validation (field + model-level constraints only)
         prop.full_clean()
-
         prop.save()
 
         if amenities:
