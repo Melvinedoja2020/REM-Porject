@@ -359,7 +359,7 @@ CORS_URLS_REGEX = r"^/api/.*$"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8081",
     "http://localhost:3000",
-    "rem-weld.vercel.app",
+    "https://rem-weld.vercel.app",
     # "https://skeema.onrender.com",
     # "https://skeema.dev",
 ]
