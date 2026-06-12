@@ -53,6 +53,7 @@ class PropertyListingType(TextChoices):
     RENT = ("Rent", "Rent")
     FOR_SALE = ("For Sale", "For Sale")
     SHORT_LET = ("Short Let", "Short Let")
+    HOTEL = ("Hotel", "Hotel")
 
 
 class AgentTypeChoices(TextChoices):

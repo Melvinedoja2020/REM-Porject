@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from core.helpers.paginations import CustomPagination
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied
@@ -54,6 +53,7 @@ from core.applications.property.permissions import IsViewingOwnerOrPropertyAgent
 from core.applications.subscriptions.models import FeaturedListing
 from core.applications.subscriptions.services.boost import boost_property
 from core.applications.subscriptions.services.boost import unboost_property
+from core.helpers.paginations import CustomPagination
 
 
 def _ctx(request: Request) -> dict:

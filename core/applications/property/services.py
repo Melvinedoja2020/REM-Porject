@@ -5,8 +5,11 @@ from typing import Any
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.utils import timezone
+from core.helpers.service_errors import ServiceValidationError
 from rest_framework.exceptions import NotFound
 from rest_framework.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 
 from core.applications.property.models import Amenity
 from core.applications.property.models import FavoriteProperty
@@ -251,7 +254,10 @@ def create_property(*, agent, validated_data: dict) -> Property:
 
     with transaction.atomic():
         prop = Property(agent=agent, **validated_data)
-        prop.full_clean()
+        try:
+            prop.full_clean()
+        except DjangoValidationError as e:
+            raise ServiceValidationError(errors=e.message_dict) from e
         prop.save()
 
         if amenities:

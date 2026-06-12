@@ -106,6 +106,11 @@ class Property(TitleTimeBasedModel):
         choices=PropertyListingType.choices,
         default=PropertyListingType.RENT,
     )
+    guest_capacity = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Maximum number of guests."
+    )
     # For RENT / SALE: annual or total figure.
     # For SHORT_LET: per-night rate.
     # price_suffix and price_display expose the right label automatically.
@@ -132,6 +137,22 @@ class Property(TitleTimeBasedModel):
 
     def __str__(self) -> str:
         return f"{self.title} — {self.get_property_listing_display()}"
+
+    def clean(self):
+        if self.property_listing in (
+             PropertyListingType.RENT,
+             PropertyListingType.FOR_SALE,
+        ) and not self.bedrooms:
+            raise ValidationError({
+                "bedrooms": "Bedrooms are required for Rent and Sale listings."
+            })
+        if self.property_listing in (
+            PropertyListingType.SHORT_LET,
+            PropertyListingType.HOTEL
+        ) and not self.guest_capacity:
+            raise ValidationError({
+                "guest_capacity": "Guest capacity is required for Short Let and Hotel listings."
+            })
 
 
     def save(self, *args, **kwargs) -> None:
@@ -171,6 +192,7 @@ class Property(TitleTimeBasedModel):
         mapping = {
             PropertyListingType.SHORT_LET: "/night",
             PropertyListingType.RENT: "/year",
+            PropertyListingType.HOTEL: "/night",
         }
         return mapping.get(self.property_listing, "")
 

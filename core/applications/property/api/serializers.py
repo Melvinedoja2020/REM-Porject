@@ -114,6 +114,7 @@ class PropertyCardSerializer(AbsoluteURLMixin, serializers.ModelSerializer):
     main_image_url = serializers.SerializerMethodField()
     price_display = serializers.CharField(read_only=True)
     price_suffix = serializers.CharField(read_only=True)
+    price_display = serializers.CharField(read_only=True)
     availability_label = serializers.CharField(read_only=True)
     listing_type_display = serializers.CharField(
         source="get_property_listing_display", read_only=True
@@ -135,6 +136,7 @@ class PropertyCardSerializer(AbsoluteURLMixin, serializers.ModelSerializer):
             "price",
             "price_display",
             "price_suffix",
+            "price_display",
             "property_type",
             "property_type_display",
             "property_listing",

@@ -101,6 +101,7 @@ LOCAL_APPS = [
     "core.applications.property",
     "core.applications.subscriptions",
     "core.applications.notifications",
+    "core.applications.rating",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -358,6 +359,7 @@ CORS_URLS_REGEX = r"^/api/.*$"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8081",
     "http://localhost:3000",
+    "rem-weld.vercel.app",
     # "https://skeema.onrender.com",
     # "https://skeema.dev",
 ]
