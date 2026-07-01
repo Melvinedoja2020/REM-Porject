@@ -360,6 +360,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8081",
     "http://localhost:3000",
     "https://rem-weld.vercel.app",
+    "https://www.realestatemarketplace.africa",
     # "https://skeema.onrender.com",
     # "https://skeema.dev",
 ]
